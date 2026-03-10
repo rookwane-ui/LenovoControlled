@@ -1,0 +1,48 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  # Allows manual trigger from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    env:
+      SOLUTION: LenovoController.sln
+      PROJECT: LenovoController.csproj
+      BUILD_CONFIG: Release
+      OUTPUT_DIR: bin\Release
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: Restore NuGet packages
+        run: nuget restore ${{ env.SOLUTION }}
+
+      - name: Build solution
+        run: |
+          msbuild ${{ env.SOLUTION }} `
+            /p:Configuration=${{ env.BUILD_CONFIG }} `
+            /p:Platform="Any CPU" `
+            /p:OutputPath=${{ env.OUTPUT_DIR }} `
+            /t:Rebuild `
+            /v:minimal
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LenovoController-${{ github.sha }}
+          path: ${{ env.OUTPUT_DIR }}\
+          if-no-files-found: error
