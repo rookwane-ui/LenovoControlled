@@ -1,4 +1,4 @@
-﻿using LenovoController.Providers;
+using LenovoController.Providers;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using System;
@@ -6,21 +6,18 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Threading;
 
 namespace LenovoController
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : System.Windows.Application
     {
         public Settings Settings { get; private set; }
-
         public static App Instance { get; private set; }
-
+        private static Mutex _mutex;
         private NotifyIcon notifyIcon;
         private MainWindow mainWindow;
 
@@ -32,14 +29,7 @@ namespace LenovoController
                 {
                     var json = File.ReadAllText("settings.ini");
                     Settings newSettings = JsonConvert.DeserializeObject<Settings>(json);
-                    if (newSettings != null)
-                    {
-                        Settings = newSettings;
-                    }
-                    else
-                    {
-                        Settings = new Settings();
-                    }
+                    Settings = newSettings ?? new Settings();
                 }
                 else
                 {
@@ -70,7 +60,6 @@ namespace LenovoController
                     var names = key.GetValueNames();
                     return names.Any(name => name.Equals("LenovoController"));
                 }
-
                 return false;
             }
         }
@@ -82,7 +71,8 @@ namespace LenovoController
                 if (autoStart)
                 {
                     Assembly currentAssembly = Assembly.GetExecutingAssembly();
-                    key.SetValue("LenovoController", currentAssembly.Location);
+                    // Quoted path required on Windows 11
+                    key.SetValue("LenovoController", $"\"{currentAssembly.Location}\"");
                 }
                 else
                 {
@@ -91,49 +81,58 @@ namespace LenovoController
             }
         }
 
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+
+            // Single-instance guard (replaces the process-count check)
+            _mutex = new Mutex(true, "LenovoController_SingleInstance", out bool isNew);
+            if (!isNew)
+            {
+                System.Windows.MessageBox.Show(
+                    "Another copy of the application is already running. Close it and try again.",
+                    "Lenovo Controller", MessageBoxButton.OK, MessageBoxImage.Error);
+                Shutdown(-1);
+                return;
+            }
+
+            // Global exception handler — prevents silent crashes on Win11
+            AppDomain.CurrentDomain.UnhandledException += (s, ex) =>
+            {
+                var errorText = ex.ExceptionObject.ToString();
+                Trace.TraceError(errorText);
+                System.Windows.MessageBox.Show(errorText, "Lenovo Controller",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            };
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            _mutex?.ReleaseMutex();
+            _mutex?.Dispose();
+            base.OnExit(e);
+        }
+
         private void Application_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             var errorText = e.Exception.ToString();
             Trace.TraceError(errorText);
-            System.Windows.MessageBox.Show(errorText, "Lenovo Controller", MessageBoxButton.OK, MessageBoxImage.Error);
+            System.Windows.MessageBox.Show(errorText, "Lenovo Controller",
+                MessageBoxButton.OK, MessageBoxImage.Error);
             Shutdown(-1);
         }
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             Instance = this;
-
-            var process = Process.GetProcessesByName("LenovoController");
-            if (process.Count() > 1)
-            {
-                switch (Settings.Culture)
-                {
-                    case "RU":
-                        System.Windows.MessageBox.Show("Другая копия приложения уже запущена. Закройте ее и попробуйте снова.", "Lenovo Controller", MessageBoxButton.OK, MessageBoxImage.Error);
-                        break;
-                    case "UA":
-                        System.Windows.MessageBox.Show("Інша копія програми уже запущена. Закрийте її та спробуйте ще раз.", "Lenovo Controller", MessageBoxButton.OK, MessageBoxImage.Error);
-                        break;
-                    default:
-                        System.Windows.MessageBox.Show("Another copy of the application is already running. Close it and try again.", "Lenovo Controller", MessageBoxButton.OK, MessageBoxImage.Error);
-                        break;
-                }
-
-                Shutdown(-1);
-            }
-
             LoadSettings();
 
-            string exitText = "Exit";
-            switch (Settings.Culture)
+            string exitText = Settings.Culture switch
             {
-                case "RU":
-                    exitText = "Выход";
-                    break;
-                case "UA":
-                    exitText = "Вихід";
-                    break;
-            }
+                "RU" => "Выход",
+                "UA" => "Вихід",
+                _ => "Exit"
+            };
 
             notifyIcon = new NotifyIcon();
             notifyIcon.Icon = System.Drawing.Icon.FromHandle(LenovoController.Properties.Resources.LC.Handle);
@@ -149,32 +148,20 @@ namespace LenovoController
 
         private void CreateMainDialog()
         {
-            if (DriverProvider.ErrorShown)
-            {
-                return;
-            }
+            if (DriverProvider.ErrorShown) return;
 
             if (mainWindow == null)
-            {
                 mainWindow = new MainWindow(this);
-            }
 
             if (!Settings.ShowOnStartup)
-            {
                 mainWindow.Hide();
-            }
             else
-            {
                 mainWindow.ShowDialog();
-            }
         }
 
         private void OnAppRun(object sender, EventArgs e)
         {
-            if (DriverProvider.ErrorShown)
-            {
-                return;
-            }
+            if (DriverProvider.ErrorShown) return;
 
             if (mainWindow == null)
             {
@@ -184,23 +171,15 @@ namespace LenovoController
             else
             {
                 if (mainWindow.Visibility != Visibility.Visible)
-                {
                     mainWindow.ShowDialog();
-                }
                 else
-                {
                     mainWindow.Activate();
-                }
             }
         }
 
         private void OnExitClick(object sender, EventArgs e)
         {
-            if (DriverProvider.ErrorShown)
-            {
-                return;
-            }
-
+            if (DriverProvider.ErrorShown) return;
             Shutdown(0);
         }
 
@@ -209,41 +188,5 @@ namespace LenovoController
             notifyIcon.Visible = false;
             notifyIcon = null;
         }
-    }
-{
-    private static Mutex _mutex;
-
-    protected override void OnStartup(StartupEventArgs e)
-    {
-        // Single-instance guard
-        _mutex = new Mutex(true, "LenovoController_SingleInstance", out bool isNew);
-        if (!isNew)
-        {
-            MessageBox.Show("LenovoController is already running.");
-            Shutdown();
-            return;
-        }
-
-        // Global exception handler — prevents silent crashes on Win11
-        AppDomain.CurrentDomain.UnhandledException += (s, ex) =>
-        {
-            MessageBox.Show($"Unhandled error:\n{ex.ExceptionObject}",
-                "LenovoController Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        };
-
-        DispatcherUnhandledException += (s, ex) =>
-        {
-            MessageBox.Show($"UI error:\n{ex.Exception.Message}",
-                "LenovoController Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            ex.Handled = true;
-        };
-
-        base.OnStartup(e);
-    }
-
-    protected override void OnExit(ExitEventArgs e)
-    {
-        _mutex?.ReleaseMutex();
-        base.OnExit(e);
     }
 }
