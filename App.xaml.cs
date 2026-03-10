@@ -210,4 +210,40 @@ namespace LenovoController
             notifyIcon = null;
         }
     }
+{
+    private static Mutex _mutex;
+
+    protected override void OnStartup(StartupEventArgs e)
+    {
+        // Single-instance guard
+        _mutex = new Mutex(true, "LenovoController_SingleInstance", out bool isNew);
+        if (!isNew)
+        {
+            MessageBox.Show("LenovoController is already running.");
+            Shutdown();
+            return;
+        }
+
+        // Global exception handler — prevents silent crashes on Win11
+        AppDomain.CurrentDomain.UnhandledException += (s, ex) =>
+        {
+            MessageBox.Show($"Unhandled error:\n{ex.ExceptionObject}",
+                "LenovoController Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        };
+
+        DispatcherUnhandledException += (s, ex) =>
+        {
+            MessageBox.Show($"UI error:\n{ex.Exception.Message}",
+                "LenovoController Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            ex.Handled = true;
+        };
+
+        base.OnStartup(e);
+    }
+
+    protected override void OnExit(ExitEventArgs e)
+    {
+        _mutex?.ReleaseMutex();
+        base.OnExit(e);
+    }
 }
