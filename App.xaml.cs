@@ -4,8 +4,6 @@ using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
@@ -59,9 +57,8 @@ namespace LenovoController
                 if (key == null) return false;
                 var value = key.GetValue("LenovoController") as string;
                 if (value == null) return false;
-                // Normalize: strip quotes for comparison
                 var stored = value.Trim('"');
-                var current = Assembly.GetExecutingAssembly().Location;
+                var current = Process.GetCurrentProcess().MainModule.FileName;
                 return string.Equals(stored, current, StringComparison.OrdinalIgnoreCase);
             }
         }
@@ -74,8 +71,7 @@ namespace LenovoController
                 if (key == null) return;
                 if (autoStart)
                 {
-                    // Windows 11 requires quoted paths in startup registry
-                    var path = Assembly.GetExecutingAssembly().Location;
+                    var path = Process.GetCurrentProcess().MainModule.FileName;
                     key.SetValue("LenovoController", $"\"{path}\"");
                 }
                 else
@@ -142,14 +138,12 @@ namespace LenovoController
             notifyIcon.Visible = true;
             notifyIcon.Text = "Lenovo Controller";
 
-            // ── Single LEFT click opens the window directly ──────────────────
             notifyIcon.Click += (s, ev) =>
             {
                 if (ev is MouseEventArgs me && me.Button == MouseButtons.Left)
                     OnAppRun(s, ev);
             };
 
-            // ── Right-click context menu ─────────────────────────────────────
             notifyIcon.ContextMenu = new ContextMenu(new MenuItem[]
             {
                 new MenuItem("Lenovo Controller", OnAppRun),
