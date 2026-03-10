@@ -23,6 +23,17 @@
 
   <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
     <application>
+<application xmlns="urn:schemas-microsoft-com:asm.v3">
+  <windowsSettings>
+    <dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">
+      true/PM
+    </dpiAware>
+    <!-- Windows 10 1607+ / Windows 11: per-monitor v2 -->
+    <dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">
+      PerMonitorV2, PerMonitor
+    </dpiAwareness>
+  </windowsSettings>
+</application>
       <!-- A list of the Windows versions that this application has been tested on
            and is designed to work with. Uncomment the appropriate elements
            and Windows will automatically select the most compatible environment. -->
