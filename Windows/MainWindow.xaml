@@ -343,8 +343,8 @@
             <Button x:Name="btnRefresh" Height="34" HorizontalAlignment="Stretch"
                     Content="Refresh" Click="btnRefresh_Click"/>
             <Button x:Name="btnSettings" Grid.Column="1" Height="34" Width="34"
-                    Padding="7" Margin="8,0" Click="btnSettings_Click">
-                <Image Source="../Resources/Icons/Settings.png"/>
+                    Padding="0" Margin="8,0" Click="btnSettings_Click">
+                <Image Source="../Resources/Icons/Settings.png" Width="16" Height="16"/>
             </Button>
             <Button x:Name="btnExit" Grid.Column="2" Height="34" Width="88"
                     Content="Exit" Click="btnExit_Click"/>
