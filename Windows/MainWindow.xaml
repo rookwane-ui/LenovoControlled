@@ -10,20 +10,10 @@
         SizeToContent="Height"
         ResizeMode="CanMinimize"
         Closing="Window_Closing"
+        Background="Transparent"
         RenderOptions.BitmapScalingMode="HighQuality"
         UseLayoutRounding="True"
         TextOptions.TextFormattingMode="Display">
-
-    <Window.Style>
-        <Style TargetType="{x:Type Window}">
-            <Setter Property="Background" Value="#F0F0F0"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                    <Setter Property="Background" Value="#1E1E1E"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-    </Window.Style>
 
     <Window.Resources>
         <ResourceDictionary>
@@ -31,12 +21,13 @@
                 <ResourceDictionary Source="../Resources/WindowResources.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
+            <!-- Section header — semi-transparent so Mica tints through -->
             <Style x:Key="StackPanelHeader" TargetType="{x:Type Border}">
-                <Setter Property="Background" Value="#FFFFFF"/>
-                <Setter Property="CornerRadius" Value="4"/>
+                <Setter Property="Background" Value="#CCF5F5F5"/>
+                <Setter Property="CornerRadius" Value="6"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Background" Value="#2D2D2D"/>
+                        <Setter Property="Background" Value="#CC202020"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
@@ -48,10 +39,10 @@
             </Style>
 
             <Style TargetType="{x:Type TextBlock}">
-                <Setter Property="Foreground" Value="#222222"/>
+                <Setter Property="Foreground" Value="#111111"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Foreground" Value="#D4D4D4"/>
+                        <Setter Property="Foreground" Value="#E8E8E8"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
@@ -190,14 +181,14 @@
                 <Setter Property="SnapsToDevicePixels" Value="true"/>
                 <Setter Property="OverridesDefaultStyle" Value="true"/>
                 <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-                <Setter Property="Foreground" Value="#222222"/>
+                <Setter Property="Foreground" Value="#111111"/>
                 <Setter Property="FontSize" Value="13"/>
                 <Setter Property="Cursor" Value="Hand"/>
                 <Setter Property="ToolTipService.ShowOnDisabled" Value="True"/>
                 <Setter Property="Template" Value="{StaticResource ToggleCheckWhite}"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Foreground" Value="#D4D4D4"/>
+                        <Setter Property="Foreground" Value="#E8E8E8"/>
                         <Setter Property="Template" Value="{StaticResource ToggleCheckDark}"/>
                     </DataTrigger>
                 </Style.Triggers>
@@ -208,13 +199,13 @@
                 <Setter Property="OverridesDefaultStyle" Value="true"/>
                 <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
                 <Setter Property="FontSize" Value="13"/>
-                <Setter Property="Foreground" Value="#222222"/>
+                <Setter Property="Foreground" Value="#111111"/>
                 <Setter Property="Cursor" Value="Hand"/>
                 <Setter Property="ToolTipService.ShowOnDisabled" Value="True"/>
                 <Setter Property="Template" Value="{StaticResource ToggleRadioWhite}"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Foreground" Value="#D4D4D4"/>
+                        <Setter Property="Foreground" Value="#E8E8E8"/>
                         <Setter Property="Template" Value="{StaticResource ToggleRadioDark}"/>
                     </DataTrigger>
                 </Style.Triggers>
@@ -222,12 +213,12 @@
 
             <Style BasedOn="{StaticResource CustomButton}" TargetType="{x:Type Button}">
                 <Setter Property="FontWeight" Value="SemiBold"/>
-                <Setter Property="Background" Value="#FFFFFF"/>
+                <Setter Property="Background" Value="#CCF5F5F5"/>
                 <Setter Property="Foreground" Value="#111111"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Background" Value="#3A3A3A"/>
-                        <Setter Property="Foreground" Value="#E0E0E0"/>
+                        <Setter Property="Background" Value="#CC2D2D2D"/>
+                        <Setter Property="Foreground" Value="#E8E8E8"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
@@ -401,10 +392,10 @@
         <Border Margin="0,8,0,0">
             <Border.Style>
                 <Style TargetType="{x:Type Border}">
-                    <Setter Property="Background" Value="#DCDCDC"/>
+                    <Setter Property="Background" Value="#AAE8E8E8"/>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                            <Setter Property="Background" Value="#2A2A2A"/>
+                            <Setter Property="Background" Value="#AA1A1A1A"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
