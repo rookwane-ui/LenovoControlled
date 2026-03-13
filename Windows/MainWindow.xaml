@@ -334,20 +334,20 @@
         <!-- ══════════════════════════════════════════
              FOOTER
         ══════════════════════════════════════════ -->
-        <Grid Margin="0,16,0,16">
+        <Grid Margin="0,16,0,16" Height="34">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="44"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="88"/>
             </Grid.ColumnDefinitions>
-            <Button x:Name="btnRefresh" Height="34" HorizontalAlignment="Stretch"
+            <Button x:Name="btnRefresh" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                     Content="Refresh" Click="btnRefresh_Click"/>
-            <Button x:Name="btnSettings" Grid.Column="1" Height="34" Width="34"
-                    Padding="0" Margin="8,0" Click="btnSettings_Click">
-                <Image Source="../Resources/Icons/Settings.png" Width="16" Height="16"/>
+            <Button x:Name="btnSettings" Grid.Column="1" HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch" Padding="0" Margin="8,0" Click="btnSettings_Click">
+                <Image Source="../Resources/Icons/Settings.png" Width="15" Height="15"/>
             </Button>
-            <Button x:Name="btnExit" Grid.Column="2" Height="34" Width="88"
-                    Content="Exit" Click="btnExit_Click"/>
+            <Button x:Name="btnExit" Grid.Column="2" HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch" Content="Exit" Click="btnExit_Click"/>
         </Grid>
 
     </StackPanel>
