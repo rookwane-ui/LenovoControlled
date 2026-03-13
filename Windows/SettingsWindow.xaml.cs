@@ -158,10 +158,11 @@ namespace LenovoController
             this.Close();
         }
 
-        private void Window_Closing(object sender, CancelEventArgs e)
-        {
-            this.DialogResult = applyPressed;
-        }
+    private void Window_Closing(object sender, CancelEventArgs e)
+{
+    try { this.DialogResult = applyPressed; }
+    catch (InvalidOperationException) { }
+}
 
         private bool applyPressed;
     }
