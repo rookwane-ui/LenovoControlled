@@ -95,6 +95,8 @@ namespace LenovoController
                 return;
             }
 
+            MigrateStartupRegistryIfNeeded();
+
             AppDomain.CurrentDomain.UnhandledException += (s, ex) =>
             {
                 var errorText = ex.ExceptionObject.ToString();
@@ -195,6 +197,31 @@ namespace LenovoController
             notifyIcon.Visible = false;
             notifyIcon.Dispose();
             notifyIcon = null;
+        }
+
+        /// <summary>
+        /// Migrates an old unquoted startup registry entry to the quoted form
+        /// required by Windows 11. Without quotes, paths with spaces are silently
+        /// ignored by the Windows startup mechanism.
+        /// </summary>
+        private void MigrateStartupRegistryIfNeeded()
+        {
+            try
+            {
+                using (RegistryKey key = Registry.CurrentUser.OpenSubKey(
+                    @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
+                {
+                    if (key == null) return;
+                    var value = key.GetValue("LenovoController") as string;
+                    if (value == null || value.StartsWith("\"")) return;
+                    key.SetValue("LenovoController", $"\"{value}\"");
+                    Trace.TraceInformation("Migrated startup registry entry to quoted path.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceWarning($"Could not migrate startup registry entry: {ex.Message}");
+            }
         }
     }
 }
