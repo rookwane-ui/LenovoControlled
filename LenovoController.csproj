@@ -85,6 +85,7 @@
     <Compile Include="Providers\Native.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="App.xaml.cs">
+    <Compile Include="FluentWindow.cs" />
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
@@ -153,4 +154,5 @@
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
+
 
