@@ -6,7 +6,7 @@
         mc:Ignorable="d"
         Title=" Lenovo Controller"
         WindowStartupLocation="CenterScreen"
-        Width="360"
+        Width="480"
         SizeToContent="Height"
         ResizeMode="CanMinimize"
         Closing="Window_Closing"
@@ -14,7 +14,8 @@
         RenderOptions.BitmapScalingMode="HighQuality"
         UseLayoutRounding="True"
         TextOptions.TextFormattingMode="Display"
-        FontFamily="Segoe UI Variable Text, Segoe UI, sans-serif">
+        FontFamily="Segoe UI Variable Text, Segoe UI, sans-serif"
+        Grid.IsSharedSizeScope="True">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -22,7 +23,6 @@
                 <ResourceDictionary Source="../Resources/WindowResources.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Default TextBlock -->
             <Style TargetType="{x:Type TextBlock}">
                 <Setter Property="Foreground" Value="#1A1A1A"/>
                 <Style.Triggers>
@@ -32,7 +32,6 @@
                 </Style.Triggers>
             </Style>
 
-            <!-- Button defaults -->
             <Style BasedOn="{StaticResource CustomButton}" TargetType="{x:Type Button}">
                 <Setter Property="Background" Value="#F5F5F5"/>
                 <Setter Property="Foreground" Value="#1A1A1A"/>
@@ -44,137 +43,151 @@
                 </Style.Triggers>
             </Style>
 
+            <!-- Reusable card style -->
+            <Style x:Key="Card" TargetType="{x:Type Border}">
+                <Setter Property="Background"      Value="#F9F9F9"/>
+                <Setter Property="BorderBrush"     Value="#EBEBEB"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="CornerRadius"    Value="8"/>
+                <Setter Property="Padding"         Value="16,12"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding DarkMode}" Value="True">
+                        <Setter Property="Background"  Value="#2D2D2D"/>
+                        <Setter Property="BorderBrush" Value="#3A3A3A"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <!-- Group card variants -->
+            <Style x:Key="CardTop" TargetType="{x:Type Border}" BasedOn="{StaticResource Card}">
+                <Setter Property="CornerRadius"    Value="8,8,0,0"/>
+                <Setter Property="BorderThickness" Value="1,1,1,0"/>
+            </Style>
+            <Style x:Key="CardMid" TargetType="{x:Type Border}" BasedOn="{StaticResource Card}">
+                <Setter Property="CornerRadius"    Value="0"/>
+                <Setter Property="BorderThickness" Value="1,0,1,0"/>
+            </Style>
+            <Style x:Key="CardBot" TargetType="{x:Type Border}" BasedOn="{StaticResource Card}">
+                <Setter Property="CornerRadius"    Value="0,0,8,8"/>
+                <Setter Property="BorderThickness" Value="1,0,1,1"/>
+            </Style>
+
+            <!-- Separator inside grouped card -->
+            <Style x:Key="CardSeparator" TargetType="{x:Type Border}">
+                <Setter Property="Height"     Value="1"/>
+                <Setter Property="Margin"     Value="16,0"/>
+                <Setter Property="Background" Value="#EBEBEB"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding DarkMode}" Value="True">
+                        <Setter Property="Background" Value="#3A3A3A"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <!-- Section header label -->
+            <Style x:Key="SectionLabel" TargetType="{x:Type TextBlock}"
+                   BasedOn="{StaticResource {x:Type TextBlock}}">
+                <Setter Property="FontSize"   Value="13"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Margin"     Value="4,0,0,6"/>
+            </Style>
+
+            <!-- Card title -->
+            <Style x:Key="CardTitle" TargetType="{x:Type TextBlock}"
+                   BasedOn="{StaticResource {x:Type TextBlock}}">
+                <Setter Property="FontSize" Value="13"/>
+            </Style>
+
+            <!-- Card subtitle -->
+            <Style x:Key="CardSubtitle" TargetType="{x:Type TextBlock}"
+                   BasedOn="{StaticResource {x:Type TextBlock}}">
+                <Setter Property="FontSize" Value="11"/>
+                <Setter Property="Margin"   Value="0,2,0,0"/>
+                <Setter Property="Foreground" Value="#888888"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding DarkMode}" Value="True">
+                        <Setter Property="Foreground" Value="#9D9D9D"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <!-- Segmented pill track -->
+            <Style x:Key="SegTrack" TargetType="{x:Type Border}">
+                <Setter Property="CornerRadius" Value="8"/>
+                <Setter Property="Padding"      Value="3"/>
+                <Setter Property="Background"   Value="#E5E5E5"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding DarkMode}" Value="True">
+                        <Setter Property="Background" Value="#252525"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <!-- Segment RadioButton -->
+            <Style x:Key="Segment" TargetType="{x:Type RadioButton}">
+                <Setter Property="Cursor"           Value="Hand"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Template"         Value="{StaticResource SegmentLight}"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding DarkMode}" Value="True">
+                        <Setter Property="Template" Value="{StaticResource SegmentDark}"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <!-- Toggle switch CheckBox -->
+            <Style x:Key="Toggle" TargetType="{x:Type CheckBox}">
+                <Setter Property="Cursor"           Value="Hand"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Template"         Value="{StaticResource ToggleSwitchLight}"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding DarkMode}" Value="True">
+                        <Setter Property="Template" Value="{StaticResource ToggleSwitchDark}"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
         </ResourceDictionary>
     </Window.Resources>
 
-    <!-- Root scroll + padding -->
     <StackPanel Margin="16,16,16,0">
 
         <!-- ══════════════════════════════════════════
              BATTERY CHARGE
         ══════════════════════════════════════════ -->
-        <TextBlock x:Name="batteryGroup" Margin="4,0,0,6" FontSize="13" FontWeight="SemiBold">
-            <TextBlock.Style>
-                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-                    <Setter Property="Foreground" Value="#1A1A1A"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                            <Setter Property="Foreground" Value="#F3F3F3"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBlock.Style>
-        </TextBlock>
+        <TextBlock x:Name="batteryGroup" Text="Battery charge" Style="{StaticResource SectionLabel}"/>
 
-        <!-- Battery card -->
-        <Border Margin="0,0,0,0">
-            <Border.Style>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="Background"      Value="#F9F9F9"/>
-                    <Setter Property="BorderBrush"     Value="#EBEBEB"/>
-                    <Setter Property="BorderThickness" Value="1"/>
-                    <Setter Property="CornerRadius"    Value="8"/>
-                    <Setter Property="Padding"         Value="16,14"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                            <Setter Property="Background"  Value="#2D2D2D"/>
-                            <Setter Property="BorderBrush" Value="#3A3A3A"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Border.Style>
+        <Border Style="{StaticResource Card}">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="44"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Icon badge -->
                 <Border Width="32" Height="32" CornerRadius="6" Background="#FFF3E0"
                         HorizontalAlignment="Left" VerticalAlignment="Center">
-                    <Image Height="18" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <Image.Style>
-                            <Style TargetType="{x:Type Image}">
-                                <Setter Property="Source" Value="../Resources/Icons/Battery_white.png"/>
-                            </Style>
-                        </Image.Style>
-                    </Image>
+                    <Image Height="18" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Source="../Resources/Icons/Battery_white.png"/>
                 </Border>
 
-                <!-- Label stack -->
-                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,12,0">
-                    <TextBlock x:Name="batteryTitle" FontSize="13" Text="Battery charge"/>
-                    <TextBlock x:Name="batterySubtitle" FontSize="11" Margin="0,1,0,0">
-                        <TextBlock.Style>
-                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-                                <Setter Property="Foreground" Value="#888888"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                        <Setter Property="Foreground" Value="#9D9D9D"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock x:Name="batteryTitle" Style="{StaticResource CardTitle}" Text="Battery charge"/>
+                    <TextBlock x:Name="batterySubtitle" Style="{StaticResource CardSubtitle}"/>
                 </StackPanel>
 
                 <!-- Segmented control -->
-                <Border Grid.Column="2" VerticalAlignment="Center" Padding="3">
-                    <Border.Style>
-                        <Style TargetType="{x:Type Border}">
-                            <Setter Property="Background"   Value="#EBEBEB"/>
-                            <Setter Property="CornerRadius" Value="8"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                    <Setter Property="Background" Value="#252525"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Border.Style>
+                <Border Grid.Column="2" Style="{StaticResource SegTrack}" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
                         <RadioButton x:Name="radioConservation" GroupName="BatteryCharge"
-                                     Content="Conservation" Checked="radioBattery_Checked"
-                                     Cursor="Hand" Margin="0">
-                            <RadioButton.Style>
-                                <Style TargetType="{x:Type RadioButton}">
-                                    <Setter Property="Template" Value="{StaticResource SegmentLight}"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                            <Setter Property="Template" Value="{StaticResource SegmentDark}"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </RadioButton.Style>
-                        </RadioButton>
+                                     Content="Conservation" Style="{StaticResource Segment}"
+                                     Checked="radioBattery_Checked"/>
                         <RadioButton x:Name="radioNormalCharge" GroupName="BatteryCharge"
-                                     Content="Normal" Checked="radioBattery_Checked"
-                                     Cursor="Hand" Margin="0">
-                            <RadioButton.Style>
-                                <Style TargetType="{x:Type RadioButton}">
-                                    <Setter Property="Template" Value="{StaticResource SegmentLight}"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                            <Setter Property="Template" Value="{StaticResource SegmentDark}"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </RadioButton.Style>
-                        </RadioButton>
+                                     Content="Normal" Style="{StaticResource Segment}"
+                                     Checked="radioBattery_Checked"/>
                         <RadioButton x:Name="radioRapidCharge" GroupName="BatteryCharge"
-                                     Content="Rapid" Checked="radioBattery_Checked"
-                                     Cursor="Hand" Margin="0">
-                            <RadioButton.Style>
-                                <Style TargetType="{x:Type RadioButton}">
-                                    <Setter Property="Template" Value="{StaticResource SegmentLight}"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                            <Setter Property="Template" Value="{StaticResource SegmentDark}"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </RadioButton.Style>
-                        </RadioButton>
+                                     Content="Rapid" Style="{StaticResource Segment}"
+                                     Checked="radioBattery_Checked"/>
                     </StackPanel>
                 </Border>
             </Grid>
@@ -183,121 +196,39 @@
         <!-- ══════════════════════════════════════════
              POWER MODE
         ══════════════════════════════════════════ -->
-        <TextBlock x:Name="powerModeGroup" Margin="4,16,0,6" FontSize="13" FontWeight="SemiBold">
-            <TextBlock.Style>
-                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-                    <Setter Property="Foreground" Value="#1A1A1A"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                            <Setter Property="Foreground" Value="#F3F3F3"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBlock.Style>
-        </TextBlock>
+        <TextBlock x:Name="powerModeGroup" Text="Power mode" Style="{StaticResource SectionLabel}"
+                   Margin="4,16,0,6"/>
 
-        <Border Margin="0,0,0,0">
-            <Border.Style>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="Background"      Value="#F9F9F9"/>
-                    <Setter Property="BorderBrush"     Value="#EBEBEB"/>
-                    <Setter Property="BorderThickness" Value="1"/>
-                    <Setter Property="CornerRadius"    Value="8"/>
-                    <Setter Property="Padding"         Value="16,14"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                            <Setter Property="Background"  Value="#2D2D2D"/>
-                            <Setter Property="BorderBrush" Value="#3A3A3A"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Border.Style>
+        <Border Style="{StaticResource Card}">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="44"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
+
                 <Border Width="32" Height="32" CornerRadius="6" Background="#E8F5E9"
                         HorizontalAlignment="Left" VerticalAlignment="Center">
-                    <Image Height="18" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <Image.Style>
-                            <Style TargetType="{x:Type Image}">
-                                <Setter Property="Source" Value="../Resources/Icons/Power_white.png"/>
-                            </Style>
-                        </Image.Style>
-                    </Image>
+                    <Image Height="18" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Source="../Resources/Icons/Power_white.png"/>
                 </Border>
-                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,12,0">
-                    <TextBlock x:Name="powerTitle" FontSize="13" Text="Power mode"/>
-                    <TextBlock x:Name="powerSubtitle" FontSize="11" Margin="0,1,0,0">
-                        <TextBlock.Style>
-                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-                                <Setter Property="Foreground" Value="#888888"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                        <Setter Property="Foreground" Value="#9D9D9D"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock x:Name="powerTitle" Style="{StaticResource CardTitle}" Text="Power mode"/>
+                    <TextBlock x:Name="powerSubtitle" Style="{StaticResource CardSubtitle}"/>
                 </StackPanel>
-                <Border Grid.Column="2" VerticalAlignment="Center" Padding="3">
-                    <Border.Style>
-                        <Style TargetType="{x:Type Border}">
-                            <Setter Property="Background"   Value="#EBEBEB"/>
-                            <Setter Property="CornerRadius" Value="8"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                    <Setter Property="Background" Value="#252525"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Border.Style>
+
+                <Border Grid.Column="2" Style="{StaticResource SegTrack}" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
                         <RadioButton x:Name="radioQuiet" GroupName="PowerMode"
-                                     Content="Quiet" Checked="radioPowerMode_Checked"
-                                     Cursor="Hand" Margin="0">
-                            <RadioButton.Style>
-                                <Style TargetType="{x:Type RadioButton}">
-                                    <Setter Property="Template" Value="{StaticResource SegmentLight}"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                            <Setter Property="Template" Value="{StaticResource SegmentDark}"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </RadioButton.Style>
-                        </RadioButton>
+                                     Content="Quiet" Style="{StaticResource Segment}"
+                                     Checked="radioPowerMode_Checked"/>
                         <RadioButton x:Name="radioBalance" GroupName="PowerMode"
-                                     Content="Balance" Checked="radioPowerMode_Checked"
-                                     Cursor="Hand" Margin="0">
-                            <RadioButton.Style>
-                                <Style TargetType="{x:Type RadioButton}">
-                                    <Setter Property="Template" Value="{StaticResource SegmentLight}"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                            <Setter Property="Template" Value="{StaticResource SegmentDark}"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </RadioButton.Style>
-                        </RadioButton>
+                                     Content="Balance" Style="{StaticResource Segment}"
+                                     Checked="radioPowerMode_Checked"/>
                         <RadioButton x:Name="radioPerformance" GroupName="PowerMode"
-                                     Content="Performance" Checked="radioPowerMode_Checked"
-                                     Cursor="Hand" Margin="0">
-                            <RadioButton.Style>
-                                <Style TargetType="{x:Type RadioButton}">
-                                    <Setter Property="Template" Value="{StaticResource SegmentLight}"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                            <Setter Property="Template" Value="{StaticResource SegmentDark}"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </RadioButton.Style>
-                        </RadioButton>
+                                     Content="Performance" Style="{StaticResource Segment}"
+                                     Checked="radioPowerMode_Checked"/>
                     </StackPanel>
                 </Border>
             </Grid>
@@ -306,367 +237,102 @@
         <!-- ══════════════════════════════════════════
              ALWAYS ON USB
         ══════════════════════════════════════════ -->
-        <TextBlock x:Name="alwaysGroup" Margin="4,16,0,6" FontSize="13" FontWeight="SemiBold">
-            <TextBlock.Style>
-                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-                    <Setter Property="Foreground" Value="#1A1A1A"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                            <Setter Property="Foreground" Value="#F3F3F3"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBlock.Style>
-        </TextBlock>
+        <TextBlock x:Name="alwaysGroup" Text="Always on USB" Style="{StaticResource SectionLabel}"
+                   Margin="4,16,0,6"/>
 
-        <Border Margin="0,0,0,0">
-            <Border.Style>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="Background"      Value="#F9F9F9"/>
-                    <Setter Property="BorderBrush"     Value="#EBEBEB"/>
-                    <Setter Property="BorderThickness" Value="1"/>
-                    <Setter Property="CornerRadius"    Value="8"/>
-                    <Setter Property="Padding"         Value="16,14"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                            <Setter Property="Background"  Value="#2D2D2D"/>
-                            <Setter Property="BorderBrush" Value="#3A3A3A"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Border.Style>
+        <Border Style="{StaticResource Card}">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="44"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
+
                 <Border Width="32" Height="32" CornerRadius="6" Background="#E3F2FD"
                         HorizontalAlignment="Left" VerticalAlignment="Center">
-                    <Image Height="18" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <Image.Style>
-                            <Style TargetType="{x:Type Image}">
-                                <Setter Property="Source" Value="../Resources/Icons/Usb_white.png"/>
-                            </Style>
-                        </Image.Style>
-                    </Image>
+                    <Image Height="18" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Source="../Resources/Icons/Usb_white.png"/>
                 </Border>
-                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,12,0">
-                    <TextBlock x:Name="usbTitle" FontSize="13" Text="Always on USB"/>
-                    <TextBlock x:Name="usbSubtitle" FontSize="11" Margin="0,1,0,0">
-                        <TextBlock.Style>
-                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-                                <Setter Property="Foreground" Value="#888888"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                        <Setter Property="Foreground" Value="#9D9D9D"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock x:Name="usbTitle" Style="{StaticResource CardTitle}" Text="Always on USB"/>
+                    <TextBlock x:Name="usbSubtitle" Style="{StaticResource CardSubtitle}"/>
                 </StackPanel>
-                <Border Grid.Column="2" VerticalAlignment="Center" Padding="3">
-                    <Border.Style>
-                        <Style TargetType="{x:Type Border}">
-                            <Setter Property="Background"   Value="#EBEBEB"/>
-                            <Setter Property="CornerRadius" Value="8"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                    <Setter Property="Background" Value="#252525"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Border.Style>
+
+                <Border Grid.Column="2" Style="{StaticResource SegTrack}" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
                         <RadioButton x:Name="radioAlwaysOnUsbOff" GroupName="Usb"
-                                     Content="Off" Checked="radioAlwaysOnUsb_Checked"
-                                     Cursor="Hand" Margin="0">
-                            <RadioButton.Style>
-                                <Style TargetType="{x:Type RadioButton}">
-                                    <Setter Property="Template" Value="{StaticResource SegmentLight}"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                            <Setter Property="Template" Value="{StaticResource SegmentDark}"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </RadioButton.Style>
-                        </RadioButton>
+                                     Content="Off" Style="{StaticResource Segment}"
+                                     Checked="radioAlwaysOnUsb_Checked"/>
                         <RadioButton x:Name="radioAlwaysOnUsbOnWhenSleeping" GroupName="Usb"
-                                     Content="Sleeping" Checked="radioAlwaysOnUsb_Checked"
-                                     Cursor="Hand" Margin="0">
-                            <RadioButton.Style>
-                                <Style TargetType="{x:Type RadioButton}">
-                                    <Setter Property="Template" Value="{StaticResource SegmentLight}"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                            <Setter Property="Template" Value="{StaticResource SegmentDark}"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </RadioButton.Style>
-                        </RadioButton>
+                                     Content="Sleeping" Style="{StaticResource Segment}"
+                                     Checked="radioAlwaysOnUsb_Checked"/>
                         <RadioButton x:Name="radioAlwaysOnUsbOnAlways" GroupName="Usb"
-                                     Content="Always" Checked="radioAlwaysOnUsb_Checked"
-                                     Cursor="Hand" Margin="0">
-                            <RadioButton.Style>
-                                <Style TargetType="{x:Type RadioButton}">
-                                    <Setter Property="Template" Value="{StaticResource SegmentLight}"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                            <Setter Property="Template" Value="{StaticResource SegmentDark}"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </RadioButton.Style>
-                        </RadioButton>
+                                     Content="Always" Style="{StaticResource Segment}"
+                                     Checked="radioAlwaysOnUsb_Checked"/>
                     </StackPanel>
                 </Border>
             </Grid>
         </Border>
 
         <!-- ══════════════════════════════════════════
-             ADDITIONAL OPTIONS  (3 card rows grouped)
+             ADDITIONAL OPTIONS  (grouped card)
         ══════════════════════════════════════════ -->
-        <TextBlock x:Name="miscGroup" Margin="4,16,0,6" FontSize="13" FontWeight="SemiBold">
-            <TextBlock.Style>
-                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-                    <Setter Property="Foreground" Value="#1A1A1A"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                            <Setter Property="Foreground" Value="#F3F3F3"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBlock.Style>
-        </TextBlock>
+        <TextBlock x:Name="miscGroup" Text="Additional options" Style="{StaticResource SectionLabel}"
+                   Margin="4,16,0,6"/>
 
-        <!-- Over Drive row (TOP of group) -->
-        <Border>
-            <Border.Style>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="Background"      Value="#F9F9F9"/>
-                    <Setter Property="BorderBrush"     Value="#EBEBEB"/>
-                    <Setter Property="BorderThickness" Value="1,1,1,0"/>
-                    <Setter Property="CornerRadius"    Value="8,8,0,0"/>
-                    <Setter Property="Padding"         Value="16,12"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                            <Setter Property="Background"  Value="#2D2D2D"/>
-                            <Setter Property="BorderBrush" Value="#3A3A3A"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Border.Style>
+        <!-- Fn Lock row (TOP) -->
+        <Border Style="{StaticResource CardTop}">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="40"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Border Width="32" Height="32" CornerRadius="6" Background="#FCE4EC"
-                        HorizontalAlignment="Left" VerticalAlignment="Center">
-                    <Image Height="18" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <Image.Style>
-                            <Style TargetType="{x:Type Image}">
-                                <Setter Property="Source" Value="../Resources/Icons/Display_white.png"/>
-                            </Style>
-                        </Image.Style>
-                    </Image>
-                </Border>
-                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,16,0">
-                    <TextBlock x:Name="overDriveTitle" FontSize="13" Text="Over Drive"/>
-                    <TextBlock x:Name="overDriveSubtitle" FontSize="11" Margin="0,1,0,0" Text="Faster display response time">
-                        <TextBlock.Style>
-                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-                                <Setter Property="Foreground" Value="#888888"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                        <Setter Property="Foreground" Value="#9D9D9D"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                </StackPanel>
-                <CheckBox x:Name="chkOverDrive" Grid.Column="2" VerticalAlignment="Center"
-                          Checked="chkOverDrive_Checked" Unchecked="chkOverDrive_Checked"
-                          Cursor="Hand" FocusVisualStyle="{x:Null}">
-                    <CheckBox.Style>
-                        <Style TargetType="{x:Type CheckBox}">
-                            <Setter Property="Template" Value="{StaticResource ToggleSwitchLight}"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                    <Setter Property="Template" Value="{StaticResource ToggleSwitchDark}"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </CheckBox.Style>
-                </CheckBox>
-            </Grid>
-        </Border>
-
-        <!-- Separator line -->
-        <Border Height="1" Margin="16,0">
-            <Border.Style>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="Background" Value="#EBEBEB"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                            <Setter Property="Background" Value="#3A3A3A"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Border.Style>
-        </Border>
-
-        <!-- FnLock row (MIDDLE of group) -->
-        <Border>
-            <Border.Style>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="Background"      Value="#F9F9F9"/>
-                    <Setter Property="BorderBrush"     Value="#EBEBEB"/>
-                    <Setter Property="BorderThickness" Value="1,0,1,0"/>
-                    <Setter Property="CornerRadius"    Value="0"/>
-                    <Setter Property="Padding"         Value="16,12"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                            <Setter Property="Background"  Value="#2D2D2D"/>
-                            <Setter Property="BorderBrush" Value="#3A3A3A"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Border.Style>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="44"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Border Width="32" Height="32" CornerRadius="6" Background="#EDE7F6"
                         HorizontalAlignment="Left" VerticalAlignment="Center">
-                    <Image Height="18" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <Image.Style>
-                            <Style TargetType="{x:Type Image}">
-                                <Setter Property="Source" Value="../Resources/Icons/Fn_white.png"/>
-                            </Style>
-                        </Image.Style>
-                    </Image>
+                    <Image Height="18" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Source="../Resources/Icons/Fn_white.png"/>
                 </Border>
-                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,16,0">
-                    <TextBlock x:Name="fnLockTitle" FontSize="13" Text="Fn Lock"/>
-                    <TextBlock x:Name="fnLockSubtitle" FontSize="11" Margin="0,1,0,0" Text="Emulates holding Fn key">
-                        <TextBlock.Style>
-                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-                                <Setter Property="Foreground" Value="#888888"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                        <Setter Property="Foreground" Value="#9D9D9D"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock x:Name="fnLockTitle" Style="{StaticResource CardTitle}" Text="Fn Lock"/>
+                    <TextBlock x:Name="fnLockSubtitle" Style="{StaticResource CardSubtitle}"
+                               Text="Emulates holding the Fn key permanently"/>
                 </StackPanel>
-                <CheckBox x:Name="chkFnLock" Grid.Column="2" VerticalAlignment="Center"
-                          Checked="chkFnLock_Checked" Unchecked="chkFnLock_Checked"
-                          Cursor="Hand" FocusVisualStyle="{x:Null}">
-                    <CheckBox.Style>
-                        <Style TargetType="{x:Type CheckBox}">
-                            <Setter Property="Template" Value="{StaticResource ToggleSwitchLight}"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                    <Setter Property="Template" Value="{StaticResource ToggleSwitchDark}"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </CheckBox.Style>
-                </CheckBox>
+                <CheckBox x:Name="chkFnLock" Grid.Column="2" Style="{StaticResource Toggle}"
+                          VerticalAlignment="Center"
+                          Checked="chkFnLock_Checked" Unchecked="chkFnLock_Checked"/>
             </Grid>
         </Border>
 
-        <!-- Separator line -->
-        <Border Height="1" Margin="16,0">
-            <Border.Style>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="Background" Value="#EBEBEB"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                            <Setter Property="Background" Value="#3A3A3A"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Border.Style>
-        </Border>
+        <Border Style="{StaticResource CardSeparator}"/>
 
-        <!-- Touchpad row (BOTTOM of group) -->
-        <Border>
-            <Border.Style>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="Background"      Value="#F9F9F9"/>
-                    <Setter Property="BorderBrush"     Value="#EBEBEB"/>
-                    <Setter Property="BorderThickness" Value="1,0,1,1"/>
-                    <Setter Property="CornerRadius"    Value="0,0,8,8"/>
-                    <Setter Property="Padding"         Value="16,12"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                            <Setter Property="Background"  Value="#2D2D2D"/>
-                            <Setter Property="BorderBrush" Value="#3A3A3A"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Border.Style>
+        <!-- Touchpad row (BOTTOM) -->
+        <Border Style="{StaticResource CardBot}">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="44"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Border Width="32" Height="32" CornerRadius="6" Background="#E0F7FA"
                         HorizontalAlignment="Left" VerticalAlignment="Center">
-                    <Image Height="18" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <Image.Style>
-                            <Style TargetType="{x:Type Image}">
-                                <Setter Property="Source" Value="../Resources/Icons/Touch_white.png"/>
-                            </Style>
-                        </Image.Style>
-                    </Image>
+                    <Image Height="18" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Source="../Resources/Icons/Touch_white.png"/>
                 </Border>
-                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,16,0">
-                    <TextBlock x:Name="touchpadTitle" FontSize="13" Text="Touchpad"/>
-                    <TextBlock x:Name="touchpadSubtitle" FontSize="11" Margin="0,1,0,0" Text="Enable or disable the touchpad">
-                        <TextBlock.Style>
-                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-                                <Setter Property="Foreground" Value="#888888"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                        <Setter Property="Foreground" Value="#9D9D9D"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock x:Name="touchpadTitle" Style="{StaticResource CardTitle}" Text="Touchpad"/>
+                    <TextBlock x:Name="touchpadSubtitle" Style="{StaticResource CardSubtitle}"
+                               Text="Enable or disable the touchpad"/>
                 </StackPanel>
-                <CheckBox x:Name="chkTouchpadLock" Grid.Column="2" VerticalAlignment="Center"
-                          Checked="chkTouchpadLock_Checked" Unchecked="chkTouchpadLock_Checked"
-                          Cursor="Hand" FocusVisualStyle="{x:Null}">
-                    <CheckBox.Style>
-                        <Style TargetType="{x:Type CheckBox}">
-                            <Setter Property="Template" Value="{StaticResource ToggleSwitchLight}"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                    <Setter Property="Template" Value="{StaticResource ToggleSwitchDark}"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </CheckBox.Style>
-                </CheckBox>
+                <CheckBox x:Name="chkTouchpadLock" Grid.Column="2" Style="{StaticResource Toggle}"
+                          VerticalAlignment="Center"
+                          Checked="chkTouchpadLock_Checked" Unchecked="chkTouchpadLock_Checked"/>
             </Grid>
         </Border>
 
         <!-- ══════════════════════════════════════════
-             FOOTER BUTTONS
+             FOOTER
         ══════════════════════════════════════════ -->
         <Grid Margin="0,16,0,16">
             <Grid.ColumnDefinitions>
