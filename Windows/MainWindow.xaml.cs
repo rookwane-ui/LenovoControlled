@@ -12,12 +12,11 @@ namespace LenovoController
 {
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        // ── Features ─────────────────────────────────────────────────────────────
+        // ── Features ──────────────────────────────────────────────────────────────
         private readonly AlwaysOnUsbFeature  _alwaysOnUsbFeature  = new AlwaysOnUsbFeature();
         private readonly BatteryFeature      _batteryFeature      = new BatteryFeature();
         private readonly PowerModeFeature    _powerModeFeature    = new PowerModeFeature();
         private readonly FnLockFeature       _fnLockFeature       = new FnLockFeature();
-        private readonly OverDriveFeature    _overDriveFeature    = new OverDriveFeature();
         private readonly TouchpadLockFeature _touchpadLockFeature = new TouchpadLockFeature();
 
         private RadioButton[] _batteryButtons;
@@ -36,7 +35,6 @@ namespace LenovoController
             {
                 _darkMode = value;
                 OnPropertyChanged();
-                // Update title bar to match theme
                 FluentWindow.UpdateTheme(this, value);
             }
         }
@@ -52,7 +50,7 @@ namespace LenovoController
             DataContext = this;
 
             _app = app;
-            _darkMode = _app.Settings.DarkMode; // set backing field directly, no UpdateTheme yet
+            _darkMode = _app.Settings.DarkMode;
             ChangeLanguage();
 
             _powerModeButtons   = new[] { radioQuiet, radioBalance, radioPerformance };
@@ -61,7 +59,6 @@ namespace LenovoController
 
             Loaded += async (_, __) =>
             {
-                // Apply Mica/Acrylic after HWND exists
                 FluentWindow.Apply(this, _darkMode);
                 await RefreshAsync();
             };
@@ -78,26 +75,24 @@ namespace LenovoController
                 PowerModeState   powerMode = default;
                 BatteryState     battery   = default;
                 AlwaysOnUsbState usb       = default;
-                bool overDrive = false, touchpad = false, fnLock = false;
+                bool touchpad = false, fnLock = false;
                 bool powerOk = false, batteryOk = false, usbOk = false,
-                     overDriveOk = false, touchpadOk = false, fnLockOk = false;
+                     touchpadOk = false, fnLockOk = false;
 
                 await Task.Run(() =>
                 {
-                    Try(() => { powerMode = _powerModeFeature.GetState();                          powerOk    = true; }, () => DisableControls(_powerModeButtons));
-                    Try(() => { battery   = _batteryFeature.GetState();                            batteryOk  = true; }, () => DisableControls(_batteryButtons));
-                    Try(() => { usb       = _alwaysOnUsbFeature.GetState();                        usbOk      = true; }, () => DisableControls(_alwaysOnUsbButtons));
-                    Try(() => { overDrive = _overDriveFeature.GetState()    == OverDriveState.On;  overDriveOk  = true; }, () => Dispatcher.Invoke(() => chkOverDrive.IsEnabled    = false));
+                    Try(() => { powerMode = _powerModeFeature.GetState();                             powerOk    = true; }, () => DisableControls(_powerModeButtons));
+                    Try(() => { battery   = _batteryFeature.GetState();                               batteryOk  = true; }, () => DisableControls(_batteryButtons));
+                    Try(() => { usb       = _alwaysOnUsbFeature.GetState();                           usbOk      = true; }, () => DisableControls(_alwaysOnUsbButtons));
                     Try(() => { touchpad  = _touchpadLockFeature.GetState() == TouchpadLockState.Off; touchpadOk = true; }, () => Dispatcher.Invoke(() => chkTouchpadLock.IsEnabled = false));
-                    Try(() => { fnLock    = _fnLockFeature.GetState()       == FnLockState.On;     fnLockOk    = true; }, () => Dispatcher.Invoke(() => chkFnLock.IsEnabled         = false));
+                    Try(() => { fnLock    = _fnLockFeature.GetState()       == FnLockState.On;        fnLockOk   = true; }, () => Dispatcher.Invoke(() => chkFnLock.IsEnabled        = false));
                 });
 
-                if (powerOk)      _powerModeButtons[(int)powerMode].IsChecked   = true;
-                if (batteryOk)    _batteryButtons[(int)battery].IsChecked        = true;
-                if (usbOk)        _alwaysOnUsbButtons[(int)usb].IsChecked        = true;
-                if (overDriveOk)  chkOverDrive.IsChecked    = overDrive;
-                if (touchpadOk)   chkTouchpadLock.IsChecked = touchpad;
-                if (fnLockOk)     chkFnLock.IsChecked        = fnLock;
+                if (powerOk)   _powerModeButtons[(int)powerMode].IsChecked  = true;
+                if (batteryOk) _batteryButtons[(int)battery].IsChecked       = true;
+                if (usbOk)     _alwaysOnUsbButtons[(int)usb].IsChecked       = true;
+                if (touchpadOk) chkTouchpadLock.IsChecked = touchpad;
+                if (fnLockOk)   chkFnLock.IsChecked        = fnLock;
             }
             finally
             {
@@ -129,7 +124,7 @@ namespace LenovoController
             dlg.ShowDialog();
             if (dlg.DialogResult == true)
             {
-                DarkMode = _app.Settings.DarkMode; // also calls UpdateTheme via setter
+                DarkMode = _app.Settings.DarkMode;
                 ChangeLanguage();
             }
         }
@@ -160,14 +155,6 @@ namespace LenovoController
             var newState = (AlwaysOnUsbState)Array.IndexOf(_alwaysOnUsbButtons, sender);
             if (_alwaysOnUsbFeature.GetState() != newState)
                 SafeSet(() => _alwaysOnUsbFeature.SetState(newState));
-        }
-
-        private void chkOverDrive_Checked(object sender, RoutedEventArgs e)
-        {
-            if (_refreshing) return;
-            var newState = chkOverDrive.IsChecked == true ? OverDriveState.On : OverDriveState.Off;
-            if (_overDriveFeature.GetState() != newState)
-                SafeSet(() => _overDriveFeature.SetState(newState));
         }
 
         private void chkTouchpadLock_Checked(object sender, RoutedEventArgs e)
@@ -204,96 +191,96 @@ namespace LenovoController
             switch (_app.Settings.Culture)
             {
                 case "RU":
-                    batteryGroup.Text = "ЗАРЯДКА БАТАРЕИ";
+                    batteryGroup.Text              = "Зарядка батареи";
                     radioConservation.Content      = "Сбережение";
                     radioConservation.ToolTip      = "Батарея не заряжается выше 60% для сбережения ресурса";
                     radioNormalCharge.Content      = "Нормальная";
                     radioNormalCharge.ToolTip      = "Батарея заряжается до 100% как обычно";
                     radioRapidCharge.Content       = "Быстрая";
                     radioRapidCharge.ToolTip       = "Батарея заряжается быстрее. Может вызывать нагрев блока питания";
-                    powerModeGroup.Text = "РЕЖИМ РАБОТЫ";
+                    powerModeGroup.Text            = "Режим работы";
                     radioQuiet.Content             = "Тихий";
                     radioQuiet.ToolTip             = "Ограничивает мощность CPU и GPU, система охлаждения работает тихо";
-                    radioBalance.Content           = "Автоматический";
+                    radioBalance.Content           = "Авто";
                     radioBalance.ToolTip           = "Мощность CPU и GPU регулируются автоматически";
-                    radioPerformance.Content       = "Производительный";
+                    radioPerformance.Content       = "Производительность";
                     radioPerformance.ToolTip       = "Максимальная мощность CPU и GPU, вентиляторы работают громче";
-                    alwaysGroup.Text = "ALWAYS ON USB";
+                    alwaysGroup.Text               = "Always on USB";
                     radioAlwaysOnUsbOff.Content            = "Выкл.";
-                    radioAlwaysOnUsbOnWhenSleeping.Content = "Вкл. во время сна";
-                    radioAlwaysOnUsbOnAlways.Content       = "Вкл. всегда";
-                    miscGroup.Text = "ДОПОЛНИТЕЛЬНЫЕ ОПЦИИ";
-                    chkOverDrive.Content    = "Вкл. Over Drive";
-                    chkFnLock.Content       = "Вкл. FnLock";
-                    chkTouchpadLock.Content = "Вкл. сенс. панель";
-                    btnRefresh.Content  = "ОБНОВИТЬ";
-                    btnRefresh.ToolTip  = "Синхронизировать настройки с ноутбуком";
-                    btnSettings.ToolTip = "Настройки";
-                    btnExit.Content     = "ВЫХОД";
+                    radioAlwaysOnUsbOnWhenSleeping.Content = "Во сне";
+                    radioAlwaysOnUsbOnAlways.Content       = "Всегда";
+                    miscGroup.Text                 = "Дополнительные опции";
+                    fnLockTitle.Text               = "Fn Lock";
+                    fnLockSubtitle.Text            = "Эмулирует удержание клавиши Fn";
+                    touchpadTitle.Text             = "Тачпад";
+                    touchpadSubtitle.Text          = "Включить или отключить тачпад";
+                    btnRefresh.Content             = "Обновить";
+                    btnRefresh.ToolTip             = "Синхронизировать настройки с ноутбуком";
+                    btnSettings.ToolTip            = "Настройки";
+                    btnExit.Content                = "Выход";
                     break;
 
                 case "UA":
-                    batteryGroup.Text = "ЗАРЯДКА БАТАРЕЇ";
+                    batteryGroup.Text              = "Зарядка батареї";
                     radioConservation.Content      = "Збереження";
                     radioConservation.ToolTip      = "Батарея не заряджається вище 60% для збереження ресурсу";
                     radioNormalCharge.Content      = "Нормальна";
                     radioNormalCharge.ToolTip      = "Батарея заряджається до 100% як зазвичай";
                     radioRapidCharge.Content       = "Швидка";
                     radioRapidCharge.ToolTip       = "Батарея заряджається швидше. Може викликати нагрів БЖ";
-                    powerModeGroup.Text = "РЕЖИМ РОБОТИ";
+                    powerModeGroup.Text            = "Режим роботи";
                     radioQuiet.Content             = "Тихий";
                     radioQuiet.ToolTip             = "Обмежує потужність CPU і GPU, система охолодження тиха";
-                    radioBalance.Content           = "Автоматичний";
+                    radioBalance.Content           = "Авто";
                     radioBalance.ToolTip           = "Потужність CPU і GPU регулюються автоматично";
-                    radioPerformance.Content       = "Продуктивний";
+                    radioPerformance.Content       = "Продуктивність";
                     radioPerformance.ToolTip       = "Максимальна потужність CPU і GPU";
-                    alwaysGroup.Text = "ALWAYS ON USB";
+                    alwaysGroup.Text               = "Always on USB";
                     radioAlwaysOnUsbOff.Content            = "Вимк.";
-                    radioAlwaysOnUsbOnWhenSleeping.Content = "Увімк. під час сну";
-                    radioAlwaysOnUsbOnAlways.Content       = "Увімк. завжди";
-                    miscGroup.Text = "ДОДАТКОВІ ОПЦІЇ";
-                    chkOverDrive.Content    = "Увімк. Over Drive";
-                    chkFnLock.Content       = "Увімк. FnLock";
-                    chkTouchpadLock.Content = "Увімк. сенс. панель";
-                    btnRefresh.Content  = "ОНОВИТИ";
-                    btnRefresh.ToolTip  = "Синхронізувати налаштування з ноутбуком";
-                    btnSettings.ToolTip = "Налаштування";
-                    btnExit.Content     = "ВИХІД";
+                    radioAlwaysOnUsbOnWhenSleeping.Content = "Уві сні";
+                    radioAlwaysOnUsbOnAlways.Content       = "Завжди";
+                    miscGroup.Text                 = "Додаткові опції";
+                    fnLockTitle.Text               = "Fn Lock";
+                    fnLockSubtitle.Text            = "Емулює утримання клавіші Fn";
+                    touchpadTitle.Text             = "Тачпад";
+                    touchpadSubtitle.Text          = "Увімкнути або вимкнути тачпад";
+                    btnRefresh.Content             = "Оновити";
+                    btnRefresh.ToolTip             = "Синхронізувати налаштування з ноутбуком";
+                    btnSettings.ToolTip            = "Налаштування";
+                    btnExit.Content                = "Вихід";
                     break;
 
                 default:
-                    batteryGroup.Text = "BATTERY CHARGE";
+                    batteryGroup.Text              = "Battery charge";
                     radioConservation.Content      = "Conservation";
                     radioConservation.ToolTip      = "Battery won't charge above 60% to extend its lifespan";
                     radioNormalCharge.Content      = "Normal";
                     radioNormalCharge.ToolTip      = "Battery charges to 100% as usual";
-                    radioRapidCharge.Content       = "Rapid Charge";
+                    radioRapidCharge.Content       = "Rapid";
                     radioRapidCharge.ToolTip       = "Battery charges faster. May cause the power adapter to run warm";
-                    powerModeGroup.Text = "POWER MODE";
+                    powerModeGroup.Text            = "Power mode";
                     radioQuiet.Content             = "Quiet";
                     radioQuiet.ToolTip             = "Limits CPU/GPU power; fans run quietly";
                     radioBalance.Content           = "Balance";
                     radioBalance.ToolTip           = "CPU/GPU power adjusts automatically for most tasks";
                     radioPerformance.Content       = "Performance";
                     radioPerformance.ToolTip       = "Maximum CPU/GPU power; fans run at full speed";
-                    alwaysGroup.Text = "ALWAYS ON USB";
+                    alwaysGroup.Text               = "Always on USB";
                     radioAlwaysOnUsbOff.Content            = "Off";
                     radioAlwaysOnUsbOff.ToolTip            = "USB ports have no power when the laptop is off";
-                    radioAlwaysOnUsbOnWhenSleeping.Content = "On when sleeping";
+                    radioAlwaysOnUsbOnWhenSleeping.Content = "Sleeping";
                     radioAlwaysOnUsbOnWhenSleeping.ToolTip = "USB ports are powered during sleep";
-                    radioAlwaysOnUsbOnAlways.Content       = "On always";
+                    radioAlwaysOnUsbOnAlways.Content       = "Always";
                     radioAlwaysOnUsbOnAlways.ToolTip       = "USB ports are always powered";
-                    miscGroup.Text = "ADDITIONAL OPTIONS";
-                    chkOverDrive.Content    = "On Over Drive";
-                    chkOverDrive.ToolTip    = "Increases monitor response time for sharper fast-moving images";
-                    chkFnLock.Content       = "On FnLock";
-                    chkFnLock.ToolTip       = "Emulates holding the Fn key permanently";
-                    chkTouchpadLock.Content = "On touchpad";
-                    chkTouchpadLock.ToolTip = "Enables the touchpad";
-                    btnRefresh.Content  = "REFRESH";
-                    btnRefresh.ToolTip  = "Sync app settings with the laptop hardware";
-                    btnSettings.ToolTip = "Settings";
-                    btnExit.Content     = "EXIT";
+                    miscGroup.Text                 = "Additional options";
+                    fnLockTitle.Text               = "Fn Lock";
+                    fnLockSubtitle.Text            = "Emulates holding the Fn key permanently";
+                    touchpadTitle.Text             = "Touchpad";
+                    touchpadSubtitle.Text          = "Enable or disable the touchpad";
+                    btnRefresh.Content             = "Refresh";
+                    btnRefresh.ToolTip             = "Sync settings with the laptop hardware";
+                    btnSettings.ToolTip            = "Settings";
+                    btnExit.Content                = "Exit";
                     break;
             }
         }
