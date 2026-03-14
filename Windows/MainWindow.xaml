@@ -63,7 +63,7 @@
         <!-- WPF-UI title bar with Mica -->
         <ui:TitleBar Grid.Row="0"
                      Title="Lenovo Controller"
-                     Icon="Resources/Icons/LC.ico"/>
+                     Icon="pack://application:,,,/Resources/Icons/LC.ico"/>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="16,8,16,16">
@@ -86,7 +86,7 @@
                                 VerticalAlignment="Center">
                             <Image Height="18" HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
-                                   Source="Resources/Icons/Battery_white.png"/>
+                                   Source="pack://application:,,,/Resources/Icons/Battery_white.png"/>
                         </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0">
                             <TextBlock x:Name="batteryTitle" Text="Battery charge" FontSize="13"/>
@@ -133,7 +133,7 @@
                                 VerticalAlignment="Center">
                             <Image Height="18" HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
-                                   Source="Resources/Icons/Power_white.png"/>
+                                   Source="pack://application:,,,/Resources/Icons/Power_white.png"/>
                         </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0">
                             <TextBlock x:Name="powerTitle" Text="Power mode" FontSize="13"/>
@@ -179,7 +179,7 @@
                                 VerticalAlignment="Center">
                             <Image Height="18" HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
-                                   Source="Resources/Icons/Usb_white.png"/>
+                                   Source="pack://application:,,,/Resources/Icons/Usb_white.png"/>
                         </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0">
                             <TextBlock x:Name="usbTitle" Text="Always on USB" FontSize="13"/>
@@ -226,7 +226,7 @@
                                     VerticalAlignment="Center">
                                 <Image Height="18" HorizontalAlignment="Center"
                                        VerticalAlignment="Center"
-                                       Source="Resources/Icons/Fn_white.png"/>
+                                       Source="pack://application:,,,/Resources/Icons/Fn_white.png"/>
                             </Border>
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                 <TextBlock x:Name="fnLockTitle" Text="Fn Lock" FontSize="13"/>
@@ -254,7 +254,7 @@
                                     VerticalAlignment="Center">
                                 <Image Height="18" HorizontalAlignment="Center"
                                        VerticalAlignment="Center"
-                                       Source="Resources/Icons/Touch_white.png"/>
+                                       Source="pack://application:,,,/Resources/Icons/Touch_white.png"/>
                             </Border>
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                 <TextBlock x:Name="touchpadTitle" Text="Touchpad" FontSize="13"/>
@@ -281,8 +281,11 @@
                                Click="btnRefresh_Click"/>
                     <ui:Button x:Name="btnSettings" Grid.Column="1"
                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                               Margin="8,0" Click="btnSettings_Click"
-                               Icon="{ui:SymbolIcon Settings24}"/>
+                               Margin="8,0" Padding="0" Click="btnSettings_Click">
+                        <Image Source="pack://application:,,,/Resources/Icons/Settings.png"
+                               Width="16" Height="16"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </ui:Button>
                     <ui:Button x:Name="btnExit" Grid.Column="2"
                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                Content="Exit" Click="btnExit_Click"
