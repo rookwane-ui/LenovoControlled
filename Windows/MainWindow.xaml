@@ -28,7 +28,7 @@
                 <Setter Property="Foreground" Value="#1C1917"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Foreground" Value="#EDE8E3"/>
+                        <Setter Property="Foreground" Value="#F2EDE8"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
@@ -39,13 +39,13 @@
                 <Setter Property="Foreground" Value="#1C1917"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Background" Value="#18120E"/>
-                        <Setter Property="Foreground" Value="#EDE8E3"/>
+                        <Setter Property="Background" Value="#30FFFFFF"/>
+                        <Setter Property="Foreground" Value="#F2EDE8"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
 
-            <!-- Card — warm surface -->
+            <!-- Card — semi-transparent in dark so Mica shows through -->
             <Style x:Key="Card" TargetType="{x:Type Border}">
                 <Setter Property="Background"      Value="#F5F4F1"/>
                 <Setter Property="BorderBrush"     Value="#E8E4DF"/>
@@ -54,8 +54,8 @@
                 <Setter Property="Padding"         Value="16,13"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Background"  Value="#110D0A"/>
-                        <Setter Property="BorderBrush" Value="#1F1A16"/>
+                        <Setter Property="Background"  Value="#40FFFFFF"/>
+                        <Setter Property="BorderBrush" Value="#28FFFFFF"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
@@ -77,12 +77,12 @@
                 <Setter Property="Background" Value="#E8E4DF"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Background" Value="#1F1A16"/>
+                        <Setter Property="Background" Value="#25FFFFFF"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
 
-            <!-- Section header — Display font, slightly larger -->
+            <!-- Section header -->
             <Style x:Key="SectionLabel" TargetType="{x:Type TextBlock}"
                    BasedOn="{StaticResource {x:Type TextBlock}}">
                 <Setter Property="FontFamily" Value="Segoe UI Variable Display, Segoe UI Variable Text, Segoe UI"/>
@@ -98,7 +98,7 @@
                 <Setter Property="FontWeight" Value="Normal"/>
             </Style>
 
-            <!-- Card secondary label — warm taupe -->
+            <!-- Card secondary label -->
             <Style x:Key="CardSubtitle" TargetType="{x:Type TextBlock}"
                    BasedOn="{StaticResource {x:Type TextBlock}}">
                 <Setter Property="FontSize"   Value="11"/>
@@ -106,7 +106,7 @@
                 <Setter Property="Foreground" Value="#78716C"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Foreground" Value="#5C5650"/>
+                        <Setter Property="Foreground" Value="#C8BFB8"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
@@ -118,7 +118,7 @@
                 <Setter Property="Background"   Value="#E8E4DF"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Background" Value="#0A0806"/>
+                        <Setter Property="Background" Value="#22FFFFFF"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
