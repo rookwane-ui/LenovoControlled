@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Threading;
 using System.Windows;
@@ -122,7 +123,7 @@ namespace LenovoController
 
             _notifyIcon = new NotifyIcon
             {
-                Icon             = System.Drawing.Icon.ExtractAssociatedIcon(
+                Icon             = Icon.ExtractAssociatedIcon(
                                        Process.GetCurrentProcess().MainModule.FileName),
                 Visible          = true,
                 Text             = "Lenovo Controller",

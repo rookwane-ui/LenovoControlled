@@ -7,17 +7,21 @@
     <RootNamespace>LenovoController</RootNamespace>
     <AssemblyName>LenovoController</AssemblyName>
     <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Resources\Icons\LC.ico</ApplicationIcon>
     <Deterministic>true</Deterministic>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <!-- Suppress duplicate attributes from old AssemblyInfo.cs -->
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="WPF-UI" Version="4.2.0" />
+    <PackageReference Include="Newtonsoft.Json"         Version="13.0.3" />
+    <PackageReference Include="WPF-UI"                  Version="4.2.0"  />
+    <PackageReference Include="System.Management"       Version="8.0.0"  />
+    <PackageReference Include="System.Drawing.Common"   Version="8.0.0"  />
   </ItemGroup>
 
   <ItemGroup>
