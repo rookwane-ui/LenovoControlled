@@ -82,10 +82,9 @@
                         <Border Width="36" Height="36" CornerRadius="8"
                                 Background="#FFF3E0" HorizontalAlignment="Left"
                                 VerticalAlignment="Center">
-                            <ui:SymbolIcon Symbol="Battery224" FontSize="18"
+                            <TextBlock Text="&#xE83F;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets" FontSize="20"
                                            Foreground="#E65100"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"/>
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0">
                             <TextBlock x:Name="batteryTitle" Text="Battery charge" FontSize="13"/>
@@ -130,10 +129,9 @@
                         <Border Width="36" Height="36" CornerRadius="8"
                                 Background="#E8F5E9" HorizontalAlignment="Left"
                                 VerticalAlignment="Center">
-                            <ui:SymbolIcon Symbol="LeafOne24" FontSize="18"
+                            <TextBlock Text="&#xE7E8;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets" FontSize="20"
                                            Foreground="#2E7D32"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"/>
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0">
                             <TextBlock x:Name="powerTitle" Text="Power mode" FontSize="13"/>
@@ -177,10 +175,9 @@
                         <Border Width="36" Height="36" CornerRadius="8"
                                 Background="#E3F2FD" HorizontalAlignment="Left"
                                 VerticalAlignment="Center">
-                            <ui:SymbolIcon Symbol="Usb24" FontSize="18"
+                            <TextBlock Text="&#xF4DF;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets" FontSize="20"
                                            Foreground="#1565C0"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"/>
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0">
                             <TextBlock x:Name="usbTitle" Text="Always on USB" FontSize="13"/>
@@ -225,10 +222,9 @@
                             <Border Width="36" Height="36" CornerRadius="8"
                                     Background="#EDE7F6" HorizontalAlignment="Left"
                                     VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="Keyboard24" FontSize="18"
+                                <TextBlock Text="&#xE92E;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets" FontSize="20"
                                                Foreground="#4527A0"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"/>
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                 <TextBlock x:Name="fnLockTitle" Text="Fn Lock" FontSize="13"/>
@@ -254,10 +250,9 @@
                             <Border Width="36" Height="36" CornerRadius="8"
                                     Background="#E0F7FA" HorizontalAlignment="Left"
                                     VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="Tablet24" FontSize="18"
+                                <TextBlock Text="&#xF1B0;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets" FontSize="20"
                                                Foreground="#006064"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"/>
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                 <TextBlock x:Name="touchpadTitle" Text="Touchpad" FontSize="13"/>
@@ -285,9 +280,8 @@
                     <ui:Button x:Name="btnSettings" Grid.Column="1"
                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                Margin="8,0" Padding="0" Click="btnSettings_Click">
-                        <ui:SymbolIcon Symbol="Settings24" FontSize="16"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"/>
+                        <TextBlock Text="&#xE713;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets" FontSize="18"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </ui:Button>
                     <ui:Button x:Name="btnExit" Grid.Column="2"
                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
