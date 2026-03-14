@@ -23,107 +23,111 @@
                 <ResourceDictionary Source="../Resources/WindowResources.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Default TextBlock — warm text colors -->
+            <!-- TextFillColorPrimary: #000000E4 light / #FFFFFFE4 dark — 14px body -->
             <Style TargetType="{x:Type TextBlock}">
-                <Setter Property="Foreground" Value="#1C1917"/>
+                <Setter Property="Foreground"  Value="#000000E4"/>
+                <Setter Property="FontSize"    Value="14"/>
+                <Setter Property="FontWeight"  Value="Normal"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Foreground" Value="#F2EDE8"/>
+                        <Setter Property="Foreground" Value="#FFFFFFE4"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
 
-            <!-- Button defaults -->
+            <!-- SubtleFillColorNormal button background -->
             <Style BasedOn="{StaticResource CustomButton}" TargetType="{x:Type Button}">
-                <Setter Property="Background" Value="#F5F4F1"/>
-                <Setter Property="Foreground" Value="#1C1917"/>
+                <Setter Property="Background" Value="#00000009"/>
+                <Setter Property="Foreground" Value="#000000E4"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Background" Value="#30FFFFFF"/>
-                        <Setter Property="Foreground" Value="#F2EDE8"/>
+                        <Setter Property="Background" Value="#FFFFFF0F"/>
+                        <Setter Property="Foreground" Value="#FFFFFFE4"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
 
-            <!-- Card — semi-transparent in dark so Mica shows through -->
+            <!-- CardBackgroundFillColorDefault -->
             <Style x:Key="Card" TargetType="{x:Type Border}">
-                <Setter Property="Background"      Value="#F5F4F1"/>
-                <Setter Property="BorderBrush"     Value="#E8E4DF"/>
+                <Setter Property="Background"      Value="#FFFFFFB3"/>
+                <Setter Property="BorderBrush"     Value="#0000000F"/>
                 <Setter Property="BorderThickness" Value="1"/>
-                <Setter Property="CornerRadius"    Value="10"/>
-                <Setter Property="Padding"         Value="16,13"/>
+                <Setter Property="CornerRadius"    Value="8"/>
+                <Setter Property="Padding"         Value="16,12"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Background"  Value="#40FFFFFF"/>
-                        <Setter Property="BorderBrush" Value="#28FFFFFF"/>
+                        <Setter Property="Background"  Value="#FFFFFF0D"/>
+                        <Setter Property="BorderBrush" Value="#FFFFFF14"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
 
-            <!-- Grouped card variants -->
             <Style x:Key="CardTop" TargetType="{x:Type Border}" BasedOn="{StaticResource Card}">
-                <Setter Property="CornerRadius"    Value="10,10,0,0"/>
+                <Setter Property="CornerRadius"    Value="8,8,0,0"/>
                 <Setter Property="BorderThickness" Value="1,1,1,0"/>
             </Style>
             <Style x:Key="CardBot" TargetType="{x:Type Border}" BasedOn="{StaticResource Card}">
-                <Setter Property="CornerRadius"    Value="0,0,10,10"/>
+                <Setter Property="CornerRadius"    Value="0,0,8,8"/>
                 <Setter Property="BorderThickness" Value="1,0,1,1"/>
             </Style>
 
-            <!-- Hairline separator inside grouped cards -->
+            <!-- DividerStrokeColorDefault -->
             <Style x:Key="CardSeparator" TargetType="{x:Type Border}">
                 <Setter Property="Height"     Value="1"/>
                 <Setter Property="Margin"     Value="16,0"/>
-                <Setter Property="Background" Value="#E8E4DF"/>
+                <Setter Property="Background" Value="#0000000F"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Background" Value="#25FFFFFF"/>
+                        <Setter Property="Background" Value="#FFFFFF14"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
 
-            <!-- Section header -->
+            <!-- BodyStrong: 14px Semibold, Display optical axis -->
             <Style x:Key="SectionLabel" TargetType="{x:Type TextBlock}"
                    BasedOn="{StaticResource {x:Type TextBlock}}">
                 <Setter Property="FontFamily" Value="Segoe UI Variable Display, Segoe UI Variable Text, Segoe UI"/>
-                <Setter Property="FontSize"   Value="13"/>
+                <Setter Property="FontSize"   Value="14"/>
                 <Setter Property="FontWeight" Value="SemiBold"/>
-                <Setter Property="Margin"     Value="4,0,0,7"/>
+                <Setter Property="Margin"     Value="4,0,0,8"/>
             </Style>
 
-            <!-- Card primary label -->
+            <!-- Body: 14px Regular -->
             <Style x:Key="CardTitle" TargetType="{x:Type TextBlock}"
                    BasedOn="{StaticResource {x:Type TextBlock}}">
-                <Setter Property="FontSize"   Value="13"/>
+                <Setter Property="FontSize"   Value="14"/>
                 <Setter Property="FontWeight" Value="Normal"/>
             </Style>
 
-            <!-- Card secondary label -->
+            <!-- Caption: 12px Regular — TextFillColorSecondary -->
             <Style x:Key="CardSubtitle" TargetType="{x:Type TextBlock}"
                    BasedOn="{StaticResource {x:Type TextBlock}}">
-                <Setter Property="FontSize"   Value="11"/>
-                <Setter Property="Margin"     Value="0,2,0,0"/>
-                <Setter Property="Foreground" Value="#78716C"/>
+                <Setter Property="FontSize"   Value="12"/>
+                <Setter Property="LineHeight" Value="16"/>
+                <Setter Property="Margin"     Value="0,3,0,0"/>
+                <Setter Property="Foreground" Value="#00000099"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Foreground" Value="#C8BFB8"/>
+                        <Setter Property="Foreground" Value="#FFFFFF99"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
 
-            <!-- Segmented pill track -->
+            <!-- SubtleFillColorSecondary pill track -->
             <Style x:Key="SegTrack" TargetType="{x:Type Border}">
-                <Setter Property="CornerRadius" Value="9"/>
-                <Setter Property="Padding"      Value="3"/>
-                <Setter Property="Background"   Value="#E8E4DF"/>
+                <Setter Property="CornerRadius"    Value="6"/>
+                <Setter Property="Padding"         Value="3"/>
+                <Setter Property="Background"      Value="#00000009"/>
+                <Setter Property="BorderBrush"     Value="#0000000F"/>
+                <Setter Property="BorderThickness" Value="1"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Background" Value="#22FFFFFF"/>
+                        <Setter Property="Background"  Value="#FFFFFF0F"/>
+                        <Setter Property="BorderBrush" Value="#FFFFFF14"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
 
-            <!-- Segment RadioButton -->
             <Style x:Key="Segment" TargetType="{x:Type RadioButton}">
                 <Setter Property="Cursor"           Value="Hand"/>
                 <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
@@ -135,7 +139,6 @@
                 </Style.Triggers>
             </Style>
 
-            <!-- Toggle switch CheckBox -->
             <Style x:Key="Toggle" TargetType="{x:Type CheckBox}">
                 <Setter Property="Cursor"           Value="Hand"/>
                 <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
@@ -150,28 +153,25 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <StackPanel Margin="18,18,18,0">
+    <StackPanel Margin="16,16,16,0">
 
-        <!-- ══════════════════════════════════
-             BATTERY CHARGE
-        ══════════════════════════════════ -->
+        <!-- ════ BATTERY CHARGE ════ -->
         <TextBlock x:Name="batteryGroup" Text="Battery charge"
                    Style="{StaticResource SectionLabel}"/>
         <Border Style="{StaticResource Card}">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="44"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="*" MinWidth="80"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Border Width="34" Height="34" CornerRadius="8" Background="#FFF3E0"
+                <Border Width="32" Height="32" CornerRadius="4" Background="#FFF3E0"
                         HorizontalAlignment="Left" VerticalAlignment="Center">
-                    <Image Height="19" HorizontalAlignment="Center" VerticalAlignment="Center"
+                    <Image Height="16" HorizontalAlignment="Center" VerticalAlignment="Center"
                            Source="../Resources/Icons/Battery_white.png"/>
                 </Border>
-                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0">
-                    <TextBlock x:Name="batteryTitle" Style="{StaticResource CardTitle}"
-                               Text="Battery charge"/>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,12,0">
+                    <TextBlock x:Name="batteryTitle"    Style="{StaticResource CardTitle}" Text="Battery charge"/>
                     <TextBlock x:Name="batterySubtitle" Style="{StaticResource CardSubtitle}"/>
                 </StackPanel>
                 <Border Grid.Column="2" Style="{StaticResource SegTrack}" VerticalAlignment="Center">
@@ -190,26 +190,23 @@
             </Grid>
         </Border>
 
-        <!-- ══════════════════════════════════
-             POWER MODE
-        ══════════════════════════════════ -->
+        <!-- ════ POWER MODE ════ -->
         <TextBlock x:Name="powerModeGroup" Text="Power mode"
-                   Style="{StaticResource SectionLabel}" Margin="4,16,0,7"/>
+                   Style="{StaticResource SectionLabel}" Margin="4,16,0,8"/>
         <Border Style="{StaticResource Card}">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="44"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="*" MinWidth="80"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Border Width="34" Height="34" CornerRadius="8" Background="#E8F5E9"
+                <Border Width="32" Height="32" CornerRadius="4" Background="#E8F5E9"
                         HorizontalAlignment="Left" VerticalAlignment="Center">
-                    <Image Height="19" HorizontalAlignment="Center" VerticalAlignment="Center"
+                    <Image Height="16" HorizontalAlignment="Center" VerticalAlignment="Center"
                            Source="../Resources/Icons/Power_white.png"/>
                 </Border>
-                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0">
-                    <TextBlock x:Name="powerTitle" Style="{StaticResource CardTitle}"
-                               Text="Power mode"/>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,12,0">
+                    <TextBlock x:Name="powerTitle"    Style="{StaticResource CardTitle}" Text="Power mode"/>
                     <TextBlock x:Name="powerSubtitle" Style="{StaticResource CardSubtitle}"/>
                 </StackPanel>
                 <Border Grid.Column="2" Style="{StaticResource SegTrack}" VerticalAlignment="Center">
@@ -228,26 +225,23 @@
             </Grid>
         </Border>
 
-        <!-- ══════════════════════════════════
-             ALWAYS ON USB
-        ══════════════════════════════════ -->
+        <!-- ════ ALWAYS ON USB ════ -->
         <TextBlock x:Name="alwaysGroup" Text="Always on USB"
-                   Style="{StaticResource SectionLabel}" Margin="4,16,0,7"/>
+                   Style="{StaticResource SectionLabel}" Margin="4,16,0,8"/>
         <Border Style="{StaticResource Card}">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="44"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="*" MinWidth="80"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Border Width="34" Height="34" CornerRadius="8" Background="#E3F2FD"
+                <Border Width="32" Height="32" CornerRadius="4" Background="#E3F2FD"
                         HorizontalAlignment="Left" VerticalAlignment="Center">
-                    <Image Height="19" HorizontalAlignment="Center" VerticalAlignment="Center"
+                    <Image Height="16" HorizontalAlignment="Center" VerticalAlignment="Center"
                            Source="../Resources/Icons/Usb_white.png"/>
                 </Border>
-                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0">
-                    <TextBlock x:Name="usbTitle" Style="{StaticResource CardTitle}"
-                               Text="Always on USB"/>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,12,0">
+                    <TextBlock x:Name="usbTitle"    Style="{StaticResource CardTitle}" Text="Always on USB"/>
                     <TextBlock x:Name="usbSubtitle" Style="{StaticResource CardSubtitle}"/>
                 </StackPanel>
                 <Border Grid.Column="2" Style="{StaticResource SegTrack}" VerticalAlignment="Center">
@@ -266,28 +260,24 @@
             </Grid>
         </Border>
 
-        <!-- ══════════════════════════════════
-             ADDITIONAL OPTIONS
-        ══════════════════════════════════ -->
+        <!-- ════ ADDITIONAL OPTIONS ════ -->
         <TextBlock x:Name="miscGroup" Text="Additional options"
-                   Style="{StaticResource SectionLabel}" Margin="4,16,0,7"/>
+                   Style="{StaticResource SectionLabel}" Margin="4,16,0,8"/>
 
-        <!-- Fn Lock — top of group -->
         <Border Style="{StaticResource CardTop}">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="44"/>
+                    <ColumnDefinition Width="40"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Border Width="34" Height="34" CornerRadius="8" Background="#EDE7F6"
+                <Border Width="32" Height="32" CornerRadius="4" Background="#EDE7F6"
                         HorizontalAlignment="Left" VerticalAlignment="Center">
-                    <Image Height="19" HorizontalAlignment="Center" VerticalAlignment="Center"
+                    <Image Height="16" HorizontalAlignment="Center" VerticalAlignment="Center"
                            Source="../Resources/Icons/Fn_white.png"/>
                 </Border>
                 <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,16,0">
-                    <TextBlock x:Name="fnLockTitle" Style="{StaticResource CardTitle}"
-                               Text="Fn Lock"/>
+                    <TextBlock x:Name="fnLockTitle"    Style="{StaticResource CardTitle}" Text="Fn Lock"/>
                     <TextBlock x:Name="fnLockSubtitle" Style="{StaticResource CardSubtitle}"
                                Text="Emulates holding the Fn key permanently"/>
                 </StackPanel>
@@ -299,22 +289,20 @@
 
         <Border Style="{StaticResource CardSeparator}"/>
 
-        <!-- Touchpad — bottom of group -->
         <Border Style="{StaticResource CardBot}">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="44"/>
+                    <ColumnDefinition Width="40"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Border Width="34" Height="34" CornerRadius="8" Background="#E0F7FA"
+                <Border Width="32" Height="32" CornerRadius="4" Background="#E0F7FA"
                         HorizontalAlignment="Left" VerticalAlignment="Center">
-                    <Image Height="19" HorizontalAlignment="Center" VerticalAlignment="Center"
+                    <Image Height="16" HorizontalAlignment="Center" VerticalAlignment="Center"
                            Source="../Resources/Icons/Touch_white.png"/>
                 </Border>
                 <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,16,0">
-                    <TextBlock x:Name="touchpadTitle" Style="{StaticResource CardTitle}"
-                               Text="Touchpad"/>
+                    <TextBlock x:Name="touchpadTitle"    Style="{StaticResource CardTitle}" Text="Touchpad"/>
                     <TextBlock x:Name="touchpadSubtitle" Style="{StaticResource CardSubtitle}"
                                Text="Enable or disable the touchpad"/>
                 </StackPanel>
@@ -324,20 +312,18 @@
             </Grid>
         </Border>
 
-        <!-- ══════════════════════════════════
-             FOOTER
-        ══════════════════════════════════ -->
-        <Grid Margin="0,18,0,18" Height="34">
+        <!-- ════ FOOTER — 40px touch target height ════ -->
+        <Grid Margin="0,16,0,16" Height="40">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="50"/>
-                <ColumnDefinition Width="88"/>
+                <ColumnDefinition Width="48"/>
+                <ColumnDefinition Width="96"/>
             </Grid.ColumnDefinitions>
-            <Button x:Name="btnRefresh" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                    Content="Refresh" Click="btnRefresh_Click"/>
+            <Button x:Name="btnRefresh" HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch" Content="Refresh" Click="btnRefresh_Click"/>
             <Button x:Name="btnSettings" Grid.Column="1" HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch" Padding="0" Margin="8,0" Click="btnSettings_Click">
-                <Image Source="../Resources/Icons/Settings.png" Width="15" Height="15"/>
+                <Image Source="../Resources/Icons/Settings.png" Width="16" Height="16"/>
             </Button>
             <Button x:Name="btnExit" Grid.Column="2" HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch" Content="Exit" Click="btnExit_Click"/>
