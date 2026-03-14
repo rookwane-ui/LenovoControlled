@@ -28,7 +28,7 @@ jobs:
 
       - name: Publish
         run: >
-          dotnet publish LenovoController/LenovoController.csproj
+          dotnet publish LenovoController.csproj
           --configuration Release
           --runtime win-x64
           --self-contained false
