@@ -52,7 +52,7 @@
             <!-- About -->
             <ui:Card Margin="0,0,0,16">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <ui:FontIcon Glyph="&#xE7F4;" FontSize="36"
+                    <ui:SymbolIcon Symbol="Laptop24" FontSize="36"
                                Foreground="#C0392B"
                                Margin="0,0,12,0" VerticalAlignment="Center"/>
                     <StackPanel VerticalAlignment="Center">

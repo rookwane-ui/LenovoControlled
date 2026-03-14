@@ -82,7 +82,7 @@
                         <Border Width="36" Height="36" CornerRadius="8"
                                 Background="#FFF3E0" HorizontalAlignment="Left"
                                 VerticalAlignment="Center">
-                            <ui:FontIcon Glyph="&#xE83F;" FontSize="20"
+                            <ui:SymbolIcon Symbol="BatteryCharge24" FontSize="20"
                                                       Foreground="#E65100"
                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
@@ -129,7 +129,7 @@
                         <Border Width="36" Height="36" CornerRadius="8"
                                 Background="#E8F5E9" HorizontalAlignment="Left"
                                 VerticalAlignment="Center">
-                            <ui:FontIcon Glyph="&#xE7E8;" FontSize="20"
+                            <ui:SymbolIcon Symbol="LeafOne24" FontSize="20"
                                                       Foreground="#2E7D32"
                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
@@ -175,7 +175,7 @@
                         <Border Width="36" Height="36" CornerRadius="8"
                                 Background="#E3F2FD" HorizontalAlignment="Left"
                                 VerticalAlignment="Center">
-                            <ui:FontIcon Glyph="&#xE88E;" FontSize="20"
+                            <ui:SymbolIcon Symbol="PlugConnected24" FontSize="20"
                                                       Foreground="#1565C0"
                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
@@ -222,7 +222,7 @@
                             <Border Width="36" Height="36" CornerRadius="8"
                                     Background="#EDE7F6" HorizontalAlignment="Left"
                                     VerticalAlignment="Center">
-                                <ui:FontIcon Glyph="&#xE92E;" FontSize="20"
+                                <ui:SymbolIcon Symbol="Keyboard24" FontSize="20"
                                                           Foreground="#4527A0"
                                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
@@ -250,7 +250,7 @@
                             <Border Width="36" Height="36" CornerRadius="8"
                                     Background="#E0F7FA" HorizontalAlignment="Left"
                                     VerticalAlignment="Center">
-                                <ui:FontIcon Glyph="&#xE962;" FontSize="20"
+                                <ui:SymbolIcon Symbol="CursorHover24" FontSize="20"
                                                           Foreground="#006064"
                                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
@@ -280,7 +280,7 @@
                     <ui:Button x:Name="btnSettings" Grid.Column="1"
                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                Margin="8,0" Padding="0" Click="btnSettings_Click">
-                        <ui:FontIcon Glyph="&#xE713;" FontSize="18"
+                        <ui:SymbolIcon Symbol="Settings24" FontSize="18"
                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </ui:Button>
                     <ui:Button x:Name="btnExit" Grid.Column="2"
