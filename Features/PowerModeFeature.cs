@@ -6,13 +6,14 @@ namespace LenovoController.Features
 {
     public enum PowerModeState
     {
-        Quiet       = 0,
-        Balance     = 1,
-        Performance = 2
+        Quiet       = 0,   // Power saver
+        Balance     = 1,   // Balanced
+        Performance = 2    // High performance / Ultimate performance
     }
 
-    public class PowerModeFeature : AbstractWmiFeature<PowerModeState>
+    public class PowerModeFeature : IFeature<PowerModeState>
     {
+        // ── Built-in Windows power plan GUIDs ────────────────────────────────────
         private static readonly Guid GuidPowerSaver   = new Guid("a1841308-3541-4fab-bc81-f71556f20b4a");
         private static readonly Guid GuidBalanced     = new Guid("381b4222-f694-41f0-9685-ff5bb260df2e");
         private static readonly Guid GuidHighPerf     = new Guid("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c");
@@ -21,38 +22,72 @@ namespace LenovoController.Features
         [DllImport("powrprof.dll")]
         private static extern uint PowerSetActiveScheme(IntPtr RootPowerKey, ref Guid SchemeGuid);
 
-        public PowerModeFeature() : base("SmartFanMode", 1) { }
+        [DllImport("powrprof.dll")]
+        private static extern uint PowerGetActiveScheme(IntPtr UserRootPowerKey, out IntPtr ActivePolicyGuid);
 
-        // GetState is inherited unchanged from AbstractWmiFeature — no override needed
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr LocalFree(IntPtr hMem);
 
-        // SetAndSyncState is what MainWindow calls instead of SetState directly
-        public void SetAndSyncState(PowerModeState state)
+        public PowerModeState GetState()
         {
-            // Step 1: original WMI fan mode — same as before
-            SetState(state);
+            IntPtr ptr;
+            uint result = PowerGetActiveScheme(IntPtr.Zero, out ptr);
+            if (result != 0)
+                throw new InvalidOperationException($"PowerGetActiveScheme failed: {result}");
 
-            // Step 2: sync Windows power plan — completely isolated, never throws
             try
             {
-                var guid = state == PowerModeState.Quiet   ? GuidPowerSaver
-                         : state == PowerModeState.Balance ? GuidBalanced
-                         : GuidHighPerf;
+                var active = (Guid)Marshal.PtrToStructure(ptr, typeof(Guid));
 
-                // Try Ultimate Performance first for Performance mode
-                if (state == PowerModeState.Performance)
-                {
-                    var ult = GuidUltimatePerf;
-                    if (PowerSetActiveScheme(IntPtr.Zero, ref ult) == 0)
-                        return; // success
-                    // Fall through to High Performance if Ultimate not available
-                }
+                if (active == GuidPowerSaver)
+                    return PowerModeState.Quiet;
 
-                PowerSetActiveScheme(IntPtr.Zero, ref guid);
+                if (active == GuidHighPerf || active == GuidUltimatePerf)
+                    return PowerModeState.Performance;
+
+                // Balanced or any custom plan — treat as Balance
+                return PowerModeState.Balance;
             }
-            catch (Exception ex)
+            finally
             {
-                Trace.TraceWarning($"Power plan sync failed for {state}: {ex.Message}");
+                LocalFree(ptr);
             }
+        }
+
+        public void SetState(PowerModeState state)
+        {
+            Guid guid;
+
+            switch (state)
+            {
+                case PowerModeState.Quiet:
+                    guid = GuidPowerSaver;
+                    break;
+
+                case PowerModeState.Performance:
+                    // Try Ultimate Performance first — only exists on Pro/Enterprise
+                    // or if the user has previously activated it
+                    guid = GuidUltimatePerf;
+                    uint r = PowerSetActiveScheme(IntPtr.Zero, ref guid);
+                    if (r == 0)
+                    {
+                        Trace.TraceInformation("Power plan set to Ultimate Performance.");
+                        return;
+                    }
+                    // Fall back to High Performance
+                    guid = GuidHighPerf;
+                    break;
+
+                default:
+                    guid = GuidBalanced;
+                    break;
+            }
+
+            uint result = PowerSetActiveScheme(IntPtr.Zero, ref guid);
+            if (result != 0)
+                Trace.TraceWarning($"PowerSetActiveScheme returned {result} for {state}");
+            else
+                Trace.TraceInformation($"Power plan set to {state}.");
         }
     }
 }
