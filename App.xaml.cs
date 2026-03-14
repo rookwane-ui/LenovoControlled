@@ -164,8 +164,14 @@ namespace LenovoController
 
         protected override void OnExit(ExitEventArgs e)
         {
-            _mutex?.ReleaseMutex();
-            _mutex?.Dispose();
+            // Only release the mutex if this is the first instance that owns it.
+            // The second instance never acquires ownership so ReleaseMutex()
+            // would throw ApplicationException from the wrong thread.
+            if (!_isSecondInstance)
+            {
+                try { _mutex?.ReleaseMutex(); } catch { }
+                _mutex?.Dispose();
+            }
             _showEvent?.Dispose();
             base.OnExit(e);
         }
