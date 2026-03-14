@@ -15,10 +15,16 @@ namespace LenovoController
     {
         public Settings Settings { get; private set; }
         public static App Instance { get; private set; }
-        private static Mutex _mutex;
-        private NotifyIcon notifyIcon;
-        private MainWindow mainWindow;
 
+        private static Mutex _mutex;
+        private static EventWaitHandle _showEvent;
+
+        // Static so the background listener thread can always reach it
+        private static MainWindow _mainWindow;
+
+        private NotifyIcon _notifyIcon;
+
+        // ── Settings ──────────────────────────────────────────────────────────────
         public void LoadSettings()
         {
             try
@@ -26,8 +32,7 @@ namespace LenovoController
                 if (File.Exists("settings.ini"))
                 {
                     var json = File.ReadAllText("settings.ini");
-                    Settings newSettings = JsonConvert.DeserializeObject<Settings>(json);
-                    Settings = newSettings ?? new Settings();
+                    Settings = JsonConvert.DeserializeObject<Settings>(json) ?? new Settings();
                 }
                 else
                 {
@@ -43,21 +48,20 @@ namespace LenovoController
         public void SaveSettings()
         {
             if (Settings != null)
-            {
-                var json = JsonConvert.SerializeObject(Settings, Formatting.Indented);
-                File.WriteAllText("settings.ini", json);
-            }
+                File.WriteAllText("settings.ini",
+                    JsonConvert.SerializeObject(Settings, Formatting.Indented));
         }
 
+        // ── Autostart ─────────────────────────────────────────────────────────────
         public bool CheckAutoStart()
         {
-            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(
+            using (var key = Registry.CurrentUser.OpenSubKey(
                 @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", false))
             {
                 if (key == null) return false;
                 var value = key.GetValue("LenovoController") as string;
                 if (value == null) return false;
-                var stored = value.Trim('"');
+                var stored  = value.Trim('"');
                 var current = Process.GetCurrentProcess().MainModule.FileName;
                 return string.Equals(stored, current, StringComparison.OrdinalIgnoreCase);
             }
@@ -65,61 +69,61 @@ namespace LenovoController
 
         public void SetRunOnWindowsStartUp(bool autoStart)
         {
-            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(
+            using (var key = Registry.CurrentUser.OpenSubKey(
                 @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
             {
                 if (key == null) return;
                 if (autoStart)
-                {
-                    var path = Process.GetCurrentProcess().MainModule.FileName;
-                    key.SetValue("LenovoController", $"\"{path}\"");
-                }
+                    key.SetValue("LenovoController",
+                        $"\"{Process.GetCurrentProcess().MainModule.FileName}\"");
                 else
-                {
                     key.DeleteValue("LenovoController", throwOnMissingValue: false);
-                }
             }
         }
 
+        // ── Startup ───────────────────────────────────────────────────────────────
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
+            // Named event — second instance signals first instance through this
+            _showEvent = new EventWaitHandle(false, EventResetMode.AutoReset,
+                "LenovoController_ShowWindow", out bool createdNew);
+
             _mutex = new Mutex(true, "LenovoController_SingleInstance", out bool isNew);
+
             if (!isNew)
             {
-                System.Windows.MessageBox.Show(
-                    "Another copy of the application is already running. Close it and try again.",
-                    "Lenovo Controller", MessageBoxButton.OK, MessageBoxImage.Error);
-                Shutdown(-1);
+                // Already running — signal the first instance to show its window
+                _showEvent.Set();
+                Shutdown(0);
                 return;
             }
+
+            // First instance — start background thread listening for show signals
+            var listenerThread = new Thread(() =>
+            {
+                while (true)
+                {
+                    _showEvent.WaitOne();
+                    Dispatcher.Invoke(BringToFront);
+                }
+            })
+            {
+                IsBackground = true,
+                Name = "ShowWindowListener"
+            };
+            listenerThread.Start();
 
             MigrateStartupRegistryIfNeeded();
 
             AppDomain.CurrentDomain.UnhandledException += (s, ex) =>
             {
-                var errorText = ex.ExceptionObject.ToString();
-                Trace.TraceError(errorText);
-                System.Windows.MessageBox.Show(errorText, "Lenovo Controller",
+                var text = ex.ExceptionObject.ToString();
+                Trace.TraceError(text);
+                System.Windows.MessageBox.Show(text, "Lenovo Controller",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             };
-        }
-
-        protected override void OnExit(ExitEventArgs e)
-        {
-            _mutex?.ReleaseMutex();
-            _mutex?.Dispose();
-            base.OnExit(e);
-        }
-
-        private void Application_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
-        {
-            var errorText = e.Exception.ToString();
-            Trace.TraceError(errorText);
-            System.Windows.MessageBox.Show(errorText, "Lenovo Controller",
-                MessageBoxButton.OK, MessageBoxImage.Error);
-            Shutdown(-1);
         }
 
         private void Application_Startup(object sender, StartupEventArgs e)
@@ -134,81 +138,92 @@ namespace LenovoController
                 _    => "Exit"
             };
 
-            notifyIcon = new NotifyIcon();
-            notifyIcon.Icon = System.Drawing.Icon.FromHandle(
-                LenovoController.Properties.Resources.LC.Handle);
-            notifyIcon.Visible = true;
-            notifyIcon.Text = "Lenovo Controller";
-
-            notifyIcon.Click += (s, ev) =>
+            _notifyIcon = new NotifyIcon
             {
-                if (ev is MouseEventArgs me && me.Button == MouseButtons.Left)
-                    OnAppRun(s, ev);
+                Icon    = System.Drawing.Icon.FromHandle(Properties.Resources.LC.Handle),
+                Visible = true,
+                Text    = "Lenovo Controller",
+                ContextMenu = new ContextMenu(new MenuItem[]
+                {
+                    new MenuItem("Lenovo Controller", OnAppRun),
+                    new MenuItem(exitText, OnExitClick)
+                })
             };
 
-            notifyIcon.ContextMenu = new ContextMenu(new MenuItem[]
+            // Single left click opens window directly
+            _notifyIcon.Click += (s, ev) =>
             {
-                new MenuItem("Lenovo Controller", OnAppRun),
-                new MenuItem(exitText, OnExitClick)
-            });
+                if (ev is MouseEventArgs me && me.Button == MouseButtons.Left)
+                    BringToFront();
+            };
 
             CreateMainDialog();
         }
 
+        // ── Window management ─────────────────────────────────────────────────────
         private void CreateMainDialog()
         {
             if (DriverProvider.ErrorShown) return;
 
-            if (mainWindow == null)
-                mainWindow = new MainWindow(this);
+            if (_mainWindow == null)
+                _mainWindow = new MainWindow(this);
 
             if (!Settings.ShowOnStartup)
-                mainWindow.Hide();
+                _mainWindow.Hide();
             else
-                mainWindow.Show();
+                _mainWindow.Show();
         }
 
-        private void OnAppRun(object sender, EventArgs e)
+        private void BringToFront()
         {
             if (DriverProvider.ErrorShown) return;
 
-            if (mainWindow == null)
-                mainWindow = new MainWindow(this);
+            if (_mainWindow == null)
+                _mainWindow = new MainWindow(this);
 
-            if (mainWindow.Visibility != Visibility.Visible)
-            {
-                mainWindow.Show();
-                mainWindow.Activate();
-            }
-            else
-            {
-                mainWindow.Activate();
-                mainWindow.Focus();
-            }
+            if (_mainWindow.Visibility != Visibility.Visible)
+                _mainWindow.Show();
+
+            _mainWindow.Activate();
+            _mainWindow.Focus();
         }
 
-        private void OnExitClick(object sender, EventArgs e)
+        private void OnAppRun(object sender, EventArgs e) => BringToFront();
+
+        private void OnExitClick(object sender, EventArgs e) => Shutdown(0);
+
+        // ── Exit ──────────────────────────────────────────────────────────────────
+        protected override void OnExit(ExitEventArgs e)
         {
-            Shutdown(0);
+            _mutex?.ReleaseMutex();
+            _mutex?.Dispose();
+            _showEvent?.Dispose();
+            base.OnExit(e);
+        }
+
+        private void Application_DispatcherUnhandledException(object sender,
+            DispatcherUnhandledExceptionEventArgs e)
+        {
+            var text = e.Exception.ToString();
+            Trace.TraceError(text);
+            System.Windows.MessageBox.Show(text, "Lenovo Controller",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+            Shutdown(-1);
         }
 
         private void Application_Exit(object sender, ExitEventArgs e)
         {
-            notifyIcon.Visible = false;
-            notifyIcon.Dispose();
-            notifyIcon = null;
+            _notifyIcon.Visible = false;
+            _notifyIcon.Dispose();
+            _notifyIcon = null;
         }
 
-        /// <summary>
-        /// Migrates an old unquoted startup registry entry to the quoted form
-        /// required by Windows 11. Without quotes, paths with spaces are silently
-        /// ignored by the Windows startup mechanism.
-        /// </summary>
+        // ── Registry migration ────────────────────────────────────────────────────
         private void MigrateStartupRegistryIfNeeded()
         {
             try
             {
-                using (RegistryKey key = Registry.CurrentUser.OpenSubKey(
+                using (var key = Registry.CurrentUser.OpenSubKey(
                     @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
                 {
                     if (key == null) return;
@@ -220,7 +235,7 @@ namespace LenovoController
             }
             catch (Exception ex)
             {
-                Trace.TraceWarning($"Could not migrate startup registry entry: {ex.Message}");
+                Trace.TraceWarning($"Could not migrate startup registry: {ex.Message}");
             }
         }
     }
