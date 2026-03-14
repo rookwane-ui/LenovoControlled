@@ -140,7 +140,7 @@ namespace LenovoController
 
             _notifyIcon = new NotifyIcon
             {
-                Icon    = System.Drawing.Icon.FromHandle(Properties.Resources.LC.Handle),
+                Icon    = System.Drawing.Icon.FromHandle(LenovoController.Properties.Resources.LC.Handle),
                 Visible = true,
                 Text    = "Lenovo Controller",
                 ContextMenu = new ContextMenu(new MenuItem[]
