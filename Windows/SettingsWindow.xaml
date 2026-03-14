@@ -58,7 +58,7 @@
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="Lenovo Controller" FontSize="13" FontWeight="SemiBold"/>
                         <TextBlock Text="v2.0.2.0" FontSize="11" Opacity="0.6"/>
-                        <TextBlock Text="ViRb3 · 5ORBEX · Doc_DDD" FontSize="11" Opacity="0.6"/>
+                        <TextBlock Text="ViRb3 · 5ORBEX · Samra" FontSize="11" Opacity="0.6"/>
                     </StackPanel>
                 </StackPanel>
             </ui:Card>
