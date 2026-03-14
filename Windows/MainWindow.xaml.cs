@@ -138,7 +138,7 @@ namespace LenovoController
             if (_refreshing) return;
             var newState = (PowerModeState)Array.IndexOf(_powerModeButtons, sender);
             if (_powerModeFeature.GetState() != newState)
-                SafeSet(() => _powerModeFeature.SetAndSyncState(newState));
+                SafeSet(() => _powerModeFeature.SetState(newState));
         }
 
         private void radioBattery_Checked(object sender, RoutedEventArgs e)
