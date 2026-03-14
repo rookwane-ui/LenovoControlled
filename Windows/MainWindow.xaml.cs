@@ -1,3 +1,4 @@
+using LenovoController.Features;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -6,11 +7,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
-using LenovoController.Features;
+using Wpf.Ui.Appearance;
 
 namespace LenovoController
 {
-    public partial class MainWindow : Window, INotifyPropertyChanged
+    public partial class MainWindow : Wpf.Ui.Controls.FluentWindow, INotifyPropertyChanged
     {
         // ── Features ──────────────────────────────────────────────────────────────
         private readonly AlwaysOnUsbFeature  _alwaysOnUsbFeature  = new AlwaysOnUsbFeature();
@@ -27,18 +28,6 @@ namespace LenovoController
         private bool _refreshing;
 
         // ── INotifyPropertyChanged ────────────────────────────────────────────────
-        private bool _darkMode;
-        public bool DarkMode
-        {
-            get => _darkMode;
-            set
-            {
-                _darkMode = value;
-                OnPropertyChanged();
-                FluentWindow.UpdateTheme(this, value);
-            }
-        }
-
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string prop = "") =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
@@ -47,21 +36,14 @@ namespace LenovoController
         public MainWindow(App app)
         {
             InitializeComponent();
-            DataContext = this;
-
             _app = app;
-            _darkMode = _app.Settings.DarkMode;
             ChangeLanguage();
 
             _powerModeButtons   = new[] { radioQuiet, radioBalance, radioPerformance };
             _batteryButtons     = new[] { radioConservation, radioNormalCharge, radioRapidCharge };
             _alwaysOnUsbButtons = new[] { radioAlwaysOnUsbOff, radioAlwaysOnUsbOnWhenSleeping, radioAlwaysOnUsbOnAlways };
 
-            Loaded += async (_, __) =>
-            {
-                FluentWindow.Apply(this, _darkMode);
-                await RefreshAsync();
-            };
+            Loaded += async (_, __) => await RefreshAsync();
         }
 
         // ── Async Refresh ─────────────────────────────────────────────────────────
@@ -88,9 +70,9 @@ namespace LenovoController
                     Try(() => { fnLock    = _fnLockFeature.GetState()       == FnLockState.On;        fnLockOk   = true; }, () => Dispatcher.Invoke(() => chkFnLock.IsEnabled        = false));
                 });
 
-                if (powerOk)   _powerModeButtons[(int)powerMode].IsChecked  = true;
-                if (batteryOk) _batteryButtons[(int)battery].IsChecked       = true;
-                if (usbOk)     _alwaysOnUsbButtons[(int)usb].IsChecked       = true;
+                if (powerOk)    _powerModeButtons[(int)powerMode].IsChecked  = true;
+                if (batteryOk)  _batteryButtons[(int)battery].IsChecked       = true;
+                if (usbOk)      _alwaysOnUsbButtons[(int)usb].IsChecked       = true;
                 if (touchpadOk) chkTouchpadLock.IsChecked = touchpad;
                 if (fnLockOk)   chkFnLock.IsChecked        = fnLock;
             }
@@ -124,7 +106,7 @@ namespace LenovoController
             dlg.ShowDialog();
             if (dlg.DialogResult == true)
             {
-                DarkMode = _app.Settings.DarkMode;
+                _app.ApplyTheme(_app.Settings.DarkMode);
                 ChangeLanguage();
             }
         }
@@ -160,7 +142,8 @@ namespace LenovoController
         private void chkTouchpadLock_Checked(object sender, RoutedEventArgs e)
         {
             if (_refreshing) return;
-            var newState = chkTouchpadLock.IsChecked == true ? TouchpadLockState.Off : TouchpadLockState.On;
+            var newState = chkTouchpadLock.IsChecked == true
+                ? TouchpadLockState.Off : TouchpadLockState.On;
             if (_touchpadLockFeature.GetState() != newState)
                 SafeSet(() => _touchpadLockFeature.SetState(newState));
         }
@@ -193,18 +176,12 @@ namespace LenovoController
                 case "RU":
                     batteryGroup.Text              = "Зарядка батареи";
                     radioConservation.Content      = "Сбережение";
-                    radioConservation.ToolTip      = "Батарея не заряжается выше 60% для сбережения ресурса";
                     radioNormalCharge.Content      = "Нормальная";
-                    radioNormalCharge.ToolTip      = "Батарея заряжается до 100% как обычно";
                     radioRapidCharge.Content       = "Быстрая";
-                    radioRapidCharge.ToolTip       = "Батарея заряжается быстрее. Может вызывать нагрев блока питания";
                     powerModeGroup.Text            = "Режим работы";
                     radioQuiet.Content             = "Тихий";
-                    radioQuiet.ToolTip             = "Ограничивает мощность CPU и GPU, система охлаждения работает тихо";
                     radioBalance.Content           = "Авто";
-                    radioBalance.ToolTip           = "Мощность CPU и GPU регулируются автоматически";
                     radioPerformance.Content       = "Производительность";
-                    radioPerformance.ToolTip       = "Максимальная мощность CPU и GPU, вентиляторы работают громче";
                     alwaysGroup.Text               = "Always on USB";
                     radioAlwaysOnUsbOff.Content            = "Выкл.";
                     radioAlwaysOnUsbOnWhenSleeping.Content = "Во сне";
@@ -215,26 +192,18 @@ namespace LenovoController
                     touchpadTitle.Text             = "Тачпад";
                     touchpadSubtitle.Text          = "Включить или отключить тачпад";
                     btnRefresh.Content             = "Обновить";
-                    btnRefresh.ToolTip             = "Синхронизировать настройки с ноутбуком";
-                    btnSettings.ToolTip            = "Настройки";
                     btnExit.Content                = "Выход";
                     break;
 
                 case "UA":
                     batteryGroup.Text              = "Зарядка батареї";
                     radioConservation.Content      = "Збереження";
-                    radioConservation.ToolTip      = "Батарея не заряджається вище 60% для збереження ресурсу";
                     radioNormalCharge.Content      = "Нормальна";
-                    radioNormalCharge.ToolTip      = "Батарея заряджається до 100% як зазвичай";
                     radioRapidCharge.Content       = "Швидка";
-                    radioRapidCharge.ToolTip       = "Батарея заряджається швидше. Може викликати нагрів БЖ";
                     powerModeGroup.Text            = "Режим роботи";
                     radioQuiet.Content             = "Тихий";
-                    radioQuiet.ToolTip             = "Обмежує потужність CPU і GPU, система охолодження тиха";
                     radioBalance.Content           = "Авто";
-                    radioBalance.ToolTip           = "Потужність CPU і GPU регулюються автоматично";
                     radioPerformance.Content       = "Продуктивність";
-                    radioPerformance.ToolTip       = "Максимальна потужність CPU і GPU";
                     alwaysGroup.Text               = "Always on USB";
                     radioAlwaysOnUsbOff.Content            = "Вимк.";
                     radioAlwaysOnUsbOnWhenSleeping.Content = "Уві сні";
@@ -245,41 +214,28 @@ namespace LenovoController
                     touchpadTitle.Text             = "Тачпад";
                     touchpadSubtitle.Text          = "Увімкнути або вимкнути тачпад";
                     btnRefresh.Content             = "Оновити";
-                    btnRefresh.ToolTip             = "Синхронізувати налаштування з ноутбуком";
-                    btnSettings.ToolTip            = "Налаштування";
                     btnExit.Content                = "Вихід";
                     break;
 
                 default:
                     batteryGroup.Text              = "Battery charge";
                     radioConservation.Content      = "Conservation";
-                    radioConservation.ToolTip      = "Battery won't charge above 60% to extend its lifespan";
                     radioNormalCharge.Content      = "Normal";
-                    radioNormalCharge.ToolTip      = "Battery charges to 100% as usual";
                     radioRapidCharge.Content       = "Rapid";
-                    radioRapidCharge.ToolTip       = "Battery charges faster. May cause the power adapter to run warm";
                     powerModeGroup.Text            = "Power mode";
                     radioQuiet.Content             = "Quiet";
-                    radioQuiet.ToolTip             = "Limits CPU/GPU power; fans run quietly";
                     radioBalance.Content           = "Balance";
-                    radioBalance.ToolTip           = "CPU/GPU power adjusts automatically for most tasks";
                     radioPerformance.Content       = "Performance";
-                    radioPerformance.ToolTip       = "Maximum CPU/GPU power; fans run at full speed";
                     alwaysGroup.Text               = "Always on USB";
                     radioAlwaysOnUsbOff.Content            = "Off";
-                    radioAlwaysOnUsbOff.ToolTip            = "USB ports have no power when the laptop is off";
                     radioAlwaysOnUsbOnWhenSleeping.Content = "Sleeping";
-                    radioAlwaysOnUsbOnWhenSleeping.ToolTip = "USB ports are powered during sleep";
                     radioAlwaysOnUsbOnAlways.Content       = "Always";
-                    radioAlwaysOnUsbOnAlways.ToolTip       = "USB ports are always powered";
                     miscGroup.Text                 = "Additional options";
                     fnLockTitle.Text               = "Fn Lock";
                     fnLockSubtitle.Text            = "Emulates holding the Fn key permanently";
                     touchpadTitle.Text             = "Touchpad";
                     touchpadSubtitle.Text          = "Enable or disable the touchpad";
                     btnRefresh.Content             = "Refresh";
-                    btnRefresh.ToolTip             = "Sync settings with the laptop hardware";
-                    btnSettings.ToolTip            = "Settings";
                     btnExit.Content                = "Exit";
                     break;
             }

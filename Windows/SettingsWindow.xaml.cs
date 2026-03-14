@@ -1,169 +1,92 @@
-﻿using System;
+using System;
 using System.ComponentModel;
-using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Interop;
-// using LenovoController.Resources;
 
 namespace LenovoController
 {
-    /// <summary>
-    /// Interaction logic for SettingsWindow.xaml
-    /// </summary>
-    public partial class SettingsWindow : Window, INotifyPropertyChanged
+    public partial class SettingsWindow : Wpf.Ui.Controls.FluentWindow, INotifyPropertyChanged
     {
-        private readonly App application;
-        private bool darkMode;
-
-        public bool DarkMode
-        {
-            get { return darkMode; }
-            set
-            {
-                darkMode = value;
-                OnPropertyChanged(nameof(DarkMode));
-            }
-        }
+        private readonly App _app;
+        private bool _applyPressed;
 
         public event PropertyChangedEventHandler PropertyChanged;
+        private void OnPropertyChanged([CallerMemberName] string p = "") =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(p));
 
-        public SettingsWindow(IntPtr handle, App app)
+        public SettingsWindow(IntPtr ownerHandle, App app)
         {
             InitializeComponent();
-            DataContext = this;
+            _app = app;
 
-            application = app;
-            DarkMode = application.Settings.DarkMode;
-            darkTheme.IsChecked = application.Settings.DarkMode;
-            autoRun.IsChecked = app.CheckAutoStart();
+            new WindowInteropHelper(this).Owner = ownerHandle;
+
+            darkTheme.IsChecked    = app.Settings.DarkMode;
+            autoRun.IsChecked      = app.CheckAutoStart();
             showOnStartup.IsChecked = app.Settings.ShowOnStartup;
+
             ChangeLanguage();
-
-            applyPressed = false;
-            var helper = new WindowInteropHelper(this);
-            helper.Owner = handle;
-        }
-
-        private void OnPropertyChanged([CallerMemberName] string prop = "")
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(prop));
-            }
         }
 
         private void ChangeLanguage()
         {
-            switch (application.Settings.Culture)
+            switch (_app.Settings.Culture)
             {
                 case "RU":
-                    langList.ItemsSource = new string[] { "Русский", "Украинский", "Английский" };
-                    langList.ToolTip = "Выбор языка программы";
+                    langList.ItemsSource   = new[] { "Русский", "Украинский", "Английский" };
                     langList.SelectedIndex = 0;
-
-                    showOnStartup.Content = "Отображать при запуске";
-                    showOnStartup.ToolTip = "Отображать основное окно при запуске приложения автоматически";
-
-                    darkTheme.Content = "Темная тема";
-                    darkTheme.ToolTip = "Изменить графическую тему программы";
-
-                    autoRun.Content = "Автозагрузка";
-                    autoRun.ToolTip = "Запуск программы при загрузке Windows";
-
-                    this.Title = " Настройки";
-                    about.Text = "О программе";
-                    authors.Text = "Авторы:";
-                    btnApply.Content = "ПРИМЕНИТЬ";
-                    btnCancel.Content = "ОТМЕНА";
+                    Title                  = "Настройки";
+                    btnApply.Content       = "Применить";
+                    btnCancel.Content      = "Отмена";
                     break;
-
                 case "UA":
-                    langList.ItemsSource = new string[] { "Російська", "Українська", "Англійська" };
-                    langList.ToolTip = "Вибір мови програми";
+                    langList.ItemsSource   = new[] { "Російська", "Українська", "Англійська" };
                     langList.SelectedIndex = 1;
-
-                    showOnStartup.Content = "Відображати при запуску";
-                    showOnStartup.ToolTip = "Відображати основне вікно при запуску програми автоматично";
-
-                    darkTheme.Content = "Темна тема";
-                    darkTheme.ToolTip = "Змінити графічну тему програми";
-
-                    autoRun.Content = "Автозапуск";
-                    autoRun.ToolTip = "Запуск програми при завантаженні Windows";
-
-                    this.Title = " Налаштування";
-                    about.Text = "Про програму";
-                    authors.Text = "Автори:";
-                    btnApply.Content = "ПРИМІНИТИ";
-                    btnCancel.Content = "ВІДМІНА";
+                    Title                  = "Налаштування";
+                    btnApply.Content       = "Примінити";
+                    btnCancel.Content      = "Відміна";
                     break;
-
                 default:
-                    langList.ItemsSource = new string[] { "Russian", "Ukrainian", "English" };
-                    langList.ToolTip = "The program language selection";
+                    langList.ItemsSource   = new[] { "Russian", "Ukrainian", "English" };
                     langList.SelectedIndex = 2;
-
-                    showOnStartup.Content = "Show on startup";
-                    showOnStartup.ToolTip = "Show main window after start automatically";
-
-                    darkTheme.Content = "Dark theme";
-                    darkTheme.ToolTip = "Switch graphic theme of the program";
-
-                    autoRun.Content = "Startup";
-                    autoRun.ToolTip = "Run program on Windows startup";
-
-                    this.Title = " Settings";
-                    about.Text = "About";
-                    authors.Text = "Authors:";
-                    btnApply.Content = "APPLY";
-                    btnCancel.Content = "CANCEL";
+                    Title                  = "Settings";
+                    btnApply.Content       = "Apply";
+                    btnCancel.Content      = "Cancel";
                     break;
             }
-        }
-
-        private void btnCancel_Click(object sender, RoutedEventArgs e)
-        {
-            this.DialogResult = false;
-            this.Close();
         }
 
         private void btnApply_Click(object sender, RoutedEventArgs e)
         {
-            var index = langList.SelectedIndex;
-            string lang = null;
-
-            switch (index)
+            string lang = langList.SelectedIndex switch
             {
-                case 0:
-                    lang = "RU";
-                    break;
-                case 1:
-                    lang = "UA";
-                    break;
-                case 2:
-                    lang = "EN";
-                    break;
-            }
+                0 => "RU",
+                1 => "UA",
+                _ => "EN"
+            };
 
-            applyPressed = true;
-            application.Settings.Culture = lang;
-            application.Settings.DarkMode = darkTheme?.IsChecked ?? false;
-            application.Settings.ShowOnStartup = showOnStartup?.IsChecked ?? false;
-            DarkMode = application.Settings.DarkMode;
-            ChangeLanguage();
-            application.SaveSettings();
-            application.SetRunOnWindowsStartUp(autoRun?.IsChecked ?? false);
-            this.DialogResult = true;
-            this.Close();
+            _app.Settings.Culture      = lang;
+            _app.Settings.DarkMode     = darkTheme.IsChecked == true;
+            _app.Settings.ShowOnStartup = showOnStartup.IsChecked == true;
+            _app.SaveSettings();
+            _app.SetRunOnWindowsStartUp(autoRun.IsChecked == true);
+
+            _applyPressed = true;
+            DialogResult  = true;
+            Close();
         }
 
-    private void Window_Closing(object sender, CancelEventArgs e)
-{
-    try { this.DialogResult = applyPressed; }
-    catch (InvalidOperationException) { }
-}
+        private void btnCancel_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = false;
+            Close();
+        }
 
-        private bool applyPressed;
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            try { DialogResult = _applyPressed; }
+            catch (InvalidOperationException) { }
+        }
     }
 }
