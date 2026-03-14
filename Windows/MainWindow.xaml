@@ -61,9 +61,7 @@
         </Grid.RowDefinitions>
 
         <!-- WPF-UI title bar with Mica -->
-        <ui:TitleBar Grid.Row="0"
-                     Title="Lenovo Controller"
-                     Icon="pack://application:,,,/Resources/Icons/LC.ico"/>
+        <ui:TitleBar Grid.Row="0" Title="Lenovo Controller"/>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="16,8,16,16">
@@ -81,12 +79,13 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <Border Width="34" Height="34" CornerRadius="6"
+                        <Border Width="36" Height="36" CornerRadius="8"
                                 Background="#FFF3E0" HorizontalAlignment="Left"
                                 VerticalAlignment="Center">
-                            <Image Height="18" HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   Source="pack://application:,,,/Resources/Icons/Battery_white.png"/>
+                            <ui:SymbolIcon Symbol="Battery224" FontSize="18"
+                                           Foreground="#E65100"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
                         </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0">
                             <TextBlock x:Name="batteryTitle" Text="Battery charge" FontSize="13"/>
@@ -128,12 +127,13 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <Border Width="34" Height="34" CornerRadius="6"
+                        <Border Width="36" Height="36" CornerRadius="8"
                                 Background="#E8F5E9" HorizontalAlignment="Left"
                                 VerticalAlignment="Center">
-                            <Image Height="18" HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   Source="pack://application:,,,/Resources/Icons/Power_white.png"/>
+                            <ui:SymbolIcon Symbol="LeafOne24" FontSize="18"
+                                           Foreground="#2E7D32"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
                         </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0">
                             <TextBlock x:Name="powerTitle" Text="Power mode" FontSize="13"/>
@@ -174,12 +174,13 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <Border Width="34" Height="34" CornerRadius="6"
+                        <Border Width="36" Height="36" CornerRadius="8"
                                 Background="#E3F2FD" HorizontalAlignment="Left"
                                 VerticalAlignment="Center">
-                            <Image Height="18" HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   Source="pack://application:,,,/Resources/Icons/Usb_white.png"/>
+                            <ui:SymbolIcon Symbol="Usb24" FontSize="18"
+                                           Foreground="#1565C0"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
                         </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0">
                             <TextBlock x:Name="usbTitle" Text="Always on USB" FontSize="13"/>
@@ -221,12 +222,13 @@
                                 <ColumnDefinition Width="44"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Border Width="34" Height="34" CornerRadius="6"
+                            <Border Width="36" Height="36" CornerRadius="8"
                                     Background="#EDE7F6" HorizontalAlignment="Left"
                                     VerticalAlignment="Center">
-                                <Image Height="18" HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"
-                                       Source="pack://application:,,,/Resources/Icons/Fn_white.png"/>
+                                <ui:SymbolIcon Symbol="Keyboard24" FontSize="18"
+                                               Foreground="#4527A0"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
                             </Border>
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                 <TextBlock x:Name="fnLockTitle" Text="Fn Lock" FontSize="13"/>
@@ -249,12 +251,13 @@
                                 <ColumnDefinition Width="44"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Border Width="34" Height="34" CornerRadius="6"
+                            <Border Width="36" Height="36" CornerRadius="8"
                                     Background="#E0F7FA" HorizontalAlignment="Left"
                                     VerticalAlignment="Center">
-                                <Image Height="18" HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"
-                                       Source="pack://application:,,,/Resources/Icons/Touch_white.png"/>
+                                <ui:SymbolIcon Symbol="Tablet24" FontSize="18"
+                                               Foreground="#006064"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
                             </Border>
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                 <TextBlock x:Name="touchpadTitle" Text="Touchpad" FontSize="13"/>
@@ -282,9 +285,9 @@
                     <ui:Button x:Name="btnSettings" Grid.Column="1"
                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                Margin="8,0" Padding="0" Click="btnSettings_Click">
-                        <Image Source="pack://application:,,,/Resources/Icons/Settings.png"
-                               Width="16" Height="16"
-                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <ui:SymbolIcon Symbol="Settings24" FontSize="16"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
                     </ui:Button>
                     <ui:Button x:Name="btnExit" Grid.Column="2"
                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
