@@ -1,0 +1,63 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main ]
+    tags:      [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore LenovoController.sln
+
+      - name: Build
+        run: dotnet build LenovoController.sln --configuration Release --no-restore
+
+      - name: Publish
+        run: >
+          dotnet publish LenovoController/LenovoController.csproj
+          --configuration Release
+          --runtime win-x64
+          --self-contained false
+          --output publish/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LenovoController
+          path: publish/
+
+  release:
+    needs: build
+    runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: LenovoController
+          path: publish/
+
+      - name: Zip
+        run: Compress-Archive -Path publish/* -DestinationPath LenovoController.zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: LenovoController.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
