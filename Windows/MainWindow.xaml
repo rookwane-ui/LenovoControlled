@@ -28,7 +28,7 @@
                 <Setter Property="Foreground" Value="#1C1917"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Foreground" Value="#F5F0EB"/>
+                        <Setter Property="Foreground" Value="#EDE8E3"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
@@ -39,8 +39,8 @@
                 <Setter Property="Foreground" Value="#1C1917"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Background" Value="#3C3835"/>
-                        <Setter Property="Foreground" Value="#F5F0EB"/>
+                        <Setter Property="Background" Value="#18120E"/>
+                        <Setter Property="Foreground" Value="#EDE8E3"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
@@ -54,8 +54,8 @@
                 <Setter Property="Padding"         Value="16,13"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Background"  Value="#292524"/>
-                        <Setter Property="BorderBrush" Value="#3C3835"/>
+                        <Setter Property="Background"  Value="#110D0A"/>
+                        <Setter Property="BorderBrush" Value="#1F1A16"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
@@ -77,7 +77,7 @@
                 <Setter Property="Background" Value="#E8E4DF"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Background" Value="#3C3835"/>
+                        <Setter Property="Background" Value="#1F1A16"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
@@ -106,7 +106,7 @@
                 <Setter Property="Foreground" Value="#78716C"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Foreground" Value="#A8A29E"/>
+                        <Setter Property="Foreground" Value="#5C5650"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
@@ -118,7 +118,7 @@
                 <Setter Property="Background"   Value="#E8E4DF"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Background" Value="#1C1917"/>
+                        <Setter Property="Background" Value="#0A0806"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
