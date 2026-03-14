@@ -73,6 +73,8 @@ namespace LenovoController
                 dark ? ApplicationTheme.Dark : ApplicationTheme.Light);
         }
 
+        private static bool _isSecondInstance;
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -83,6 +85,8 @@ namespace LenovoController
 
             if (!isNew)
             {
+                // Signal the running instance to show its window then exit silently
+                _isSecondInstance = true;
                 _showEvent.Set();
                 Shutdown(0);
                 return;
@@ -106,6 +110,9 @@ namespace LenovoController
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            // Second instance — do nothing, OnStartup already signalled and shut down
+            if (_isSecondInstance) return;
+
             Instance = this;
             LoadSettings();
             ApplyTheme(Settings.DarkMode);
