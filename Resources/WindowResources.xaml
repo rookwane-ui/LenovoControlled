@@ -95,7 +95,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Border x:Name="Border" Height="18" Width="18" CornerRadius="4"
-                    Background="#110D0A" BorderBrush="#1F1A16" BorderThickness="1.5"
+                    Background="#35FFFFFF" BorderBrush="#30FFFFFF" BorderThickness="1.5"
                     HorizontalAlignment="Left" VerticalAlignment="Center">
                 <Path x:Name="CheckMark" HorizontalAlignment="Center" VerticalAlignment="Center"
                       SnapsToDevicePixels="False" Stroke="#C0392B" StrokeThickness="2"
@@ -286,7 +286,7 @@
             <TextBlock x:Name="Label" Text="{TemplateBinding Content}"
                        FontSize="12" FontWeight="Normal"
                        FontFamily="Segoe UI Variable Text, Segoe UI"
-                       Foreground="#78716C"
+                       Foreground="#C0B8B0"
                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Border>
         <ControlTemplate.Triggers>
@@ -296,7 +296,7 @@
                         <Storyboard>
                             <ColorAnimation Storyboard.TargetName="Bg"
                                 Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
-                                To="#3C3835" Duration="0:0:0.14"/>
+                                To="#50FFFFFF" Duration="0:0:0.14"/>
                         </Storyboard>
                     </BeginStoryboard>
                 </Trigger.EnterActions>
@@ -305,7 +305,7 @@
                         <Storyboard>
                             <ColorAnimation Storyboard.TargetName="Bg"
                                 Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
-                                To="#003C3835" Duration="0:0:0.14"/>
+                                To="#0050FFFFFF" Duration="0:0:0.14"/>
                         </Storyboard>
                     </BeginStoryboard>
                 </Trigger.ExitActions>
@@ -319,10 +319,10 @@
                 </Setter>
             </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Label" Property="Foreground" Value="#F5F0EB"/>
+                <Setter TargetName="Label" Property="Foreground" Value="#F2EDE8"/>
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="Label" Property="Foreground" Value="#44403C"/>
+                <Setter TargetName="Label" Property="Foreground" Value="#706860"/>
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -418,7 +418,7 @@
     <ControlTemplate x:Key="ComboBoxDark" TargetType="{x:Type ComboBox}">
         <Grid>
             <Border x:Name="OuterBorder" CornerRadius="6" BorderThickness="1"
-                    BorderBrush="#1F1A16" Background="#110D0A" SnapsToDevicePixels="True">
+                    BorderBrush="#30FFFFFF" Background="#40FFFFFF" SnapsToDevicePixels="True">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -454,7 +454,7 @@
             </Border>
             <Popup Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}"
                    AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
-                <Border Background="#110D0A" BorderBrush="#C0392B" BorderThickness="1"
+                <Border Background="#40FFFFFF" BorderBrush="#C0392B" BorderThickness="1"
                         CornerRadius="6" MinWidth="{TemplateBinding ActualWidth}"
                         MaxHeight="{TemplateBinding MaxDropDownHeight}" Margin="0,3,0,0">
                     <ScrollViewer Margin="2" SnapsToDevicePixels="True">
