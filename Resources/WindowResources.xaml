@@ -2,25 +2,35 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <!--
-        DESIGN TOKENS  —  Warm Modern + Deep Crimson
-        ───────────────────────────────────────────────────────
-        Accent:        #C0392B   Accent hover:  #A93226
-        Accent press:  #922B21
-
-        Light bg:      #FAFAF8   Light card:    #F5F4F1
-        Light border:  #E8E4DF   Light text:    #1C1917
-        Light subtext: #78716C   Light input:   #FAFAF8
-
-        Dark bg:       #1C1917   Dark card:     #292524
-        Dark border:   #3C3835   Dark text:     #F5F0EB
-        Dark subtext:  #A8A29E
-
-        Heading font:  Segoe UI Variable Display
-        Body font:     Segoe UI Variable Text
-        ───────────────────────────────────────────────────────
+    ╔══════════════════════════════════════════════════════════════════════╗
+    ║  FLUENT 2 / WinUI 3 DESIGN TOKENS                                   ║
+    ╠══════════════════════════════════════════════════════════════════════╣
+    ║  Font:        Segoe UI Variable (Text axis for body, Display axis   ║
+    ║               for headings)                                          ║
+    ║  Type ramp:   Caption 12/16  Body 14/20  Subtitle 20/28             ║
+    ║  Weight:      Regular (400) body,  Semibold (600) titles only        ║
+    ║  Casing:      Sentence case everywhere                               ║
+    ║  Grid:        40×40 epx touch target,  4px label gap,  8px gutter   ║
+    ║  Radius:      Control = 4px  Card = 8px  Pill = 9999px              ║
+    ║                                                                      ║
+    ║  Light layer:                                                        ║
+    ║    Bg        #F3F3F3  (SolidBackgroundFillColorBase)                ║
+    ║    Card      #FFFFFF at 70% (CardBackgroundFillColorDefault)        ║
+    ║    Border    #0000000E (CardStrokeColorDefault)                      ║
+    ║    Text      #000000E4 (TextFillColorPrimary)                        ║
+    ║    Subtext   #00000099 (TextFillColorSecondary)                      ║
+    ║    Accent    #C0392B (brand crimson)                                 ║
+    ║                                                                      ║
+    ║  Dark layer:                                                         ║
+    ║    Bg        Mica backdrop (transparent window)                      ║
+    ║    Card      #FFFFFF0D (CardBackgroundFillColorDefault dark ~5%)     ║
+    ║    Border    #FFFFFF14 (CardStrokeColorDefault dark ~8%)             ║
+    ║    Text      #FFFFFFЕ4 (TextFillColorPrimary dark)                   ║
+    ║    Subtext   #FFFFFF99 (TextFillColorSecondary dark ~60%)            ║
+    ╚══════════════════════════════════════════════════════════════════════╝
     -->
 
-    <!-- ── TOOLTIP ─────────────────────────────────────────── -->
+    <!-- ── TOOLTIP ─────────────────────────────────────────────────────── -->
     <Style TargetType="{x:Type ToolTip}">
         <Style.Resources>
             <Style TargetType="{x:Type ContentPresenter}">
@@ -32,11 +42,11 @@
             </Style>
         </Style.Resources>
         <Setter Property="MaxWidth"        Value="260"/>
-        <Setter Property="Background"      Value="#FAFAF8"/>
-        <Setter Property="Foreground"      Value="#1C1917"/>
-        <Setter Property="BorderBrush"     Value="#E8E4DF"/>
+        <Setter Property="Background"      Value="#F9F9F9"/>
+        <Setter Property="Foreground"      Value="#000000E4"/>
+        <Setter Property="BorderBrush"     Value="#0000000E"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Padding"         Value="10,7"/>
+        <Setter Property="Padding"         Value="12,8"/>
         <Setter Property="FontSize"        Value="12"/>
         <Setter Property="FontFamily"      Value="Segoe UI Variable Text, Segoe UI"/>
         <Setter Property="Template">
@@ -45,7 +55,7 @@
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="6" Padding="{TemplateBinding Padding}"
+                            CornerRadius="4" Padding="{TemplateBinding Padding}"
                             SnapsToDevicePixels="True">
                         <ContentPresenter/>
                     </Border>
@@ -54,36 +64,41 @@
         </Setter>
     </Style>
 
-    <!-- ── CLASSIC CHECKBOX  (SettingsWindow) ───────────────── -->
+    <!-- ── CLASSIC CHECKBOX  (SettingsWindow) ────────────────────────── -->
+    <!-- WinUI CheckBox: 20×20 box, CornerRadius=4, 2px border, checkmark SVG path -->
     <ControlTemplate x:Key="CheckBoxWhite" TargetType="{x:Type CheckBox}">
         <Grid Background="Transparent" SnapsToDevicePixels="True">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="20"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Border x:Name="Border" Height="18" Width="18" CornerRadius="4"
-                    Background="#FAFAF8" BorderBrush="#D6D0C8" BorderThickness="1.5"
-                    HorizontalAlignment="Left" VerticalAlignment="Center">
-                <Path x:Name="CheckMark" HorizontalAlignment="Center" VerticalAlignment="Center"
-                      SnapsToDevicePixels="False" Stroke="#C0392B" StrokeThickness="2"
+            <Border x:Name="Box" Height="20" Width="20" CornerRadius="4"
+                    Background="#FFFFFF" BorderBrush="#00000073" BorderThickness="1.5"
+                    VerticalAlignment="Center" HorizontalAlignment="Left">
+                <Path x:Name="Check" Data="M 3 9 L 7.5 13.5 L 14 5"
+                      Stroke="#FFFFFF" StrokeThickness="1.8"
                       StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                      Data="M 2 5 L 6 9 L 13 2"/>
+                      StrokeLineJoin="Round"
+                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                      SnapsToDevicePixels="False"/>
             </Border>
-            <ContentPresenter Grid.Column="1" Margin="9,0,0,0"
+            <ContentPresenter Grid.Column="1" Margin="8,0,0,0"
                               VerticalAlignment="Center" RecognizesAccessKey="True"/>
         </Grid>
         <ControlTemplate.Triggers>
             <Trigger Property="IsChecked" Value="False">
-                <Setter TargetName="CheckMark" Property="Visibility" Value="Collapsed"/>
+                <Setter TargetName="Check"   Property="Visibility"   Value="Collapsed"/>
+            </Trigger>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="Box"     Property="Background"   Value="#C0392B"/>
+                <Setter TargetName="Box"     Property="BorderBrush"  Value="#C0392B"/>
             </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Border" Property="BorderBrush" Value="#C0392B"/>
+                <Setter TargetName="Box"     Property="BorderBrush"  Value="#C0392B"/>
             </Trigger>
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="Border"    Property="Background"  Value="#F0EDE8"/>
-                <Setter TargetName="Border"    Property="BorderBrush" Value="#DDD8D0"/>
-                <Setter TargetName="CheckMark" Property="Stroke"      Value="#C8C2BA"/>
-                <Setter Property="Foreground" Value="#A8A29E"/>
+            <Trigger Property="IsEnabled"   Value="False">
+                <Setter TargetName="Box"     Property="Opacity"      Value="0.38"/>
+                <Setter Property="Foreground" Value="#00000072"/>
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -91,47 +106,52 @@
     <ControlTemplate x:Key="CheckBoxDark" TargetType="{x:Type CheckBox}">
         <Grid Background="Transparent" SnapsToDevicePixels="True">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="20"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Border x:Name="Border" Height="18" Width="18" CornerRadius="4"
-                    Background="#35FFFFFF" BorderBrush="#30FFFFFF" BorderThickness="1.5"
-                    HorizontalAlignment="Left" VerticalAlignment="Center">
-                <Path x:Name="CheckMark" HorizontalAlignment="Center" VerticalAlignment="Center"
-                      SnapsToDevicePixels="False" Stroke="#C0392B" StrokeThickness="2"
+            <Border x:Name="Box" Height="20" Width="20" CornerRadius="4"
+                    Background="#FFFFFF14" BorderBrush="#FFFFFF8B" BorderThickness="1.5"
+                    VerticalAlignment="Center" HorizontalAlignment="Left">
+                <Path x:Name="Check" Data="M 3 9 L 7.5 13.5 L 14 5"
+                      Stroke="#FFFFFFE4" StrokeThickness="1.8"
                       StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                      Data="M 2 5 L 6 9 L 13 2"/>
+                      StrokeLineJoin="Round"
+                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                      SnapsToDevicePixels="False"/>
             </Border>
-            <ContentPresenter Grid.Column="1" Margin="9,0,0,0"
+            <ContentPresenter Grid.Column="1" Margin="8,0,0,0"
                               VerticalAlignment="Center" RecognizesAccessKey="True"/>
         </Grid>
         <ControlTemplate.Triggers>
             <Trigger Property="IsChecked" Value="False">
-                <Setter TargetName="CheckMark" Property="Visibility" Value="Collapsed"/>
+                <Setter TargetName="Check"   Property="Visibility"   Value="Collapsed"/>
+            </Trigger>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="Box"     Property="Background"   Value="#C0392B"/>
+                <Setter TargetName="Box"     Property="BorderBrush"  Value="#C0392B"/>
             </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Border" Property="BorderBrush" Value="#C0392B"/>
+                <Setter TargetName="Box"     Property="BorderBrush"  Value="#C0392B"/>
             </Trigger>
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="Border"    Property="Background"  Value="#211E1C"/>
-                <Setter TargetName="Border"    Property="BorderBrush" Value="#3C3835"/>
-                <Setter TargetName="CheckMark" Property="Stroke"      Value="#57534E"/>
-                <Setter Property="Foreground" Value="#57534E"/>
+            <Trigger Property="IsEnabled"   Value="False">
+                <Setter TargetName="Box"     Property="Opacity"      Value="0.38"/>
+                <Setter Property="Foreground" Value="#FFFFFF72"/>
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
-    <!-- ── TOGGLE SWITCH  (MainWindow) ──────────────────────── -->
+    <!-- ── TOGGLE SWITCH  (MainWindow card rows) ─────────────────────── -->
+    <!-- WinUI ToggleSwitch: 40×20 pill, 14px thumb, no border on track   -->
     <ControlTemplate x:Key="ToggleSwitchLight" TargetType="{x:Type CheckBox}">
         <Grid Background="Transparent" SnapsToDevicePixels="True" VerticalAlignment="Center">
-            <Border x:Name="Track" Height="22" Width="42" CornerRadius="11"
-                    Background="#D6D0C8" VerticalAlignment="Center">
-                <Border x:Name="Thumb" Height="15" Width="15" CornerRadius="8"
-                        Background="#FAFAF8" VerticalAlignment="Center"
+            <Border x:Name="Track" Height="20" Width="40" CornerRadius="10"
+                    Background="#00000073" VerticalAlignment="Center">
+                <Border x:Name="Thumb" Height="12" Width="12" CornerRadius="6"
+                        Background="#FFFFFF" VerticalAlignment="Center"
                         HorizontalAlignment="Left" Margin="3,0,0,0">
                     <Border.Effect>
-                        <DropShadowEffect ShadowDepth="1" BlurRadius="3"
-                                          Color="#1C1917" Opacity="0.15" Direction="270"/>
+                        <DropShadowEffect ShadowDepth="0" BlurRadius="2"
+                                          Color="#000000" Opacity="0.14"/>
                     </Border.Effect>
                 </Border>
             </Border>
@@ -143,10 +163,13 @@
                         <Storyboard>
                             <ColorAnimation Storyboard.TargetName="Track"
                                 Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
-                                To="#C0392B" Duration="0:0:0.18"/>
+                                To="#C0392B" Duration="0:0:0.167"/>
                             <ThicknessAnimation Storyboard.TargetName="Thumb"
-                                Storyboard.TargetProperty="Margin" To="23,0,0,0" Duration="0:0:0.18">
-                                <ThicknessAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></ThicknessAnimation.EasingFunction>
+                                Storyboard.TargetProperty="Margin"
+                                To="23,0,0,0" Duration="0:0:0.167">
+                                <ThicknessAnimation.EasingFunction>
+                                    <CircleEase EasingMode="EaseOut"/>
+                                </ThicknessAnimation.EasingFunction>
                             </ThicknessAnimation>
                         </Storyboard>
                     </BeginStoryboard>
@@ -156,17 +179,20 @@
                         <Storyboard>
                             <ColorAnimation Storyboard.TargetName="Track"
                                 Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
-                                To="#D6D0C8" Duration="0:0:0.18"/>
+                                To="#00000073" Duration="0:0:0.167"/>
                             <ThicknessAnimation Storyboard.TargetName="Thumb"
-                                Storyboard.TargetProperty="Margin" To="3,0,0,0" Duration="0:0:0.18">
-                                <ThicknessAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></ThicknessAnimation.EasingFunction>
+                                Storyboard.TargetProperty="Margin"
+                                To="3,0,0,0" Duration="0:0:0.167">
+                                <ThicknessAnimation.EasingFunction>
+                                    <CircleEase EasingMode="EaseOut"/>
+                                </ThicknessAnimation.EasingFunction>
                             </ThicknessAnimation>
                         </Storyboard>
                     </BeginStoryboard>
                 </Trigger.ExitActions>
             </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Track" Property="Opacity" Value="0.82"/>
+                <Setter TargetName="Track" Property="Opacity" Value="0.8"/>
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter TargetName="Track" Property="Opacity" Value="0.38"/>
@@ -176,14 +202,14 @@
 
     <ControlTemplate x:Key="ToggleSwitchDark" TargetType="{x:Type CheckBox}">
         <Grid Background="Transparent" SnapsToDevicePixels="True" VerticalAlignment="Center">
-            <Border x:Name="Track" Height="22" Width="42" CornerRadius="11"
-                    Background="#2A2018" VerticalAlignment="Center">
-                <Border x:Name="Thumb" Height="15" Width="15" CornerRadius="8"
-                        Background="#6B6560" VerticalAlignment="Center"
+            <Border x:Name="Track" Height="20" Width="40" CornerRadius="10"
+                    Background="#FFFFFF8B" VerticalAlignment="Center">
+                <Border x:Name="Thumb" Height="12" Width="12" CornerRadius="6"
+                        Background="#000000" VerticalAlignment="Center"
                         HorizontalAlignment="Left" Margin="3,0,0,0">
                     <Border.Effect>
-                        <DropShadowEffect ShadowDepth="1" BlurRadius="3"
-                                          Color="#000000" Opacity="0.35" Direction="270"/>
+                        <DropShadowEffect ShadowDepth="0" BlurRadius="2"
+                                          Color="#000000" Opacity="0.35"/>
                     </Border.Effect>
                 </Border>
             </Border>
@@ -195,13 +221,16 @@
                         <Storyboard>
                             <ColorAnimation Storyboard.TargetName="Track"
                                 Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
-                                To="#C0392B" Duration="0:0:0.18"/>
+                                To="#C0392B" Duration="0:0:0.167"/>
                             <ColorAnimation Storyboard.TargetName="Thumb"
                                 Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
-                                To="#F5F0EB" Duration="0:0:0.18"/>
+                                To="#FFFFFF" Duration="0:0:0.167"/>
                             <ThicknessAnimation Storyboard.TargetName="Thumb"
-                                Storyboard.TargetProperty="Margin" To="23,0,0,0" Duration="0:0:0.18">
-                                <ThicknessAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></ThicknessAnimation.EasingFunction>
+                                Storyboard.TargetProperty="Margin"
+                                To="23,0,0,0" Duration="0:0:0.167">
+                                <ThicknessAnimation.EasingFunction>
+                                    <CircleEase EasingMode="EaseOut"/>
+                                </ThicknessAnimation.EasingFunction>
                             </ThicknessAnimation>
                         </Storyboard>
                     </BeginStoryboard>
@@ -211,35 +240,39 @@
                         <Storyboard>
                             <ColorAnimation Storyboard.TargetName="Track"
                                 Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
-                                To="#57534E" Duration="0:0:0.18"/>
+                                To="#FFFFFF8B" Duration="0:0:0.167"/>
                             <ColorAnimation Storyboard.TargetName="Thumb"
                                 Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
-                                To="#A8A29E" Duration="0:0:0.18"/>
+                                To="#000000" Duration="0:0:0.167"/>
                             <ThicknessAnimation Storyboard.TargetName="Thumb"
-                                Storyboard.TargetProperty="Margin" To="3,0,0,0" Duration="0:0:0.18">
-                                <ThicknessAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></ThicknessAnimation.EasingFunction>
+                                Storyboard.TargetProperty="Margin"
+                                To="3,0,0,0" Duration="0:0:0.167">
+                                <ThicknessAnimation.EasingFunction>
+                                    <CircleEase EasingMode="EaseOut"/>
+                                </ThicknessAnimation.EasingFunction>
                             </ThicknessAnimation>
                         </Storyboard>
                     </BeginStoryboard>
                 </Trigger.ExitActions>
             </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Track" Property="Opacity" Value="0.82"/>
+                <Setter TargetName="Track" Property="Opacity" Value="0.8"/>
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="Track" Property="Opacity" Value="0.3"/>
+                <Setter TargetName="Track" Property="Opacity" Value="0.38"/>
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
-    <!-- ── SEGMENTED CONTROL ─────────────────────────────────── -->
+    <!-- ── SEGMENTED CONTROL ─────────────────────────────────────────── -->
+    <!-- WinUI-style pill selector: subtle background, accent on selected  -->
     <ControlTemplate x:Key="SegmentLight" TargetType="{x:Type RadioButton}">
-        <Border x:Name="Bg" CornerRadius="6" Padding="11,5"
+        <Border x:Name="Bg" CornerRadius="4" Padding="12,6"
                 Background="Transparent" SnapsToDevicePixels="True">
             <TextBlock x:Name="Label" Text="{TemplateBinding Content}"
-                       FontSize="12" FontWeight="Normal"
+                       FontSize="13" FontWeight="Normal"
                        FontFamily="Segoe UI Variable Text, Segoe UI"
-                       Foreground="#78716C"
+                       Foreground="#00000099"
                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Border>
         <ControlTemplate.Triggers>
@@ -249,7 +282,7 @@
                         <Storyboard>
                             <ColorAnimation Storyboard.TargetName="Bg"
                                 Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
-                                To="#FAFAF8" Duration="0:0:0.14"/>
+                                To="#FFFFFFFF" Duration="0:0:0.1"/>
                         </Storyboard>
                     </BeginStoryboard>
                 </Trigger.EnterActions>
@@ -258,35 +291,35 @@
                         <Storyboard>
                             <ColorAnimation Storyboard.TargetName="Bg"
                                 Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
-                                To="#00F5F4F1" Duration="0:0:0.14"/>
+                                To="#00FFFFFF" Duration="0:0:0.1"/>
                         </Storyboard>
                     </BeginStoryboard>
                 </Trigger.ExitActions>
                 <Setter TargetName="Label" Property="FontWeight" Value="SemiBold"/>
                 <Setter TargetName="Label" Property="Foreground"  Value="#C0392B"/>
-                <Setter TargetName="Bg" Property="Effect">
+                <Setter TargetName="Bg"    Property="Effect">
                     <Setter.Value>
-                        <DropShadowEffect ShadowDepth="1" BlurRadius="5"
-                                          Color="#1C1917" Opacity="0.08" Direction="270"/>
+                        <DropShadowEffect ShadowDepth="0" BlurRadius="4"
+                                          Color="#000000" Opacity="0.06"/>
                     </Setter.Value>
                 </Setter>
             </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Label" Property="Foreground" Value="#1C1917"/>
+                <Setter TargetName="Label" Property="Foreground" Value="#000000E4"/>
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="Label" Property="Foreground" Value="#C8C2BA"/>
+                <Setter TargetName="Label" Property="Foreground" Value="#00000038"/>
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
     <ControlTemplate x:Key="SegmentDark" TargetType="{x:Type RadioButton}">
-        <Border x:Name="Bg" CornerRadius="6" Padding="11,5"
+        <Border x:Name="Bg" CornerRadius="4" Padding="12,6"
                 Background="Transparent" SnapsToDevicePixels="True">
             <TextBlock x:Name="Label" Text="{TemplateBinding Content}"
-                       FontSize="12" FontWeight="Normal"
+                       FontSize="13" FontWeight="Normal"
                        FontFamily="Segoe UI Variable Text, Segoe UI"
-                       Foreground="#C0B8B0"
+                       Foreground="#FFFFFF99"
                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Border>
         <ControlTemplate.Triggers>
@@ -296,7 +329,7 @@
                         <Storyboard>
                             <ColorAnimation Storyboard.TargetName="Bg"
                                 Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
-                                To="#50FFFFFF" Duration="0:0:0.14"/>
+                                To="#FFFFFF1F" Duration="0:0:0.1"/>
                         </Storyboard>
                     </BeginStoryboard>
                 </Trigger.EnterActions>
@@ -305,50 +338,51 @@
                         <Storyboard>
                             <ColorAnimation Storyboard.TargetName="Bg"
                                 Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
-                                To="#00FFFFFF" Duration="0:0:0.14"/>
+                                To="#00FFFFFF" Duration="0:0:0.1"/>
                         </Storyboard>
                     </BeginStoryboard>
                 </Trigger.ExitActions>
                 <Setter TargetName="Label" Property="FontWeight" Value="SemiBold"/>
                 <Setter TargetName="Label" Property="Foreground"  Value="#C0392B"/>
-                <Setter TargetName="Bg" Property="Effect">
+                <Setter TargetName="Bg"    Property="Effect">
                     <Setter.Value>
-                        <DropShadowEffect ShadowDepth="1" BlurRadius="5"
-                                          Color="#000000" Opacity="0.22" Direction="270"/>
+                        <DropShadowEffect ShadowDepth="0" BlurRadius="4"
+                                          Color="#000000" Opacity="0.18"/>
                     </Setter.Value>
                 </Setter>
             </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Label" Property="Foreground" Value="#F2EDE8"/>
+                <Setter TargetName="Label" Property="Foreground" Value="#FFFFFFE4"/>
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="Label" Property="Foreground" Value="#706860"/>
+                <Setter TargetName="Label" Property="Foreground" Value="#FFFFFF38"/>
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
-    <!-- ── BUTTON ────────────────────────────────────────────── -->
+    <!-- ── BUTTON  ────────────────────────────────────────────────────── -->
+    <!-- WinUI Button: CornerRadius=4, SubtleFill background, accent hover -->
     <Style x:Key="CustomButton" TargetType="{x:Type Button}">
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment"   Value="Center"/>
-        <Setter Property="FontSize"         Value="13"/>
+        <Setter Property="FontSize"         Value="14"/>
         <Setter Property="FontWeight"       Value="Normal"/>
         <Setter Property="FontFamily"       Value="Segoe UI Variable Text, Segoe UI"/>
-        <Setter Property="Padding"          Value="16,7"/>
+        <Setter Property="Padding"          Value="16,8"/>
         <Setter Property="Cursor"           Value="Hand"/>
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
                     <Grid>
-                        <Border x:Name="Base" CornerRadius="6" BorderThickness="1"
-                                BorderBrush="#1A000000"
+                        <Border x:Name="Base" CornerRadius="4"
+                                BorderThickness="1" BorderBrush="#0000000F"
                                 Background="{TemplateBinding Background}"
                                 SnapsToDevicePixels="True"/>
-                        <Border x:Name="Accent" CornerRadius="6"
+                        <Border x:Name="Hover" CornerRadius="4"
+                                Background="#000000" Opacity="0" IsHitTestVisible="False"/>
+                        <Border x:Name="Accent" CornerRadius="4"
                                 Background="#C0392B" Opacity="0" IsHitTestVisible="False"/>
-                        <Border x:Name="Press" CornerRadius="6"
-                                Background="#922B21" Opacity="0" IsHitTestVisible="False"/>
                         <ContentPresenter x:Name="Content" Focusable="False"
                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
@@ -362,7 +396,7 @@
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="Accent"
                                             Storyboard.TargetProperty="Opacity"
-                                            To="1" Duration="0:0:0.15"/>
+                                            To="1" Duration="0:0:0.167"/>
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
@@ -371,42 +405,36 @@
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="Accent"
                                             Storyboard.TargetProperty="Opacity"
-                                            To="0" Duration="0:0:0.15"/>
+                                            To="0" Duration="0:0:0.167"/>
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.ExitActions>
-                            <Setter TargetName="Content" Property="TextElement.Foreground" Value="#FAFAF8"/>
+                            <Setter TargetName="Content" Property="TextElement.Foreground" Value="#FFFFFF"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Trigger.EnterActions>
                                 <BeginStoryboard>
                                     <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="Press"
-                                            Storyboard.TargetProperty="Opacity"
-                                            To="1" Duration="0:0:0.06"/>
                                         <DoubleAnimation Storyboard.TargetName="Content"
                                             Storyboard.TargetProperty="Opacity"
-                                            To="0.75" Duration="0:0:0.06"/>
+                                            To="0.72" Duration="0:0:0.05"/>
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
                             <Trigger.ExitActions>
                                 <BeginStoryboard>
                                     <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="Press"
-                                            Storyboard.TargetProperty="Opacity"
-                                            To="0" Duration="0:0:0.12"/>
                                         <DoubleAnimation Storyboard.TargetName="Content"
                                             Storyboard.TargetProperty="Opacity"
-                                            To="1" Duration="0:0:0.12"/>
+                                            To="1" Duration="0:0:0.1"/>
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.ExitActions>
-                            <Setter TargetName="Content" Property="TextElement.Foreground" Value="#FAFAF8"/>
+                            <Setter TargetName="Content" Property="TextElement.Foreground" Value="#FFFFFF"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="Base"    Property="Opacity" Value="0.4"/>
-                            <Setter TargetName="Content" Property="Opacity" Value="0.4"/>
+                            <Setter TargetName="Base"    Property="Opacity" Value="0.38"/>
+                            <Setter TargetName="Content" Property="Opacity" Value="0.38"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -414,39 +442,32 @@
         </Setter>
     </Style>
 
-    <!-- ── COMBOBOX ──────────────────────────────────────────── -->
+    <!-- ── COMBOBOX  ─────────────────────────────────────────────────── -->
     <ControlTemplate x:Key="ComboBoxDark" TargetType="{x:Type ComboBox}">
         <Grid>
-            <Border x:Name="OuterBorder" CornerRadius="6" BorderThickness="1"
-                    BorderBrush="#30FFFFFF" Background="#40FFFFFF" SnapsToDevicePixels="True">
+            <Border x:Name="OuterBorder" CornerRadius="4" BorderThickness="1"
+                    BorderBrush="#FFFFFF8B" Background="#FFFFFF0D" SnapsToDevicePixels="True">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="32"/>
+                        <ColumnDefinition Width="30"/>
                     </Grid.ColumnDefinitions>
                     <ContentPresenter Name="ContentSite" IsHitTestVisible="False"
                                       Content="{TemplateBinding SelectionBoxItem}"
                                       ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
-                                      Margin="10,5,4,5" TextElement.FontSize="13"
-                                      TextElement.Foreground="#F5F0EB"
+                                      Margin="10,6,4,6" TextElement.FontSize="14"
+                                      TextElement.Foreground="#FFFFFFE4"
                                       VerticalAlignment="Center" HorizontalAlignment="Left"/>
                     <ToggleButton Grid.Column="1" Focusable="False" ClickMode="Press"
                                   IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay,
                                               RelativeSource={RelativeSource TemplatedParent}}">
                         <ToggleButton.Template>
                             <ControlTemplate TargetType="{x:Type ToggleButton}">
-                                <Border Background="Transparent" CornerRadius="0,6,6,0">
+                                <Border Background="Transparent">
                                     <Path x:Name="Arrow" HorizontalAlignment="Center"
-                                          VerticalAlignment="Center" Fill="#C0392B"
+                                          VerticalAlignment="Center" Fill="#FFFFFFE4"
                                           Data="M0,0 L4,5 L8,0 Z"/>
                                 </Border>
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="IsChecked" Value="True">
-                                        <Setter TargetName="Arrow" Property="RenderTransform">
-                                            <Setter.Value><RotateTransform Angle="180" CenterX="4" CenterY="2.5"/></Setter.Value>
-                                        </Setter>
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
                             </ControlTemplate>
                         </ToggleButton.Template>
                     </ToggleButton>
@@ -454,11 +475,12 @@
             </Border>
             <Popup Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}"
                    AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
-                <Border Background="#40FFFFFF" BorderBrush="#C0392B" BorderThickness="1"
-                        CornerRadius="6" MinWidth="{TemplateBinding ActualWidth}"
-                        MaxHeight="{TemplateBinding MaxDropDownHeight}" Margin="0,3,0,0">
+                <Border Background="#2C2C2C" BorderBrush="#FFFFFF14" BorderThickness="1"
+                        CornerRadius="4" MinWidth="{TemplateBinding ActualWidth}"
+                        MaxHeight="{TemplateBinding MaxDropDownHeight}" Margin="0,4,0,0">
                     <ScrollViewer Margin="2" SnapsToDevicePixels="True">
-                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained"/>
+                        <StackPanel IsItemsHost="True"
+                                    KeyboardNavigation.DirectionalNavigation="Contained"/>
                     </ScrollViewer>
                 </Border>
             </Popup>
@@ -472,36 +494,29 @@
 
     <ControlTemplate x:Key="ComboBoxWhite" TargetType="{x:Type ComboBox}">
         <Grid>
-            <Border x:Name="OuterBorder" CornerRadius="6" BorderThickness="1"
-                    BorderBrush="#D6D0C8" Background="#FAFAF8" SnapsToDevicePixels="True">
+            <Border x:Name="OuterBorder" CornerRadius="4" BorderThickness="1"
+                    BorderBrush="#00000073" Background="#FFFFFF" SnapsToDevicePixels="True">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="32"/>
+                        <ColumnDefinition Width="30"/>
                     </Grid.ColumnDefinitions>
                     <ContentPresenter Name="ContentSite" IsHitTestVisible="False"
                                       Content="{TemplateBinding SelectionBoxItem}"
                                       ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
-                                      Margin="10,5,4,5" TextElement.FontSize="13"
-                                      TextElement.Foreground="#1C1917"
+                                      Margin="10,6,4,6" TextElement.FontSize="14"
+                                      TextElement.Foreground="#000000E4"
                                       VerticalAlignment="Center" HorizontalAlignment="Left"/>
                     <ToggleButton Grid.Column="1" Focusable="False" ClickMode="Press"
                                   IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay,
                                               RelativeSource={RelativeSource TemplatedParent}}">
                         <ToggleButton.Template>
                             <ControlTemplate TargetType="{x:Type ToggleButton}">
-                                <Border Background="Transparent" CornerRadius="0,6,6,0">
+                                <Border Background="Transparent">
                                     <Path x:Name="Arrow" HorizontalAlignment="Center"
-                                          VerticalAlignment="Center" Fill="#C0392B"
+                                          VerticalAlignment="Center" Fill="#000000E4"
                                           Data="M0,0 L4,5 L8,0 Z"/>
                                 </Border>
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="IsChecked" Value="True">
-                                        <Setter TargetName="Arrow" Property="RenderTransform">
-                                            <Setter.Value><RotateTransform Angle="180" CenterX="4" CenterY="2.5"/></Setter.Value>
-                                        </Setter>
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
                             </ControlTemplate>
                         </ToggleButton.Template>
                     </ToggleButton>
@@ -509,11 +524,12 @@
             </Border>
             <Popup Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}"
                    AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
-                <Border Background="#FAFAF8" BorderBrush="#C0392B" BorderThickness="1"
-                        CornerRadius="6" MinWidth="{TemplateBinding ActualWidth}"
-                        MaxHeight="{TemplateBinding MaxDropDownHeight}" Margin="0,3,0,0">
+                <Border Background="#FFFFFF" BorderBrush="#0000000E" BorderThickness="1"
+                        CornerRadius="4" MinWidth="{TemplateBinding ActualWidth}"
+                        MaxHeight="{TemplateBinding MaxDropDownHeight}" Margin="0,4,0,0">
                     <ScrollViewer Margin="2" SnapsToDevicePixels="True">
-                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained"/>
+                        <StackPanel IsItemsHost="True"
+                                    KeyboardNavigation.DirectionalNavigation="Contained"/>
                     </ScrollViewer>
                 </Border>
             </Popup>
@@ -526,19 +542,19 @@
     </ControlTemplate>
 
     <Style x:Key="ComboBoxItemDark" TargetType="{x:Type ComboBoxItem}">
-        <Setter Property="SnapsToDevicePixels"   Value="true"/>
-        <Setter Property="Foreground"            Value="#F5F0EB"/>
-        <Setter Property="OverridesDefaultStyle" Value="true"/>
+        <Setter Property="SnapsToDevicePixels"   Value="True"/>
+        <Setter Property="Foreground"            Value="#FFFFFFE4"/>
+        <Setter Property="OverridesDefaultStyle" Value="True"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ComboBoxItem}">
-                    <Border x:Name="Border" CornerRadius="4" Margin="3,1" Background="Transparent">
-                        <ContentPresenter TextElement.FontSize="13" Margin="8,6"/>
+                    <Border x:Name="Bg" CornerRadius="4" Margin="4,2" Background="Transparent">
+                        <ContentPresenter TextElement.FontSize="14" Margin="8,6"/>
                     </Border>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsHighlighted" Value="true">
-                            <Setter TargetName="Border" Property="Background" Value="#C0392B"/>
-                            <Setter Property="Foreground" Value="#FAFAF8"/>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#C0392B"/>
+                            <Setter Property="Foreground" Value="#FFFFFF"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -547,19 +563,19 @@
     </Style>
 
     <Style x:Key="ComboBoxItemWhite" TargetType="{x:Type ComboBoxItem}">
-        <Setter Property="SnapsToDevicePixels"   Value="true"/>
-        <Setter Property="Foreground"            Value="#1C1917"/>
-        <Setter Property="OverridesDefaultStyle" Value="true"/>
+        <Setter Property="SnapsToDevicePixels"   Value="True"/>
+        <Setter Property="Foreground"            Value="#000000E4"/>
+        <Setter Property="OverridesDefaultStyle" Value="True"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ComboBoxItem}">
-                    <Border x:Name="Border" CornerRadius="4" Margin="3,1" Background="Transparent">
-                        <ContentPresenter TextElement.FontSize="13" Margin="8,6"/>
+                    <Border x:Name="Bg" CornerRadius="4" Margin="4,2" Background="Transparent">
+                        <ContentPresenter TextElement.FontSize="14" Margin="8,6"/>
                     </Border>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsHighlighted" Value="true">
-                            <Setter TargetName="Border" Property="Background" Value="#C0392B"/>
-                            <Setter Property="Foreground" Value="#FAFAF8"/>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#C0392B"/>
+                            <Setter Property="Foreground" Value="#FFFFFF"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
