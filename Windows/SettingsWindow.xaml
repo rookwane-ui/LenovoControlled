@@ -20,7 +20,7 @@
 
         <ui:TitleBar Grid.Row="0" Title="Settings"/>
 
-        <StackPanel Grid.Row="1" Margin="16,8,16,16">
+        <StackPanel Grid.Row="1" Margin="20,12,20,20">
 
             <!-- Language -->
             <TextBlock Text="Language" FontSize="12" Opacity="0.6" Margin="0,0,0,4"/>
@@ -28,21 +28,21 @@
                       HorizontalAlignment="Left" Margin="0,0,0,12"/>
 
             <!-- Options group -->
-            <ui:CardControl Margin="0,0,0,1">
+            <ui:CardControl Margin="0,0,0,4">
                 <ui:CardControl.Header>
                     <TextBlock Text="Show on startup" FontSize="13" VerticalAlignment="Center"/>
                 </ui:CardControl.Header>
                 <ui:ToggleSwitch x:Name="showOnStartup"/>
             </ui:CardControl>
 
-            <ui:CardControl Margin="0,0,0,1">
+            <ui:CardControl Margin="0,0,0,4">
                 <ui:CardControl.Header>
                     <TextBlock Text="Dark theme" FontSize="13" VerticalAlignment="Center"/>
                 </ui:CardControl.Header>
                 <ui:ToggleSwitch x:Name="darkTheme"/>
             </ui:CardControl>
 
-            <ui:CardControl Margin="0,0,0,12">
+            <ui:CardControl Margin="0,0,0,16">
                 <ui:CardControl.Header>
                     <TextBlock Text="Start with Windows" FontSize="13" VerticalAlignment="Center"/>
                 </ui:CardControl.Header>
@@ -64,16 +64,17 @@
             </ui:Card>
 
             <!-- Footer buttons -->
-            <Grid Height="32">
+            <Grid Height="36">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="8"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="100"/>
                 </Grid.ColumnDefinitions>
                 <ui:Button x:Name="btnApply" HorizontalAlignment="Stretch"
                            Content="Apply" Appearance="Primary"
                            Click="btnApply_Click"/>
-                <ui:Button x:Name="btnCancel" Grid.Column="2" Width="80"
+                <ui:Button x:Name="btnCancel" Grid.Column="2"
+                           HorizontalAlignment="Stretch"
                            Content="Cancel" Appearance="Secondary"
                            Click="btnCancel_Click"/>
             </Grid>
