@@ -1,5 +1,4 @@
-<ui:FluentWindow
-    x:Class="LenovoController.AboutWindow"
+<ui:FluentWindow x:Class="LenovoController.AboutWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
@@ -23,131 +22,118 @@
             <StackPanel Margin="16,8,16,20">
 
                 <!-- DEVICE -->
-                <TextBlock Text="Device"
-                           FontSize="20"
-                           FontWeight="Bold"
-                           Margin="4,4,0,12"/>
+                <TextBlock Text="Device" FontSize="20" FontWeight="Bold" Margin="4,4,0,12"/>
 
-                <ui:Card Padding="16,12">
+                <ui:Card Margin="0,0,0,2" Padding="16,12">
                     <Grid>
-                        <TextBlock Text="Manufacturer"/>
+                        <TextBlock Text="Manufacturer" FontWeight="SemiBold"/>
                         <TextBlock x:Name="txtManufacturer"
                                    HorizontalAlignment="Right"
                                    Opacity="0.7"/>
                     </Grid>
                 </ui:Card>
 
-                <ui:Card Padding="16,12" Margin="0,2,0,0">
+                <ui:Card Margin="0,0,0,2" Padding="16,12">
                     <Grid>
-                        <TextBlock Text="Model"/>
+                        <TextBlock Text="Model" FontWeight="SemiBold"/>
                         <TextBlock x:Name="txtModel"
                                    HorizontalAlignment="Right"
                                    Opacity="0.7"/>
                     </Grid>
                 </ui:Card>
 
-                <ui:Card Padding="16,12" Margin="0,2,0,0">
+                <ui:Card Margin="0,0,0,2" Padding="16,12">
                     <Grid>
-                        <TextBlock Text="Machine type"/>
+                        <TextBlock Text="Machine Type" FontWeight="SemiBold"/>
                         <TextBlock x:Name="txtMachineType"
                                    HorizontalAlignment="Right"
                                    Opacity="0.7"/>
                     </Grid>
                 </ui:Card>
 
-                <ui:Card Padding="16,12" Margin="0,2,0,0">
+                <ui:Card Margin="0,0,0,2" Padding="16,12">
                     <Grid>
-                        <TextBlock Text="Serial number"/>
+                        <TextBlock Text="Serial number" FontWeight="SemiBold"/>
                         <TextBlock x:Name="txtSerial"
                                    HorizontalAlignment="Right"
                                    Opacity="0.7"/>
                     </Grid>
                 </ui:Card>
 
-                <ui:Card Padding="16,12" Margin="0,2,0,0">
+                <ui:Card Margin="0,0,0,2" Padding="16,12">
                     <Grid>
-                        <TextBlock Text="BIOS version"/>
+                        <TextBlock Text="BIOS version" FontWeight="SemiBold"/>
                         <TextBlock x:Name="txtBios"
                                    HorizontalAlignment="Right"
                                    Opacity="0.7"/>
                     </Grid>
                 </ui:Card>
 
-
                 <!-- SYSTEM -->
-                <TextBlock Text="System"
-                           FontSize="20"
-                           FontWeight="Bold"
-                           Margin="4,20,0,12"/>
+                <TextBlock Text="System" FontSize="20" FontWeight="Bold" Margin="4,20,0,12"/>
 
-                <ui:Card Padding="16,12">
+                <ui:Card Margin="0,0,0,2" Padding="16,12">
                     <Grid>
-                        <TextBlock Text="Windows edition"/>
+                        <TextBlock Text="Windows edition" FontWeight="SemiBold"/>
                         <TextBlock x:Name="txtWinEdition"
                                    HorizontalAlignment="Right"
                                    Opacity="0.7"/>
                     </Grid>
                 </ui:Card>
 
-                <ui:Card Padding="16,12" Margin="0,2,0,0">
+                <ui:Card Margin="0,0,0,2" Padding="16,12">
                     <Grid>
-                        <TextBlock Text="Version"/>
+                        <TextBlock Text="Version" FontWeight="SemiBold"/>
                         <TextBlock x:Name="txtWinVersion"
                                    HorizontalAlignment="Right"
                                    Opacity="0.7"/>
                     </Grid>
                 </ui:Card>
 
-                <ui:Card Padding="16,12" Margin="0,2,0,0">
+                <ui:Card Margin="0,0,0,2" Padding="16,12">
                     <Grid>
-                        <TextBlock Text="OS build"/>
+                        <TextBlock Text="OS build" FontWeight="SemiBold"/>
                         <TextBlock x:Name="txtWinBuild"
                                    HorizontalAlignment="Right"
                                    Opacity="0.7"/>
                     </Grid>
                 </ui:Card>
 
-                <ui:Card Padding="16,12" Margin="0,2,0,0">
+                <ui:Card Margin="0,0,0,2" Padding="16,12">
                     <Grid>
-                        <TextBlock Text="Architecture"/>
+                        <TextBlock Text="Architecture" FontWeight="SemiBold"/>
                         <TextBlock x:Name="txtWinArch"
                                    HorizontalAlignment="Right"
                                    Opacity="0.7"/>
                     </Grid>
                 </ui:Card>
 
-                <ui:Card Padding="16,12" Margin="0,2,0,0">
+                <ui:Card Margin="0,0,0,2" Padding="16,12">
                     <Grid>
-                        <TextBlock Text="Installed on"/>
+                        <TextBlock Text="Installed on" FontWeight="SemiBold"/>
                         <TextBlock x:Name="txtInstallDate"
                                    HorizontalAlignment="Right"
                                    Opacity="0.7"/>
                     </Grid>
                 </ui:Card>
 
-
                 <!-- BATTERY -->
-                <TextBlock Text="Battery"
-                           FontSize="20"
-                           FontWeight="Bold"
-                           Margin="4,20,0,12"/>
+                <TextBlock Text="Battery" FontSize="20" FontWeight="Bold" Margin="4,20,0,12"/>
 
-                <ui:Card Padding="16,12">
+                <ui:Card Margin="0,0,0,2" Padding="16,12">
                     <Grid>
-                        <TextBlock Text="Health"/>
+                        <TextBlock Text="Health" FontWeight="SemiBold"/>
 
                         <StackPanel Orientation="Horizontal"
                                     HorizontalAlignment="Right">
-                            <Border Width="80"
-                                    Height="8"
+                            <Border Width="80" Height="8"
                                     CornerRadius="4"
-                                    Background="#444"
+                                    Background="{DynamicResource ControlFillColorDefaultBrush}"
                                     Margin="0,0,8,0">
-
                                 <Border x:Name="batteryHealthBar"
-                                        Width="0"
                                         Height="8"
                                         CornerRadius="4"
+                                        Width="0"
                                         Background="#4CAF50"/>
                             </Border>
 
@@ -157,64 +143,57 @@
                     </Grid>
                 </ui:Card>
 
-                <ui:Card Padding="16,12" Margin="0,2,0,0">
+                <ui:Card Margin="0,0,0,2" Padding="16,12">
                     <Grid>
-                        <TextBlock Text="Design capacity"/>
+                        <TextBlock Text="Design capacity" FontWeight="SemiBold"/>
                         <TextBlock x:Name="txtBatteryDesign"
                                    HorizontalAlignment="Right"
                                    Opacity="0.7"/>
                     </Grid>
                 </ui:Card>
 
-                <ui:Card Padding="16,12" Margin="0,2,0,0">
+                <ui:Card Margin="0,0,0,2" Padding="16,12">
                     <Grid>
-                        <TextBlock Text="Full charge capacity"/>
+                        <TextBlock Text="Full charge capacity" FontWeight="SemiBold"/>
                         <TextBlock x:Name="txtBatteryFull"
                                    HorizontalAlignment="Right"
                                    Opacity="0.7"/>
                     </Grid>
                 </ui:Card>
 
-                <ui:Card Padding="16,12" Margin="0,2,0,0">
+                <ui:Card Margin="0,0,0,2" Padding="16,12">
                     <Grid>
-                        <TextBlock Text="Cycle count"/>
+                        <TextBlock Text="Cycle count" FontWeight="SemiBold"/>
                         <TextBlock x:Name="txtBatteryCycles"
                                    HorizontalAlignment="Right"
                                    Opacity="0.7"/>
                     </Grid>
                 </ui:Card>
 
-
                 <!-- WARRANTY -->
-                <TextBlock Text="Warranty"
-                           FontSize="20"
-                           FontWeight="Bold"
-                           Margin="4,20,0,12"/>
+                <Grid Margin="4,20,0,12">
+                    <TextBlock Text="Warranty" FontSize="20" FontWeight="Bold"/>
+                </Grid>
 
-                <ui:Card Padding="16,12">
+                <ui:Card Margin="0,0,0,2" Padding="16,12">
                     <Grid>
-                        <TextBlock Text="Start date"/>
+                        <TextBlock Text="Start date" FontWeight="SemiBold"/>
                         <TextBlock x:Name="txtWarrantyStart"
                                    HorizontalAlignment="Right"
                                    Opacity="0.7"/>
                     </Grid>
                 </ui:Card>
 
-                <ui:Card Padding="16,12" Margin="0,2,0,0">
+                <ui:Card Margin="0,0,0,2" Padding="16,12">
                     <Grid>
-                        <TextBlock Text="End date"/>
+                        <TextBlock Text="End date" FontWeight="SemiBold"/>
                         <TextBlock x:Name="txtWarrantyEnd"
                                    HorizontalAlignment="Right"
                                    Opacity="0.7"/>
                     </Grid>
                 </ui:Card>
 
-                <ui:Button Margin="0,8,0,0"
-                           Click="BtnRefreshWarranty_Click"
-                           Content="Refresh warranty"/>
-
             </StackPanel>
         </ScrollViewer>
-
     </Grid>
 </ui:FluentWindow>
