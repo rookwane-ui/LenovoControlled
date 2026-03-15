@@ -58,7 +58,7 @@ namespace LenovoController
         {
             try
             {
-                var state = new PowerModeFeature().GetState();
+                var state = new PowerModeFeature().GetAcState();
                 statusText.Text = state switch
                 {
                     PowerModeState.Quiet       => "Best power efficiency",
