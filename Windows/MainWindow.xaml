@@ -121,26 +121,34 @@
 
                 <ui:Card>
                     <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="44"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
+
                         <Border Width="36" Height="36" CornerRadius="8"
                                 Background="#E8F5E9" HorizontalAlignment="Left"
-                                VerticalAlignment="Center">
+                                VerticalAlignment="Center"
+                                Grid.RowSpan="2">
                             <ui:SymbolIcon Symbol="LeafOne24" FontSize="18"
                                            Foreground="#2E7D32"
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center"/>
                         </Border>
-                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0">
-                            <TextBlock x:Name="powerTitle" Text="Power mode" FontSize="13"/>
-                            <TextBlock x:Name="powerSubtitle" FontSize="11"
-                                       Margin="0,2,0,0" Opacity="0.6"
-                                       Text="Controls performance and battery life"/>
-                        </StackPanel>
-                        <Border Grid.Column="2" VerticalAlignment="Center"
+
+                        <!-- Title row -->
+                        <TextBlock x:Name="powerTitle" Grid.Column="1"
+                                   Text="Power mode" FontSize="13"
+                                   VerticalAlignment="Center"/>
+
+                        <!-- Segment control spans both rows on the right -->
+                        <Border Grid.Column="2" Grid.RowSpan="2"
+                                VerticalAlignment="Center"
                                 CornerRadius="8" Padding="3"
                                 Background="{DynamicResource ControlFillColorDefaultBrush}">
                             <StackPanel Orientation="Horizontal">
@@ -158,6 +166,13 @@
                                              Checked="radioPowerMode_Checked"/>
                             </StackPanel>
                         </Border>
+
+                        <!-- Subtitle below title -->
+                        <TextBlock x:Name="powerSubtitle" Grid.Row="1" Grid.Column="1"
+                                   Text="Controls performance and battery life"
+                                   FontSize="11" Margin="0,2,8,0" Opacity="0.6"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis"/>
                     </Grid>
                 </ui:Card>
 
@@ -214,7 +229,7 @@
                            Margin="4,16,0,6"/>
 
                 <!-- Fn Lock -->
-                <ui:CardControl Margin="0,0,0,1">
+                <ui:CardControl Margin="0,0,0,1" MinHeight="64" Padding="16,10">
                     <ui:CardControl.Header>
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -224,15 +239,17 @@
                             <Border Width="36" Height="36" CornerRadius="8"
                                     Background="#EDE7F6" HorizontalAlignment="Left"
                                     VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="Keyboard24" FontSize="20"
-                                                          Foreground="#4527A0"
-                                                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <ui:SymbolIcon Symbol="Keyboard24" FontSize="18"
+                                               Foreground="#4527A0"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
                             </Border>
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                 <TextBlock x:Name="fnLockTitle" Text="Fn Lock" FontSize="13"/>
                                 <TextBlock x:Name="fnLockSubtitle"
                                            Text="Emulates holding the Fn key permanently"
-                                           FontSize="11" Margin="0,2,0,0" Opacity="0.6"/>
+                                           FontSize="11" Margin="0,3,0,0" Opacity="0.6"
+                                           TextWrapping="Wrap"/>
                             </StackPanel>
                         </Grid>
                     </ui:CardControl.Header>
@@ -242,7 +259,7 @@
                 </ui:CardControl>
 
                 <!-- Touchpad -->
-                <ui:CardControl>
+                <ui:CardControl MinHeight="64" Padding="16,10">
                     <ui:CardControl.Header>
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -252,15 +269,17 @@
                             <Border Width="36" Height="36" CornerRadius="8"
                                     Background="#E0F7FA" HorizontalAlignment="Left"
                                     VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="CursorHover24" FontSize="20"
-                                                          Foreground="#006064"
-                                                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <ui:SymbolIcon Symbol="CursorHover24" FontSize="18"
+                                               Foreground="#006064"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
                             </Border>
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                 <TextBlock x:Name="touchpadTitle" Text="Touchpad" FontSize="13"/>
                                 <TextBlock x:Name="touchpadSubtitle"
                                            Text="Enable or disable the touchpad"
-                                           FontSize="11" Margin="0,2,0,0" Opacity="0.6"/>
+                                           FontSize="11" Margin="0,3,0,0" Opacity="0.6"
+                                           TextWrapping="Wrap"/>
                             </StackPanel>
                         </Grid>
                     </ui:CardControl.Header>
