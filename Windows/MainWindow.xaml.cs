@@ -96,6 +96,13 @@ namespace LenovoController
         }
 
         // ── Button handlers ───────────────────────────────────────────────────────
+        private void btnAbout_Click(object sender, RoutedEventArgs e)
+        {
+            var handle = new WindowInteropHelper(this).EnsureHandle();
+            var dlg = new AboutWindow(handle);
+            dlg.ShowDialog();
+        }
+
         private async void btnRefresh_Click(object sender, RoutedEventArgs e) =>
             await RefreshAsync();
 
@@ -190,7 +197,7 @@ namespace LenovoController
                     fnLockSubtitle.Text            = "Эмулирует удержание клавиши Fn";
                     touchpadTitle.Text             = "Тачпад";
                     touchpadSubtitle.Text          = "Включить или отключить тачпад";
-                    btnRefresh.Content             = "Обновить";
+                    btnAbout.Content = "О программе";
                     btnExit.Content                = "Выход";
                     break;
 
@@ -212,7 +219,7 @@ namespace LenovoController
                     fnLockSubtitle.Text            = "Емулює утримання клавіші Fn";
                     touchpadTitle.Text             = "Тачпад";
                     touchpadSubtitle.Text          = "Увімкнути або вимкнути тачпад";
-                    btnRefresh.Content             = "Оновити";
+                    btnAbout.Content = "Про програму";
                     btnExit.Content                = "Вихід";
                     break;
 
@@ -234,7 +241,7 @@ namespace LenovoController
                     fnLockSubtitle.Text            = "Emulates holding the Fn key permanently";
                     touchpadTitle.Text             = "Touchpad";
                     touchpadSubtitle.Text          = "Enable or disable the touchpad";
-                    btnRefresh.Content             = "Refresh";
+                    btnAbout.Content = "About";
                     btnExit.Content                = "Exit";
                     break;
             }

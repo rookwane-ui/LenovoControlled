@@ -273,20 +273,30 @@
                 <Grid Margin="0,16,0,0" Height="34">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="50"/>
+                        <ColumnDefinition Width="42"/>
+                        <ColumnDefinition Width="42"/>
                         <ColumnDefinition Width="88"/>
                     </Grid.ColumnDefinitions>
-                    <ui:Button x:Name="btnRefresh" HorizontalAlignment="Stretch"
-                               VerticalAlignment="Stretch" Content="Refresh"
-                               Click="btnRefresh_Click"/>
-                    <ui:Button x:Name="btnSettings" Grid.Column="1"
+                    <ui:Button x:Name="btnAbout" HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch" Content="About"
+                               Click="btnAbout_Click"/>
+                    <ui:Button x:Name="btnRefresh" Grid.Column="1"
                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                               Margin="8,0" Padding="0" Click="btnSettings_Click">
-                        <ui:SymbolIcon Symbol="Settings24" FontSize="18"
-                                                  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                               Margin="8,0,0,0" Padding="0" ToolTip="Refresh"
+                               Click="btnRefresh_Click">
+                        <ui:SymbolIcon Symbol="ArrowClockwise24" FontSize="16"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </ui:Button>
-                    <ui:Button x:Name="btnExit" Grid.Column="2"
+                    <ui:Button x:Name="btnSettings" Grid.Column="2"
                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                               Margin="8,0,0,0" Padding="0" ToolTip="Settings"
+                               Click="btnSettings_Click">
+                        <ui:SymbolIcon Symbol="Settings24" FontSize="16"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </ui:Button>
+                    <ui:Button x:Name="btnExit" Grid.Column="3"
+                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                               Margin="8,0,0,0"
                                Content="Exit" Click="btnExit_Click"
                                Appearance="Secondary"/>
                 </Grid>
