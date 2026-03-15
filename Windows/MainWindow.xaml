@@ -119,45 +119,91 @@
                            FontSize="13" FontWeight="SemiBold"
                            Margin="4,16,0,6"/>
 
-                <ui:Card>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="44"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <Border Width="36" Height="36" CornerRadius="8"
-                                Background="#E8F5E9" HorizontalAlignment="Left"
-                                VerticalAlignment="Center">
-                            <ui:SymbolIcon Symbol="LeafOne24" FontSize="20"
-                                                      Foreground="#2E7D32"
-                                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0">
-                            <TextBlock x:Name="powerTitle" Text="Power mode" FontSize="13"/>
-                            <TextBlock x:Name="powerSubtitle" FontSize="11"
-                                       Margin="0,2,0,0" Opacity="0.6"/>
-                        </StackPanel>
-                        <Border Grid.Column="2" VerticalAlignment="Center"
-                                CornerRadius="8" Padding="3"
-                                Background="{DynamicResource ControlFillColorDefaultBrush}">
-                            <StackPanel Orientation="Horizontal">
-                                <RadioButton x:Name="radioQuiet" GroupName="PowerMode"
-                                             Content="Quiet"
-                                             Style="{StaticResource SegmentStyle}"
-                                             Checked="radioPowerMode_Checked"/>
-                                <RadioButton x:Name="radioBalance" GroupName="PowerMode"
-                                             Content="Balance"
-                                             Style="{StaticResource SegmentStyle}"
-                                             Checked="radioPowerMode_Checked"/>
-                                <RadioButton x:Name="radioPerformance" GroupName="PowerMode"
-                                             Content="Performance"
-                                             Style="{StaticResource SegmentStyle}"
-                                             Checked="radioPowerMode_Checked"/>
+                <!-- Plugged in row (TOP) -->
+                <ui:CardControl Margin="0,0,0,0">
+                    <ui:CardControl.Header>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="44"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Width="36" Height="36" CornerRadius="8"
+                                    Background="#E8F5E9" HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                                <ui:SymbolIcon Symbol="PlugConnected24" FontSize="18"
+                                               Foreground="#2E7D32"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock x:Name="powerAcTitle" Text="Plugged in" FontSize="13"/>
+                                <TextBlock x:Name="powerAcSubtitle" FontSize="11"
+                                           Margin="0,2,0,0" Opacity="0.6"
+                                           Text="Power mode when charging"/>
                             </StackPanel>
-                        </Border>
-                    </Grid>
-                </ui:Card>
+                        </Grid>
+                    </ui:CardControl.Header>
+                    <Border VerticalAlignment="Center" CornerRadius="8" Padding="3"
+                            Background="{DynamicResource ControlFillColorDefaultBrush}">
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton x:Name="radioAcQuiet" GroupName="PowerModeAC"
+                                         Content="Efficiency"
+                                         Style="{StaticResource SegmentStyle}"
+                                         Checked="radioPowerModeAC_Checked"/>
+                            <RadioButton x:Name="radioAcBalance" GroupName="PowerModeAC"
+                                         Content="Balanced"
+                                         Style="{StaticResource SegmentStyle}"
+                                         Checked="radioPowerModeAC_Checked"/>
+                            <RadioButton x:Name="radioAcPerformance" GroupName="PowerModeAC"
+                                         Content="Performance"
+                                         Style="{StaticResource SegmentStyle}"
+                                         Checked="radioPowerModeAC_Checked"/>
+                        </StackPanel>
+                    </Border>
+                </ui:CardControl>
+
+                <!-- On battery row (BOTTOM) -->
+                <ui:CardControl Margin="0,1,0,0">
+                    <ui:CardControl.Header>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="44"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Width="36" Height="36" CornerRadius="8"
+                                    Background="#FFF3E0" HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                                <ui:SymbolIcon Symbol="BatteryCharge24" FontSize="18"
+                                               Foreground="#E65100"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock x:Name="powerDcTitle" Text="On battery" FontSize="13"/>
+                                <TextBlock x:Name="powerDcSubtitle" FontSize="11"
+                                           Margin="0,2,0,0" Opacity="0.6"
+                                           Text="Power mode when on battery"/>
+                            </StackPanel>
+                        </Grid>
+                    </ui:CardControl.Header>
+                    <Border VerticalAlignment="Center" CornerRadius="8" Padding="3"
+                            Background="{DynamicResource ControlFillColorDefaultBrush}">
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton x:Name="radioDcQuiet" GroupName="PowerModeDC"
+                                         Content="Efficiency"
+                                         Style="{StaticResource SegmentStyle}"
+                                         Checked="radioPowerModeDC_Checked"/>
+                            <RadioButton x:Name="radioDcBalance" GroupName="PowerModeDC"
+                                         Content="Balanced"
+                                         Style="{StaticResource SegmentStyle}"
+                                         Checked="radioPowerModeDC_Checked"/>
+                            <RadioButton x:Name="radioDcPerformance" GroupName="PowerModeDC"
+                                         Content="Performance"
+                                         Style="{StaticResource SegmentStyle}"
+                                         Checked="radioPowerModeDC_Checked"/>
+                        </StackPanel>
+                    </Border>
+                </ui:CardControl>
 
                 <!-- ══ ALWAYS ON USB ══ -->
                 <TextBlock x:Name="alwaysGroup"
