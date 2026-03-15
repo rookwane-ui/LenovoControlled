@@ -1,8 +1,9 @@
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Diagnostics;
 using System.Management;
 using System.Net.Http;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -13,121 +14,218 @@ namespace LenovoController
     public partial class AboutWindow : Wpf.Ui.Controls.FluentWindow
     {
         private string _serialNumber;
+        private Uri _warrantyLink;
+
+        // Lenovo PC Support API — same endpoints used by Lenovo Vantage and Legion Toolkit
+        private const string ProductsApi = "https://pcsupport.lenovo.com/us/en/api/v4/mse/getproducts?productId={0}";
+        private const string WarrantyApi = "https://pcsupport.lenovo.com/us/en/api/v4/upsell/redport/getWarranty?productId={0}&serialNumber={1}&countryCode=us&language=en";
+
+        // Spoofs a real browser — Lenovo's API blocks non-browser user agents
+        private const string UserAgent =
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
+            "AppleWebKit/537.36 (KHTML, like Gecko) " +
+            "Chrome/124.0.0.0 Safari/537.36";
 
         public AboutWindow(IntPtr ownerHandle)
         {
             InitializeComponent();
             new WindowInteropHelper(this).Owner = ownerHandle;
-            _ = LoadDeviceInfoAsync();
+            _ = LoadAsync();
         }
 
-        // ── Device info ───────────────────────────────────────────────────────
+        // ── Load all data ─────────────────────────────────────────────────────
+        private async Task LoadAsync()
+        {
+            await LoadDeviceInfoAsync();
+            await LoadWarrantyAsync();
+        }
+
+        // ── Device info from WMI ──────────────────────────────────────────────
         private async Task LoadDeviceInfoAsync()
         {
             await Task.Run(() =>
             {
                 try
                 {
-                    using var searcher = new ManagementObjectSearcher(
-                        "SELECT * FROM Win32_ComputerSystemProduct");
-                    using var results = searcher.Get();
+                    string manufacturer = "—", model = "—", machineType = "—",
+                           serial = "—", bios = "—";
 
-                    foreach (ManagementObject obj in results)
+                    using (var s = new ManagementObjectSearcher(
+                        "SELECT * FROM Win32_ComputerSystemProduct"))
+                    using (var r = s.Get())
                     {
-                        string manufacturer = obj["Vendor"]?.ToString()?.Trim()
-                                           ?? obj["Manufacturer"]?.ToString()?.Trim()
-                                           ?? "—";
-                        string model        = obj["Name"]?.ToString()?.Trim()     ?? "—";
-                        string machineType  = obj["Version"]?.ToString()?.Trim()  ?? "—";
-                        string serial       = obj["IdentifyingNumber"]?.ToString()?.Trim() ?? "—";
-
-                        _serialNumber = serial;
-
-                        // BIOS version from separate class
-                        string bios = "—";
-                        try
+                        foreach (ManagementObject o in r)
                         {
-                            using var bs = new ManagementObjectSearcher(
-                                "SELECT SMBIOSBIOSVersion FROM Win32_BIOS");
-                            using var br = bs.Get();
-                            foreach (ManagementObject b in br)
-                                bios = b["SMBIOSBIOSVersion"]?.ToString()?.Trim() ?? "—";
+                            manufacturer = o["Vendor"]?.ToString()?.Trim()
+                                        ?? o["Manufacturer"]?.ToString()?.Trim() ?? "—";
+                            model        = o["Name"]?.ToString()?.Trim()              ?? "—";
+                            machineType  = o["Version"]?.ToString()?.Trim()           ?? "—";
+                            serial       = o["IdentifyingNumber"]?.ToString()?.Trim() ?? "—";
+                            break;
                         }
-                        catch { }
-
-                        Dispatcher.Invoke(() =>
-                        {
-                            txtManufacturer.Text = manufacturer.ToUpper();
-                            txtModel.Text        = model;
-                            txtMachineType.Text  = machineType;
-                            txtSerial.Text       = MaskSerial(serial);
-                            txtBios.Text         = bios;
-                        });
-                        break;
                     }
+
+                    using (var s = new ManagementObjectSearcher(
+                        "SELECT SMBIOSBIOSVersion FROM Win32_BIOS"))
+                    using (var r = s.Get())
+                    {
+                        foreach (ManagementObject o in r)
+                        {
+                            bios = o["SMBIOSBIOSVersion"]?.ToString()?.Trim() ?? "—";
+                            break;
+                        }
+                    }
+
+                    _serialNumber = serial;
+
+                    Dispatcher.Invoke(() =>
+                    {
+                        txtManufacturer.Text = manufacturer.ToUpperInvariant();
+                        txtModel.Text        = model;
+                        txtMachineType.Text  = machineType;
+                        txtSerial.Text       = serial;
+                        txtBios.Text         = bios;
+                    });
                 }
                 catch (Exception ex)
                 {
                     Trace.TraceWarning($"AboutWindow.LoadDeviceInfo: {ex.Message}");
                 }
             });
-
-            await LoadWarrantyAsync();
         }
 
-        // ── Warranty ──────────────────────────────────────────────────────────
+        // ── Warranty from Lenovo API ──────────────────────────────────────────
         private async Task LoadWarrantyAsync()
         {
+            Dispatcher.Invoke(() =>
+            {
+                txtWarrantyStart.Text = "Loading…";
+                txtWarrantyEnd.Text   = "Loading…";
+            });
+
             if (string.IsNullOrWhiteSpace(_serialNumber) || _serialNumber == "—")
             {
-                txtWarrantyStart.Text = "—";
-                txtWarrantyEnd.Text   = "—";
+                Dispatcher.Invoke(() =>
+                {
+                    txtWarrantyStart.Text = "—";
+                    txtWarrantyEnd.Text   = "—";
+                });
                 return;
             }
-
-            txtWarrantyStart.Text = "Loading…";
-            txtWarrantyEnd.Text   = "Loading…";
 
             try
             {
                 using var client = new HttpClient();
-                client.Timeout = TimeSpan.FromSeconds(10);
-                client.DefaultRequestHeaders.Add("User-Agent", "LenovoController/2.0");
+                client.Timeout = TimeSpan.FromSeconds(15);
+                client.DefaultRequestHeaders.Add("User-Agent", UserAgent);
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+                client.DefaultRequestHeaders.Add("Referer", "https://pcsupport.lenovo.com/");
 
-                // Lenovo warranty API
-                string url = $"https://pcsupport.lenovo.com/us/en/api/v4/mse/getWarranty?country=us&language=en&serialnumber={_serialNumber}";
-                var response = await client.GetStringAsync(url);
+                // Step 1: get product ID from serial number
+                string productId = await GetProductIdAsync(client, _serialNumber);
+                if (productId == null)
+                    throw new Exception("Product not found for serial: " + _serialNumber);
 
-                // Parse start/end dates from JSON response
-                var startMatch = Regex.Match(response, @"""Start""\s*:\s*""([^""]+)""");
-                var endMatch   = Regex.Match(response, @"""End""\s*:\s*""([^""]+)""");
+                // Step 2: fetch warranty using product ID + serial
+                string warrantyUrl = string.Format(WarrantyApi, productId, _serialNumber);
+                string json = await client.GetStringAsync(warrantyUrl);
 
-                string start = startMatch.Success ? FormatDate(startMatch.Groups[1].Value) : "—";
-                string end   = endMatch.Success   ? FormatDate(endMatch.Groups[1].Value)   : "—";
+                var (start, end, link) = ParseWarranty(json, productId);
 
-                txtWarrantyStart.Text = start;
-                txtWarrantyEnd.Text   = end;
+                _warrantyLink = link;
+
+                Dispatcher.Invoke(() =>
+                {
+                    txtWarrantyStart.Text = start ?? "—";
+                    txtWarrantyEnd.Text   = end   ?? "—";
+                });
             }
             catch (Exception ex)
             {
                 Trace.TraceWarning($"AboutWindow.LoadWarranty: {ex.Message}");
-                txtWarrantyStart.Text = "Unavailable";
-                txtWarrantyEnd.Text   = "Unavailable";
+                Dispatcher.Invoke(() =>
+                {
+                    txtWarrantyStart.Text = "Unavailable";
+                    txtWarrantyEnd.Text   = "Unavailable";
+                });
+            }
+        }
+
+        private static async Task<string> GetProductIdAsync(HttpClient client, string serial)
+        {
+            try
+            {
+                string url  = string.Format(ProductsApi, serial);
+                string json = await client.GetStringAsync(url);
+                var obj = JObject.Parse(json);
+
+                // Response: { "data": { "productList": [ { "ProductID": "..." } ] } }
+                var productId = obj["data"]?["productList"]?[0]?["ProductID"]?.ToString()
+                             ?? obj["data"]?["productList"]?[0]?["id"]?.ToString();
+
+                return productId;
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceWarning($"GetProductId: {ex.Message}");
+                return null;
+            }
+        }
+
+        private static (string start, string end, Uri link) ParseWarranty(string json, string productId)
+        {
+            try
+            {
+                var obj = JObject.Parse(json);
+
+                // Traverse: data.WarrantyInfo[] or data.warrantyInfo[]
+                var warrantyArray = obj["data"]?["WarrantyInfo"]
+                                 ?? obj["data"]?["warrantyInfo"]
+                                 ?? obj["data"]?["warranty"];
+
+                string start = null, end = null;
+
+                if (warrantyArray is JArray arr && arr.Count > 0)
+                {
+                    // Find the base warranty (type = 1 or earliest start date)
+                    JToken best = arr[0];
+                    foreach (var item in arr)
+                    {
+                        var typeVal = item["Type"]?.ToString() ?? item["type"]?.ToString();
+                        if (typeVal == "1") { best = item; break; }
+                    }
+
+                    start = FormatDate(best["Start"]?.ToString() ?? best["start"]?.ToString());
+                    end   = FormatDate(best["End"]?.ToString()   ?? best["end"]?.ToString());
+                }
+
+                // Build warranty link
+                Uri link = null;
+                try
+                {
+                    link = new Uri($"https://pcsupport.lenovo.com/us/en/products/{productId.ToLower()}/warranty");
+                }
+                catch { }
+
+                return (start, end, link);
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceWarning($"ParseWarranty: {ex.Message}");
+                return (null, null, null);
             }
         }
 
         private static string FormatDate(string raw)
         {
+            if (string.IsNullOrWhiteSpace(raw)) return null;
+            // Handle both "2019-08-25" and "08/25/2019" and unix timestamps
+            if (long.TryParse(raw, out long ts))
+                return DateTimeOffset.FromUnixTimeMilliseconds(ts)
+                                     .LocalDateTime.ToString("M/d/yyyy");
             if (DateTime.TryParse(raw, out var dt))
                 return dt.ToString("M/d/yyyy");
             return raw;
-        }
-
-        // Mask middle of serial for privacy when displayed
-        private static string MaskSerial(string serial)
-        {
-            if (serial.Length <= 4) return serial;
-            return serial; // show full serial — remove this line to mask
         }
 
         // ── Handlers ──────────────────────────────────────────────────────────
@@ -140,14 +238,15 @@ namespace LenovoController
         {
             try
             {
-                string url = string.IsNullOrWhiteSpace(_serialNumber) || _serialNumber == "—"
-                    ? "https://support.lenovo.com"
-                    : $"https://pcsupport.lenovo.com/us/en/products/laptops-and-netbooks/ideapad/ideapad-l340-series/{_serialNumber}";
+                string url = _warrantyLink?.ToString()
+                          ?? (_serialNumber != null && _serialNumber != "—"
+                              ? $"https://pcsupport.lenovo.com/us/en/warrantylookup#/{_serialNumber}"
+                              : "https://support.lenovo.com");
                 Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
             }
             catch (Exception ex)
             {
-                Trace.TraceWarning($"AboutWindow.LenovoSupport: {ex.Message}");
+                Trace.TraceWarning($"LenovoSupport: {ex.Message}");
             }
         }
     }
