@@ -20,8 +20,7 @@ namespace LenovoController
         private readonly TouchpadLockFeature _touchpadLockFeature = new TouchpadLockFeature();
 
         private RadioButton[] _batteryButtons;
-        private RadioButton[] _powerModeAcButtons;
-        private RadioButton[] _powerModeDcButtons;
+        private RadioButton[] _powerModeButtons;
         private RadioButton[] _alwaysOnUsbButtons;
 
         private readonly App _app;
@@ -40,8 +39,7 @@ namespace LenovoController
             ChangeLanguage();
 
             _batteryButtons     = new[] { radioConservation, radioNormalCharge, radioRapidCharge };
-            _powerModeAcButtons = new[] { radioAcQuiet, radioAcBalance, radioAcPerformance };
-            _powerModeDcButtons = new[] { radioDcQuiet, radioDcBalance, radioDcPerformance };
+            _powerModeButtons   = new[] { radioQuiet, radioBalance, radioPerformance };
             _alwaysOnUsbButtons = new[] { radioAlwaysOnUsbOff, radioAlwaysOnUsbOnWhenSleeping, radioAlwaysOnUsbOnAlways };
 
             Loaded += async (_, __) => await RefreshAsync();
@@ -57,25 +55,22 @@ namespace LenovoController
             {
                 BatteryState     battery    = default;
                 AlwaysOnUsbState usb        = default;
-                PowerModeState   powerAc    = default;
-                PowerModeState   powerDc    = default;
+                PowerModeState   powerMode  = default;
                 bool touchpad = false, fnLock = false;
                 bool batteryOk = false, usbOk = false,
-                     powerAcOk = false, powerDcOk = false,
+                     powerOk = false,
                      touchpadOk = false, fnLockOk = false;
 
                 await Task.Run(() =>
                 {
-                    Try(() => { powerAc  = _powerModeFeature.GetAcState();                            powerAcOk  = true; }, () => DisableControls(_powerModeAcButtons));
-                    Try(() => { powerDc  = _powerModeFeature.GetDcState();                            powerDcOk  = true; }, () => DisableControls(_powerModeDcButtons));
+                    Try(() => { powerMode = _powerModeFeature.GetAcState();                           powerOk    = true; }, () => DisableControls(_powerModeButtons));
                     Try(() => { battery  = _batteryFeature.GetState();                                batteryOk  = true; }, () => DisableControls(_batteryButtons));
                     Try(() => { usb      = _alwaysOnUsbFeature.GetState();                            usbOk      = true; }, () => DisableControls(_alwaysOnUsbButtons));
                     Try(() => { touchpad = _touchpadLockFeature.GetState() == TouchpadLockState.Off;  touchpadOk = true; }, () => Dispatcher.Invoke(() => chkTouchpadLock.IsEnabled = false));
                     Try(() => { fnLock   = _fnLockFeature.GetState()       == FnLockState.On;         fnLockOk   = true; }, () => Dispatcher.Invoke(() => chkFnLock.IsEnabled        = false));
                 });
 
-                if (powerAcOk)  _powerModeAcButtons[(int)powerAc].IsChecked = true;
-                if (powerDcOk)  _powerModeDcButtons[(int)powerDc].IsChecked = true;
+                if (powerOk)    _powerModeButtons[(int)powerMode].IsChecked  = true;
                 if (batteryOk)  _batteryButtons[(int)battery].IsChecked      = true;
                 if (usbOk)      _alwaysOnUsbButtons[(int)usb].IsChecked      = true;
                 if (touchpadOk) chkTouchpadLock.IsChecked = touchpad;
@@ -120,18 +115,11 @@ namespace LenovoController
             _app.Shutdown(0);
 
         // ── Feature handlers ─────────────────────────────────────────────────────
-        private void radioPowerModeAC_Checked(object sender, RoutedEventArgs e)
+        private void radioPowerMode_Checked(object sender, RoutedEventArgs e)
         {
             if (_refreshing) return;
-            var newState = (PowerModeState)Array.IndexOf(_powerModeAcButtons, sender);
+            var newState = (PowerModeState)Array.IndexOf(_powerModeButtons, sender);
             SafeSet(() => _powerModeFeature.SetAcState(newState));
-        }
-
-        private void radioPowerModeDC_Checked(object sender, RoutedEventArgs e)
-        {
-            if (_refreshing) return;
-            var newState = (PowerModeState)Array.IndexOf(_powerModeDcButtons, sender);
-            SafeSet(() => _powerModeFeature.SetDcState(newState));
         }
 
         private void radioBattery_Checked(object sender, RoutedEventArgs e)
@@ -190,16 +178,9 @@ namespace LenovoController
                     radioNormalCharge.Content      = "Нормальная";
                     radioRapidCharge.Content       = "Быстрая";
                     powerModeGroup.Text            = "Режим питания";
-                    powerAcTitle.Text              = "От сети";
-                    powerAcSubtitle.Text           = "Режим при зарядке";
-                    powerDcTitle.Text              = "От батареи";
-                    powerDcSubtitle.Text           = "Режим при работе от батареи";
-                    radioAcQuiet.Content           = "Экономия";
-                    radioAcBalance.Content         = "Баланс";
-                    radioAcPerformance.Content     = "Производительность";
-                    radioDcQuiet.Content           = "Экономия";
-                    radioDcBalance.Content         = "Баланс";
-                    radioDcPerformance.Content     = "Производительность";
+                    radioQuiet.Content             = "Экономия";
+                    radioBalance.Content           = "Баланс";
+                    radioPerformance.Content       = "Производительность";
                     alwaysGroup.Text               = "Always on USB";
                     radioAlwaysOnUsbOff.Content            = "Выкл.";
                     radioAlwaysOnUsbOnWhenSleeping.Content = "Во сне";
@@ -219,16 +200,9 @@ namespace LenovoController
                     radioNormalCharge.Content      = "Нормальна";
                     radioRapidCharge.Content       = "Швидка";
                     powerModeGroup.Text            = "Режим живлення";
-                    powerAcTitle.Text              = "Від мережі";
-                    powerAcSubtitle.Text           = "Режим під час зарядки";
-                    powerDcTitle.Text              = "Від батареї";
-                    powerDcSubtitle.Text           = "Режим під час роботи від батареї";
-                    radioAcQuiet.Content           = "Економія";
-                    radioAcBalance.Content         = "Баланс";
-                    radioAcPerformance.Content     = "Продуктивність";
-                    radioDcQuiet.Content           = "Економія";
-                    radioDcBalance.Content         = "Баланс";
-                    radioDcPerformance.Content     = "Продуктивність";
+                    radioQuiet.Content             = "Економія";
+                    radioBalance.Content           = "Баланс";
+                    radioPerformance.Content       = "Продуктивність";
                     alwaysGroup.Text               = "Always on USB";
                     radioAlwaysOnUsbOff.Content            = "Вимк.";
                     radioAlwaysOnUsbOnWhenSleeping.Content = "Уві сні";
@@ -248,16 +222,9 @@ namespace LenovoController
                     radioNormalCharge.Content      = "Normal";
                     radioRapidCharge.Content       = "Rapid";
                     powerModeGroup.Text            = "Power mode";
-                    powerAcTitle.Text              = "Plugged in";
-                    powerAcSubtitle.Text           = "Power mode when charging";
-                    powerDcTitle.Text              = "On battery";
-                    powerDcSubtitle.Text           = "Power mode when on battery";
-                    radioAcQuiet.Content           = "Efficiency";
-                    radioAcBalance.Content         = "Balanced";
-                    radioAcPerformance.Content     = "Performance";
-                    radioDcQuiet.Content           = "Efficiency";
-                    radioDcBalance.Content         = "Balanced";
-                    radioDcPerformance.Content     = "Performance";
+                    radioQuiet.Content             = "Efficiency";
+                    radioBalance.Content           = "Balanced";
+                    radioPerformance.Content       = "Performance";
                     alwaysGroup.Text               = "Always on USB";
                     radioAlwaysOnUsbOff.Content            = "Off";
                     radioAlwaysOnUsbOnWhenSleeping.Content = "Sleeping";
