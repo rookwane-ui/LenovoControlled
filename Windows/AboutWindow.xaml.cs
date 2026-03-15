@@ -99,42 +99,54 @@ namespace LenovoController
         }
 
         // ── Windows version + exact build from Registry ───────────────────────
-        private void LoadWindowsInfo()
+     private void LoadWindowsInfo()
+{
+    try
+    {
+        const string key = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion";
+        using var reg = Registry.LocalMachine.OpenSubKey(key);
+        if (reg == null) return;
+
+        // Get the base product name (might be "Windows 10" even on Windows 11)
+        string productName = reg.GetValue("ProductName")?.ToString() ?? "—";
+        
+        // Get CurrentBuild and UBR for the full build number
+        string currentBuild = reg.GetValue("CurrentBuild")?.ToString() ?? "—";
+        string ubr = reg.GetValue("UBR")?.ToString() ?? "";
+        string fullBuild = string.IsNullOrEmpty(ubr)
+                           ? currentBuild
+                           : $"{currentBuild}.{ubr}";
+
+        // Get the DisplayVersion (e.g., "23H2")
+        string displayVersion = reg.GetValue("DisplayVersion")?.ToString()
+                             ?? reg.GetValue("ReleaseId")?.ToString()
+                             ?? "—";
+
+        // Determine the actual Windows version based on build number
+        string edition;
+        int buildNum = int.TryParse(currentBuild, out int build) ? build : 0;
+        
+        if (buildNum >= 22000)
         {
-            try
-            {
-                const string key = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion";
-                using var reg = Registry.LocalMachine.OpenSubKey(key);
-                if (reg == null) return;
-
-                // e.g. "Windows 11 Home" or "Windows 11 Pro"
-                string edition = reg.GetValue("ProductName")?.ToString() ?? "—";
-
-                // e.g. "23H2"
-                string displayVersion = reg.GetValue("DisplayVersion")?.ToString()
-                                     ?? reg.GetValue("ReleaseId")?.ToString()
-                                     ?? "—";
-
-                // e.g. "22631" (major OS build)
-                string currentBuild = reg.GetValue("CurrentBuild")?.ToString() ?? "—";
-
-                // UBR = Update Build Revision (the .xxxx part) — gives exact patch build
-                string ubr = reg.GetValue("UBR")?.ToString() ?? "";
-                string fullBuild = string.IsNullOrEmpty(ubr)
-                                   ? currentBuild
-                                   : $"{currentBuild}.{ubr}";
-
-                txtWinEdition.Text  = edition;
-                txtWinVersion.Text  = displayVersion;
-                txtWinBuild.Text    = fullBuild;
-            }
-            catch (Exception ex)
-            {
-                Trace.TraceWarning($"LoadWindowsInfo: {ex.Message}");
-                txtWinEdition.Text = txtWinVersion.Text = txtWinBuild.Text = "—";
-            }
+            // Windows 11 starts at build 22000
+            // Replace "Windows 10" with "Windows 11" in the product name
+            edition = productName.Replace("Windows 10", "Windows 11");
+        }
+        else
+        {
+            edition = productName;
         }
 
+        txtWinEdition.Text = edition;
+        txtWinVersion.Text = displayVersion;
+        txtWinBuild.Text = fullBuild;
+    }
+    catch (Exception ex)
+    {
+        Trace.TraceWarning($"LoadWindowsInfo: {ex.Message}");
+        txtWinEdition.Text = txtWinVersion.Text = txtWinBuild.Text = "—";
+    }
+}
         // ── Battery health via WMI BatteryFullChargedCapacity ─────────────────
         private void LoadBatteryInfo()
         {
