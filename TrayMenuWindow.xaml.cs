@@ -1,12 +1,13 @@
+using LenovoController.Features;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using System.Windows.Forms;
+using System.Windows.Input;
 
 namespace LenovoController
 {
-    public partial class TrayMenuWindow : Wpf.Ui.Controls.FluentWindow, INotifyPropertyChanged
+    public partial class TrayMenuWindow : Window, INotifyPropertyChanged
     {
         private readonly App _app;
 
@@ -55,16 +56,14 @@ namespace LenovoController
 
         private void UpdateStatus()
         {
-            // Show current power mode as subtitle
             try
             {
-                var pm = new Features.PowerModeFeature();
-                var state = pm.GetState();
+                var state = new PowerModeFeature().GetState();
                 statusText.Text = state switch
                 {
-                    Features.PowerModeState.Quiet       => "Power saver",
-                    Features.PowerModeState.Performance => "Best performance",
-                    _                                    => "Balanced"
+                    PowerModeState.Quiet       => "Best power efficiency",
+                    PowerModeState.Performance => "Best performance",
+                    _                          => "Balanced"
                 };
             }
             catch
@@ -73,35 +72,30 @@ namespace LenovoController
             }
         }
 
-        /// <summary>Show the menu anchored to the tray icon position.</summary>
         public void ShowAtCursor()
         {
-            // Get cursor position in device pixels
-            var cursor = System.Windows.Forms.Cursor.Position;
-
-            // Convert to WPF device-independent pixels
-            var source = PresentationSource.FromVisual(this);
-            double dpiX = 1.0, dpiY = 1.0;
-            if (source?.CompositionTarget != null)
-            {
-                dpiX = source.CompositionTarget.TransformFromDevice.M11;
-                dpiY = source.CompositionTarget.TransformFromDevice.M22;
-            }
-
-            // Measure the window so we know its size
-            Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            // Force layout so we know ActualHeight before positioning
+            Measure(new Size(220, double.PositiveInfinity));
             Arrange(new Rect(DesiredSize));
 
-            double w = ActualWidth  > 0 ? ActualWidth  : 240;
-            double h = ActualHeight > 0 ? ActualHeight : 180;
+            var cursor = System.Windows.Forms.Cursor.Position;
 
-            // Position above and to the left of the cursor, keep on screen
-            var screen = SystemParameters.WorkArea;
-            double left = cursor.X * dpiX - w + 8;
-            double top  = cursor.Y * dpiY - h - 8;
+            // DPI scale factor
+            double dpi = 1.0;
+            using (var g = System.Drawing.Graphics.FromHwnd(IntPtr.Zero))
+                dpi = g.DpiX / 96.0;
 
-            if (left < screen.Left) left = screen.Left + 8;
-            if (top  < screen.Top)  top  = cursor.Y * dpiY + 8;
+            double w = 220;
+            double h = DesiredSize.Height > 0 ? DesiredSize.Height : 200;
+
+            double left = cursor.X / dpi - w + 4;
+            double top  = cursor.Y / dpi - h - 4;
+
+            // Keep on screen
+            var area = SystemParameters.WorkArea;
+            if (left < area.Left)   left = area.Left + 4;
+            if (left + w > area.Right) left = area.Right - w - 4;
+            if (top  < area.Top)    top  = cursor.Y / dpi + 4;
 
             Left = left;
             Top  = top;
@@ -110,26 +104,21 @@ namespace LenovoController
             Activate();
         }
 
-        private void Window_Deactivated(object sender, EventArgs e)
-        {
-            Close();
-        }
+        private void Window_Deactivated(object sender, EventArgs e) => Close();
 
-        private void BtnOpen_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void BtnOpen_Click(object sender, MouseButtonEventArgs e)
         {
             Close();
             _app.BringToFront();
         }
 
-        private void BtnSettings_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void BtnSettings_Click(object sender, MouseButtonEventArgs e)
         {
             Close();
             _app.OpenSettings();
         }
 
-        private void BtnExit_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
+        private void BtnExit_Click(object sender, MouseButtonEventArgs e) =>
             _app.Shutdown(0);
-        }
     }
 }

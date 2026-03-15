@@ -1,58 +1,126 @@
-<ui:FluentWindow
-    x:Class="LenovoController.TrayMenuWindow"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    Width="220"
-    SizeToContent="Height"
-    ShowInTaskbar="False"
-    WindowStyle="None"
-    ResizeMode="NoResize"
-    AllowsTransparency="True"
-    Background="Transparent"
-    Topmost="True"
-    Deactivated="Window_Deactivated"
-    WindowBackdropType="Acrylic">
+<Window x:Class="LenovoController.TrayMenuWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        Width="220"
+        SizeToContent="Height"
+        ShowInTaskbar="False"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        Deactivated="Window_Deactivated">
 
     <Border Margin="8" CornerRadius="12">
         <Border.Effect>
-            <DropShadowEffect BlurRadius="20" ShadowDepth="4"
-                              Color="#000000" Opacity="0.25" Direction="270"/>
+            <DropShadowEffect BlurRadius="24" ShadowDepth="2"
+                              Color="#000000" Opacity="0.22" Direction="270"/>
         </Border.Effect>
-        <Border.Style>
-            <Style TargetType="Border">
-                <Setter Property="Background" Value="#F3F3F3"/>
-                <Setter Property="BorderBrush" Value="#E0E0E0"/>
-                <Setter Property="BorderThickness" Value="1"/>
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                        <Setter Property="Background" Value="#2C2C2C"/>
-                        <Setter Property="BorderBrush" Value="#404040"/>
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </Border.Style>
+        <Border x:Name="menuRoot" CornerRadius="12" Padding="4">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Background"   Value="#F3F3F3"/>
+                    <Setter Property="BorderBrush"  Value="#E0E0E0"/>
+                    <Setter Property="BorderThickness" Value="1"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
+                            <Setter Property="Background"  Value="#2C2C2C"/>
+                            <Setter Property="BorderBrush" Value="#3A3A3A"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
 
-        <StackPanel Margin="4">
+            <StackPanel>
 
-            <!-- App header -->
-            <Border CornerRadius="8" Margin="0,0,0,2" Padding="12,10">
-                <Border.Style>
-                    <Style TargetType="Border">
-                        <Setter Property="Background" Value="Transparent"/>
-                    </Style>
-                </Border.Style>
-                <StackPanel Orientation="Horizontal">
-                    <Border Width="28" Height="28" CornerRadius="6"
-                            Background="#C0392B" Margin="0,0,10,0"
-                            VerticalAlignment="Center">
-                        <TextBlock Text="LC" FontSize="11" FontWeight="Bold"
-                                   Foreground="White" HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"/>
-                    </Border>
-                    <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="Lenovo Controller" FontSize="13"
-                                   FontWeight="SemiBold">
+                <!-- App header -->
+                <Border Padding="10,10,10,8">
+                    <StackPanel Orientation="Horizontal">
+                        <Border Width="30" Height="30" CornerRadius="7"
+                                Background="#C0392B" Margin="0,0,10,0"
+                                VerticalAlignment="Center">
+                            <TextBlock Text="LC" FontSize="11" FontWeight="Bold"
+                                       Foreground="White"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Lenovo Controller"
+                                       FontSize="13" FontWeight="SemiBold">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#1C1917"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding DarkMode}" Value="True">
+                                                <Setter Property="Foreground" Value="#F2EDE8"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <TextBlock x:Name="statusText" FontSize="11">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#78716C"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding DarkMode}" Value="True">
+                                                <Setter Property="Foreground" Value="#A8A29E"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Separator -->
+                <Border Height="1" Margin="10,2">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Background" Value="#E8E4DF"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding DarkMode}" Value="True">
+                                    <Setter Property="Background" Value="#404040"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                </Border>
+
+                <!-- Open -->
+                <Border CornerRadius="8" Margin="2,2" Padding="10,8"
+                        Cursor="Hand" MouseLeftButtonUp="BtnOpen_Click">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#12000000"/>
+                                </Trigger>
+                                <DataTrigger Binding="{Binding DarkMode}" Value="True">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="AppGeneric24" FontSize="15"
+                                       Margin="0,0,10,0" VerticalAlignment="Center">
+                            <ui:SymbolIcon.Style>
+                                <Style TargetType="ui:SymbolIcon">
+                                    <Setter Property="Foreground" Value="#1C1917"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
+                                            <Setter Property="Foreground" Value="#F2EDE8"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:SymbolIcon.Style>
+                        </ui:SymbolIcon>
+                        <TextBlock x:Name="openLabel" Text="Open"
+                                   FontSize="13" VerticalAlignment="Center">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="Foreground" Value="#1C1917"/>
@@ -64,181 +132,94 @@
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
-                        <TextBlock x:Name="statusText" FontSize="11">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Foreground" Value="#78716C"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Settings -->
+                <Border CornerRadius="8" Margin="2,2" Padding="10,8"
+                        Cursor="Hand" MouseLeftButtonUp="BtnSettings_Click">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#12000000"/>
+                                </Trigger>
+                                <DataTrigger Binding="{Binding DarkMode}" Value="True">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Settings24" FontSize="15"
+                                       Margin="0,0,10,0" VerticalAlignment="Center">
+                            <ui:SymbolIcon.Style>
+                                <Style TargetType="ui:SymbolIcon">
+                                    <Setter Property="Foreground" Value="#1C1917"/>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                            <Setter Property="Foreground" Value="#A8A29E"/>
+                                            <Setter Property="Foreground" Value="#F2EDE8"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:SymbolIcon.Style>
+                        </ui:SymbolIcon>
+                        <TextBlock x:Name="settingsLabel" Text="Settings"
+                                   FontSize="13" VerticalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="#1C1917"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding DarkMode}" Value="True">
+                                            <Setter Property="Foreground" Value="#F2EDE8"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
                     </StackPanel>
-                </StackPanel>
-            </Border>
+                </Border>
 
-            <!-- Separator -->
-            <Border Height="1" Margin="8,2">
-                <Border.Style>
-                    <Style TargetType="Border">
-                        <Setter Property="Background" Value="#E8E4DF"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                <Setter Property="Background" Value="#404040"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Border.Style>
-            </Border>
+                <!-- Separator -->
+                <Border Height="1" Margin="10,4">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Background" Value="#E8E4DF"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding DarkMode}" Value="True">
+                                    <Setter Property="Background" Value="#404040"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                </Border>
 
-            <!-- Open -->
-            <Border x:Name="btnOpen" CornerRadius="8" Margin="0,2"
-                    Cursor="Hand" Padding="12,9"
-                    MouseLeftButtonUp="BtnOpen_Click">
-                <Border.Style>
-                    <Style TargetType="Border">
-                        <Setter Property="Background" Value="Transparent"/>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#14000000"/>
-                            </Trigger>
-                            <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                <Setter Property="Background" Value="Transparent"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Border.Style>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="28"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <ui:SymbolIcon Symbol="AppGeneric24" FontSize="16"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <ui:SymbolIcon.Style>
-                            <Style TargetType="ui:SymbolIcon">
-                                <Setter Property="Foreground" Value="#1C1917"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                        <Setter Property="Foreground" Value="#F2EDE8"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ui:SymbolIcon.Style>
-                    </ui:SymbolIcon>
-                    <TextBlock x:Name="openLabel" Grid.Column="1"
-                               Text="Open" FontSize="13"
-                               VerticalAlignment="Center">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Foreground" Value="#1C1917"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                        <Setter Property="Foreground" Value="#F2EDE8"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                </Grid>
-            </Border>
+                <!-- Exit -->
+                <Border CornerRadius="8" Margin="2,2,2,2" Padding="10,8"
+                        Cursor="Hand" MouseLeftButtonUp="BtnExit_Click">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#18C0392B"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Power24" FontSize="15"
+                                       Foreground="#C0392B"
+                                       Margin="0,0,10,0" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="exitLabel" Text="Exit"
+                                   FontSize="13" Foreground="#C0392B"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
 
-            <!-- Settings -->
-            <Border x:Name="btnSettings" CornerRadius="8" Margin="0,2"
-                    Cursor="Hand" Padding="12,9"
-                    MouseLeftButtonUp="BtnSettings_Click">
-                <Border.Style>
-                    <Style TargetType="Border">
-                        <Setter Property="Background" Value="Transparent"/>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#14000000"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Border.Style>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="28"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <ui:SymbolIcon Symbol="Settings24" FontSize="16"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <ui:SymbolIcon.Style>
-                            <Style TargetType="ui:SymbolIcon">
-                                <Setter Property="Foreground" Value="#1C1917"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                        <Setter Property="Foreground" Value="#F2EDE8"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ui:SymbolIcon.Style>
-                    </ui:SymbolIcon>
-                    <TextBlock x:Name="settingsLabel" Grid.Column="1"
-                               Text="Settings" FontSize="13"
-                               VerticalAlignment="Center">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Foreground" Value="#1C1917"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                        <Setter Property="Foreground" Value="#F2EDE8"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                </Grid>
-            </Border>
-
-            <!-- Separator -->
-            <Border Height="1" Margin="8,4">
-                <Border.Style>
-                    <Style TargetType="Border">
-                        <Setter Property="Background" Value="#E8E4DF"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding DarkMode}" Value="True">
-                                <Setter Property="Background" Value="#404040"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Border.Style>
-            </Border>
-
-            <!-- Exit -->
-            <Border x:Name="btnExit" CornerRadius="8" Margin="0,2,0,0"
-                    Cursor="Hand" Padding="12,9"
-                    MouseLeftButtonUp="BtnExit_Click">
-                <Border.Style>
-                    <Style TargetType="Border">
-                        <Setter Property="Background" Value="Transparent"/>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#14C0392B"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Border.Style>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="28"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <ui:SymbolIcon Symbol="Power24" FontSize="16"
-                                   Foreground="#C0392B"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <TextBlock x:Name="exitLabel" Grid.Column="1"
-                               Text="Exit" FontSize="13"
-                               Foreground="#C0392B"
-                               VerticalAlignment="Center"/>
-                </Grid>
-            </Border>
-
-        </StackPanel>
+            </StackPanel>
+        </Border>
     </Border>
 
-</ui:FluentWindow>
+</Window>
