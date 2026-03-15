@@ -125,7 +125,11 @@ namespace LenovoController
             _app.OpenSettings();
         }
 
-        private void BtnExit_Click(object sender, MouseButtonEventArgs e) =>
+        private void BtnExit_Click(object sender, MouseButtonEventArgs e)
+        {
+            _closing = true;
+            Deactivated -= Window_Deactivated;
             _app.Shutdown(0);
+        }
     }
 }
