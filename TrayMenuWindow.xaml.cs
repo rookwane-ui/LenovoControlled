@@ -104,16 +104,23 @@ namespace LenovoController
             Activate();
         }
 
-        private void Window_Deactivated(object sender, EventArgs e) => Close();
+        private bool _closing;
+
+        private void Window_Deactivated(object sender, EventArgs e)
+        {
+            if (!_closing) { _closing = true; Close(); }
+        }
 
         private void BtnOpen_Click(object sender, MouseButtonEventArgs e)
         {
+            _closing = true;
             Close();
             _app.BringToFront();
         }
 
         private void BtnSettings_Click(object sender, MouseButtonEventArgs e)
         {
+            _closing = true;
             Close();
             _app.OpenSettings();
         }
