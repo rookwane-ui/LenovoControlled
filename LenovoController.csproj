@@ -13,8 +13,9 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Resources\Icons\LC.ico</ApplicationIcon>
     <Deterministic>true</Deterministic>
-    <!-- Suppress duplicate attributes from old AssemblyInfo.cs -->
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <!-- This is a Windows-only app — suppress platform compatibility warnings -->
+    <NoWarn>CA1416;WFAC010</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
