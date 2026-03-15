@@ -114,7 +114,11 @@ namespace LenovoController
                 string displayVersion = reg.GetValue("DisplayVersion")?.ToString()
                                      ?? reg.GetValue("ReleaseId")?.ToString()
                                      ?? "—";
-
+ // Fix incorrect "Windows 10" label on Windows 11 systems
+        if (int.TryParse(currentBuild, out int build) && build >= 22000)
+        {
+            edition = edition.Replace("Windows 10", "Windows 11");
+        }
                 // e.g. "22631" (major OS build)
                 string currentBuild = reg.GetValue("CurrentBuild")?.ToString() ?? "—";
 
