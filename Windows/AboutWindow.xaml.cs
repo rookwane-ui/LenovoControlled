@@ -99,46 +99,72 @@ namespace LenovoController
         }
 
         // ── Windows version + exact build from Registry ───────────────────────
-        private void LoadWindowsInfo()
-        {
-            try
-            {
-                const string key = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion";
-                using var reg = Registry.LocalMachine.OpenSubKey(key);
-                if (reg == null) return;
+    private void LoadWindowsInfo()
+{
+    try
+    {
+        const string key = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion";
+        using var reg = Registry.LocalMachine.OpenSubKey(key);
+        if (reg == null) return;
 
-                // e.g. "Windows 11 Home" or "Windows 11 Pro"
-                string edition = reg.GetValue("ProductName")?.ToString() ?? "—";
+        // Windows edition
+        string edition = reg.GetValue("ProductName")?.ToString() ?? "—";
 
-                // e.g. "23H2"
-                string displayVersion = reg.GetValue("DisplayVersion")?.ToString()
-                                     ?? reg.GetValue("ReleaseId")?.ToString()
-                                     ?? "—";
- // Fix incorrect "Windows 10" label on Windows 11 systems
+        // Version (23H2 / 24H2)
+        string displayVersion = reg.GetValue("DisplayVersion")?.ToString()
+                             ?? reg.GetValue("ReleaseId")?.ToString()
+                             ?? "—";
+
+        // Build number
+        string currentBuild = reg.GetValue("CurrentBuild")?.ToString() ?? "0";
+
+        // Update build revision
+        string ubr = reg.GetValue("UBR")?.ToString() ?? "";
+
+        string fullBuild = string.IsNullOrEmpty(ubr)
+            ? currentBuild
+            : $"{currentBuild}.{ubr}";
+
+        // Fix Windows 10 label on Windows 11 systems
         if (int.TryParse(currentBuild, out int build) && build >= 22000)
         {
             edition = edition.Replace("Windows 10", "Windows 11");
         }
-                // e.g. "22631" (major OS build)
-                string currentBuild = reg.GetValue("CurrentBuild")?.ToString() ?? "—";
 
-                // UBR = Update Build Revision (the .xxxx part) — gives exact patch build
-                string ubr = reg.GetValue("UBR")?.ToString() ?? "";
-                string fullBuild = string.IsNullOrEmpty(ubr)
-                                   ? currentBuild
-                                   : $"{currentBuild}.{ubr}";
+        // Architecture
+        string architecture = Environment.Is64BitOperatingSystem ? "64-bit" : "32-bit";
 
-                txtWinEdition.Text  = edition;
-                txtWinVersion.Text  = displayVersion;
-                txtWinBuild.Text    = fullBuild;
-            }
-            catch (Exception ex)
-            {
-                Trace.TraceWarning($"LoadWindowsInfo: {ex.Message}");
-                txtWinEdition.Text = txtWinVersion.Text = txtWinBuild.Text = "—";
-            }
+        // Install date
+        string installDateText = "—";
+        object installValue = reg.GetValue("InstallDate");
+
+        if (installValue != null)
+        {
+            long seconds = Convert.ToInt64(installValue);
+            DateTime installDate = DateTimeOffset
+                .FromUnixTimeSeconds(seconds)
+                .LocalDateTime;
+
+            installDateText = installDate.ToString("yyyy-MM-dd");
         }
 
+        txtWinEdition.Text = edition;
+        txtWinVersion.Text = displayVersion;
+        txtWinBuild.Text   = fullBuild;
+        txtWinArch.Text    = architecture;
+        txtInstallDate.Text = installDateText;
+    }
+    catch (Exception ex)
+    {
+        Trace.TraceWarning($"LoadWindowsInfo: {ex.Message}");
+
+        txtWinEdition.Text =
+        txtWinVersion.Text =
+        txtWinBuild.Text =
+        txtWinArch.Text =
+        txtInstallDate.Text = "—";
+    }
+}
         // ── Battery health via WMI BatteryFullChargedCapacity ─────────────────
         private void LoadBatteryInfo()
         {
