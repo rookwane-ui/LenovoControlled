@@ -14,8 +14,8 @@ New features:
 
 Preview:
 
-![Main](https://github.com/S0RBEX/LenovoController/blob/main/Main.png](https://github.com/rookwane-ui/LenovoControlled/blob/main/Main.png)
+![Main](https://github.com/rookwane-ui/LenovoControlled/blob/main/Main.png)
 
 
-![Tray](https://github.com/S0RBEX/LenovoController/blob/main/Tray.png](https://github.com/rookwane-ui/LenovoControlled/blob/main/Tray.png)
+![Tray](https://github.com/rookwane-ui/LenovoControlled/blob/main/Tray.png)
 
