@@ -96,6 +96,7 @@
 
                         <TextBlock x:Name="batteryTitle" Grid.Column="1"
                                    Text="Battery charge" FontSize="13"
+                                   FontWeight="SemiBold"
                                    VerticalAlignment="Center"/>
 
                         <Border Grid.Column="2" Grid.RowSpan="2"
@@ -156,6 +157,7 @@
                         <!-- Title row -->
                         <TextBlock x:Name="powerTitle" Grid.Column="1"
                                    Text="Power mode" FontSize="13"
+                                   FontWeight="SemiBold"
                                    VerticalAlignment="Center"/>
 
                         <!-- Segment control spans both rows on the right -->
@@ -218,6 +220,7 @@
 
                         <TextBlock x:Name="usbTitle" Grid.Column="1"
                                    Text="Always on USB" FontSize="13"
+                                   FontWeight="SemiBold"
                                    VerticalAlignment="Center"/>
 
                         <Border Grid.Column="2" Grid.RowSpan="2"
@@ -270,7 +273,8 @@
                                                VerticalAlignment="Center"/>
                             </Border>
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock x:Name="fnLockTitle" Text="Fn Lock" FontSize="13"/>
+                                <TextBlock x:Name="fnLockTitle" Text="Fn Lock" FontSize="13"
+                                               FontWeight="SemiBold"/>
                                 <TextBlock x:Name="fnLockSubtitle"
                                            Text="Emulates holding the Fn key permanently"
                                            FontSize="11" Margin="0,3,0,0" Opacity="0.6"
@@ -300,7 +304,8 @@
                                                VerticalAlignment="Center"/>
                             </Border>
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock x:Name="touchpadTitle" Text="Touchpad" FontSize="13"/>
+                                <TextBlock x:Name="touchpadTitle" Text="Touchpad" FontSize="13"
+                                               FontWeight="SemiBold"/>
                                 <TextBlock x:Name="touchpadSubtitle"
                                            Text="Enable or disable the touchpad"
                                            FontSize="11" Margin="0,3,0,0" Opacity="0.6"
