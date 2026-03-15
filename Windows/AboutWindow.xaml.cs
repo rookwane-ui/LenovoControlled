@@ -2,7 +2,6 @@ using Microsoft.Win32;
 using System;
 using System.Diagnostics;
 using System.Management;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 
@@ -14,66 +13,13 @@ namespace LenovoController
         {
             InitializeComponent();
             new WindowInteropHelper(this).Owner = ownerHandle;
-            _ = LoadAsync();
-        }
 
-        private async Task LoadAsync()
-        {
-            await LoadDeviceInfoAsync();
-            LoadWindowsInfo();
+            LoadSystemInfo();
             LoadBatteryInfo();
+            LoadWarrantyInfo();
         }
 
-        private async Task LoadDeviceInfoAsync()
-        {
-            await Task.Run(() =>
-            {
-                try
-                {
-                    string manufacturer = "—";
-                    string model = "—";
-                    string machineType = "—";
-                    string serial = "—";
-                    string bios = "—";
-
-                    using var searcher =
-                        new ManagementObjectSearcher("SELECT * FROM Win32_ComputerSystemProduct");
-
-                    foreach (ManagementObject obj in searcher.Get())
-                    {
-                        manufacturer = obj["Vendor"]?.ToString() ?? "—";
-                        model = obj["Name"]?.ToString() ?? "—";
-                        machineType = obj["Version"]?.ToString() ?? "—";
-                        serial = obj["IdentifyingNumber"]?.ToString() ?? "—";
-                        break;
-                    }
-
-                    using var biosSearcher =
-                        new ManagementObjectSearcher("SELECT SMBIOSBIOSVersion FROM Win32_BIOS");
-
-                    foreach (ManagementObject obj in biosSearcher.Get())
-                    {
-                        bios = obj["SMBIOSBIOSVersion"]?.ToString() ?? "—";
-                        break;
-                    }
-
-                    Dispatcher.Invoke(() =>
-                    {
-                        txtManufacturer.Text = manufacturer;
-                        txtModel.Text = model;
-                        txtMachineType.Text = machineType;
-                        txtSerial.Text = serial;
-                        txtBios.Text = bios;
-                    });
-                }
-                catch (Exception ex)
-                {
-                    Trace.TraceWarning(ex.Message);
-                }
-            });
-        }
-
-        private void LoadWindowsInfo()
+        private void LoadSystemInfo()
         {
             try
             {
@@ -85,50 +31,32 @@ namespace LenovoController
 
                 if (reg == null) return;
 
-                string edition =
+                txtWinEdition.Text =
                     reg.GetValue("ProductName")?.ToString() ?? "—";
 
-                string version =
+                txtWinVersion.Text =
                     reg.GetValue("DisplayVersion")?.ToString() ?? "—";
 
-                string build =
-                    reg.GetValue("CurrentBuild")?.ToString() ?? "0";
-
-                string ubr =
-                    reg.GetValue("UBR")?.ToString() ?? "";
-
-                string fullBuild =
-                    string.IsNullOrEmpty(ubr)
-                        ? build
-                        : $"{build}.{ubr}";
-
-                if (int.TryParse(build, out int b) && b >= 22000)
-                    edition = edition.Replace("Windows 10", "Windows 11");
-
-                txtWinEdition.Text = edition;
-                txtWinVersion.Text = version;
-                txtWinBuild.Text = fullBuild;
+                txtWinBuild.Text =
+                    reg.GetValue("CurrentBuild")?.ToString() ?? "—";
 
                 txtWinArch.Text =
                     Environment.Is64BitOperatingSystem ? "64-bit" : "32-bit";
 
-                var installValue = reg.GetValue("InstallDate");
+                var install = reg.GetValue("InstallDate");
 
-                if (installValue != null)
+                if (install != null &&
+                    long.TryParse(install.ToString(), out long seconds))
                 {
-                    long seconds = Convert.ToInt64(installValue);
-                    DateTime installDate =
+                    var date =
                         DateTimeOffset.FromUnixTimeSeconds(seconds)
                         .LocalDateTime;
 
                     txtInstallDate.Text =
-                        installDate.ToString("yyyy-MM-dd");
+                        date.ToString("yyyy-MM-dd");
                 }
             }
-            catch (Exception ex)
-            {
-                Trace.TraceWarning(ex.Message);
-            }
+            catch { }
         }
 
         private void LoadBatteryInfo()
@@ -139,41 +67,38 @@ namespace LenovoController
                 ulong full = 0;
                 uint cycles = 0;
 
-                using var designSearcher =
-                    new ManagementObjectSearcher(
-                        "root\\WMI",
+                using var s1 =
+                    new ManagementObjectSearcher("root\\WMI",
                         "SELECT * FROM BatteryStaticData");
 
-                foreach (ManagementObject obj in designSearcher.Get())
+                foreach (ManagementObject obj in s1.Get())
                 {
                     design = Convert.ToUInt64(obj["DesignedCapacity"]);
                     break;
                 }
 
-                using var fullSearcher =
-                    new ManagementObjectSearcher(
-                        "root\\WMI",
+                using var s2 =
+                    new ManagementObjectSearcher("root\\WMI",
                         "SELECT * FROM BatteryFullChargedCapacity");
 
-                foreach (ManagementObject obj in fullSearcher.Get())
+                foreach (ManagementObject obj in s2.Get())
                 {
                     full = Convert.ToUInt64(obj["FullChargedCapacity"]);
                     break;
                 }
 
-                using var cycleSearcher =
-                    new ManagementObjectSearcher(
-                        "root\\WMI",
+                using var s3 =
+                    new ManagementObjectSearcher("root\\WMI",
                         "SELECT * FROM BatteryCycleCount");
 
-                foreach (ManagementObject obj in cycleSearcher.Get())
+                foreach (ManagementObject obj in s3.Get())
                 {
                     cycles = Convert.ToUInt32(obj["CycleCount"]);
                     break;
                 }
 
                 double health =
-                    design > 0 && full > 0
+                    (design > 0 && full > 0)
                     ? (double)full / design * 100
                     : 0;
 
@@ -187,20 +112,18 @@ namespace LenovoController
                     full > 0 ? $"{full / 1000.0:F1} Wh" : "—";
 
                 txtBatteryCycles.Text =
-                    cycles > 0 ? $"{cycles}" : "—";
+                    cycles > 0 ? cycles.ToString() : "—";
 
                 batteryHealthBar.Width =
                     Math.Min(80, 80 * health / 100);
             }
-            catch (Exception ex)
-            {
-                Trace.TraceWarning(ex.Message);
-            }
+            catch { }
         }
 
-        private void BtnRefreshWarranty_Click(object sender, RoutedEventArgs e)
+        private void LoadWarrantyInfo()
         {
-            MessageBox.Show("Warranty refresh not implemented here.");
+            txtWarrantyStart.Text = "—";
+            txtWarrantyEnd.Text = "—";
         }
     }
 }
