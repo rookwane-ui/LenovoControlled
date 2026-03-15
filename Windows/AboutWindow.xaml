@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     Title="About"
-    Width="400"
+    Width="420"
     SizeToContent="Height"
     ResizeMode="NoResize"
     WindowStartupLocation="CenterOwner"
@@ -22,7 +22,7 @@
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="16,8,16,20">
 
-                <!-- Device section -->
+                <!-- ── DEVICE ── -->
                 <TextBlock Text="Device"
                            FontSize="20" FontWeight="Bold"
                            Margin="4,4,0,12"/>
@@ -77,7 +77,97 @@
                     </Grid>
                 </ui:Card>
 
-                <!-- Warranty section -->
+                <!-- ── SYSTEM ── -->
+                <TextBlock Text="System"
+                           FontSize="20" FontWeight="Bold"
+                           Margin="4,20,0,12"/>
+
+                <ui:Card Margin="0,0,0,2" Padding="16,12">
+                    <Grid>
+                        <TextBlock Text="Windows edition" FontSize="13" FontWeight="SemiBold"
+                                   HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="txtWinEdition" FontSize="13"
+                                   HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   Opacity="0.7"/>
+                    </Grid>
+                </ui:Card>
+
+                <ui:Card Margin="0,0,0,2" Padding="16,12">
+                    <Grid>
+                        <TextBlock Text="Version" FontSize="13" FontWeight="SemiBold"
+                                   HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="txtWinVersion" FontSize="13"
+                                   HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   Opacity="0.7"/>
+                    </Grid>
+                </ui:Card>
+
+                <ui:Card Margin="0,0,0,2" Padding="16,12">
+                    <Grid>
+                        <TextBlock Text="OS build" FontSize="13" FontWeight="SemiBold"
+                                   HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="txtWinBuild" FontSize="13"
+                                   HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   Opacity="0.7"/>
+                    </Grid>
+                </ui:Card>
+
+                <!-- ── BATTERY ── -->
+                <TextBlock Text="Battery"
+                           FontSize="20" FontWeight="Bold"
+                           Margin="4,20,0,12"/>
+
+                <ui:Card Margin="0,0,0,2" Padding="16,12">
+                    <Grid>
+                        <TextBlock Text="Health" FontSize="13" FontWeight="SemiBold"
+                                   HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <!-- health bar + percentage -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                                    VerticalAlignment="Center">
+                            <Border Width="80" Height="8" CornerRadius="4"
+                                    Background="{DynamicResource ControlFillColorDefaultBrush}"
+                                    VerticalAlignment="Center" Margin="0,0,8,0">
+                                <Border x:Name="batteryHealthBar" Height="8" CornerRadius="4"
+                                        HorizontalAlignment="Left" Width="0"
+                                        Background="#4CAF50"/>
+                            </Border>
+                            <TextBlock x:Name="txtBatteryHealth" FontSize="13" Opacity="0.7"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
+                </ui:Card>
+
+                <ui:Card Margin="0,0,0,2" Padding="16,12">
+                    <Grid>
+                        <TextBlock Text="Design capacity" FontSize="13" FontWeight="SemiBold"
+                                   HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="txtBatteryDesign" FontSize="13"
+                                   HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   Opacity="0.7"/>
+                    </Grid>
+                </ui:Card>
+
+                <ui:Card Margin="0,0,0,2" Padding="16,12">
+                    <Grid>
+                        <TextBlock Text="Full charge capacity" FontSize="13" FontWeight="SemiBold"
+                                   HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="txtBatteryFull" FontSize="13"
+                                   HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   Opacity="0.7"/>
+                    </Grid>
+                </ui:Card>
+
+                <ui:Card Margin="0,0,0,2" Padding="16,12">
+                    <Grid>
+                        <TextBlock Text="Cycle count" FontSize="13" FontWeight="SemiBold"
+                                   HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="txtBatteryCycles" FontSize="13"
+                                   HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   Opacity="0.7"/>
+                    </Grid>
+                </ui:Card>
+
+                <!-- ── WARRANTY ── -->
                 <Grid Margin="4,20,0,12">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
