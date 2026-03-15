@@ -117,32 +117,44 @@ namespace LenovoController
             LoadSettings();
             ApplyTheme(Settings.DarkMode);
 
-            string exitText = Settings.Culture switch
-            {
-                "RU" => "Выход",
-                "UA" => "Вихід",
-                _    => "Exit"
-            };
-
-            var menu = new ContextMenuStrip();
-            menu.Items.Add("Lenovo Controller", null, (s, ev) => BringToFront());
-            menu.Items.Add(exitText, null, (s, ev) => Shutdown(0));
-
             _notifyIcon = new NotifyIcon
             {
-                Icon             = Icon.ExtractAssociatedIcon(
-                                       Process.GetCurrentProcess().MainModule.FileName),
-                Visible          = true,
-                Text             = "Lenovo Controller",
-                ContextMenuStrip = menu
+                Icon    = Icon.ExtractAssociatedIcon(
+                              Process.GetCurrentProcess().MainModule.FileName),
+                Visible = true,
+                Text    = "Lenovo Controller",
             };
+
+            // Left click — open window
             _notifyIcon.Click += (s, ev) =>
             {
                 if (ev is MouseEventArgs me && me.Button == MouseButtons.Left)
                     BringToFront();
             };
 
+            // Right click — show custom Fluent tray menu
+            _notifyIcon.MouseClick += (s, ev) =>
+            {
+                if (ev is MouseEventArgs me && me.Button == MouseButtons.Right)
+                {
+                    var menu = new TrayMenuWindow(this);
+                    menu.ShowAtCursor();
+                }
+            };
+
             CreateMainDialog();
+        }
+
+        public void OpenSettings()
+        {
+            if (_mainWindow == null) _mainWindow = new MainWindow(this);
+            var handle = new System.Windows.Interop.WindowInteropHelper(_mainWindow).EnsureHandle();
+            var dlg = new SettingsWindow(handle, this);
+            dlg.ShowDialog();
+            if (dlg.DialogResult == true)
+            {
+                ApplyTheme(Settings.DarkMode);
+            }
         }
 
         private void CreateMainDialog()
