@@ -1,9 +1,10 @@
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Management;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -14,13 +15,13 @@ namespace LenovoController
     public partial class AboutWindow : Wpf.Ui.Controls.FluentWindow
     {
         private string _serialNumber;
+        private string _machineType;
         private Uri _warrantyLink;
 
-        // Lenovo PC Support API — same endpoints used by Lenovo Vantage and Legion Toolkit
-        private const string ProductsApi = "https://pcsupport.lenovo.com/us/en/api/v4/mse/getproducts?productId={0}";
-        private const string WarrantyApi = "https://pcsupport.lenovo.com/us/en/api/v4/upsell/redport/getWarranty?productId={0}&serialNumber={1}&countryCode=us&language=en";
+        // Exact same endpoint Legion Toolkit uses
+        private const string IbaseInfoUrl = "https://pcsupport.lenovo.com/dk/en/api/v4/upsell/redport/getIbaseInfo";
+        private const string ProductsUrl   = "https://pcsupport.lenovo.com/dk/en/api/v4/mse/getproducts?productId={0}";
 
-        // Spoofs a real browser — Lenovo's API blocks non-browser user agents
         private const string UserAgent =
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
             "AppleWebKit/537.36 (KHTML, like Gecko) " +
@@ -33,14 +34,14 @@ namespace LenovoController
             _ = LoadAsync();
         }
 
-        // ── Load all data ─────────────────────────────────────────────────────
+        // ── Load everything ───────────────────────────────────────────────────
         private async Task LoadAsync()
         {
             await LoadDeviceInfoAsync();
             await LoadWarrantyAsync();
         }
 
-        // ── Device info from WMI ──────────────────────────────────────────────
+        // ── WMI device info ───────────────────────────────────────────────────
         private async Task LoadDeviceInfoAsync()
         {
             await Task.Run(() =>
@@ -51,7 +52,7 @@ namespace LenovoController
                            serial = "—", bios = "—";
 
                     using (var s = new ManagementObjectSearcher(
-                        "SELECT * FROM Win32_ComputerSystemProduct"))
+                               "SELECT * FROM Win32_ComputerSystemProduct"))
                     using (var r = s.Get())
                     {
                         foreach (ManagementObject o in r)
@@ -66,7 +67,7 @@ namespace LenovoController
                     }
 
                     using (var s = new ManagementObjectSearcher(
-                        "SELECT SMBIOSBIOSVersion FROM Win32_BIOS"))
+                               "SELECT SMBIOSBIOSVersion FROM Win32_BIOS"))
                     using (var r = s.Get())
                     {
                         foreach (ManagementObject o in r)
@@ -77,6 +78,10 @@ namespace LenovoController
                     }
 
                     _serialNumber = serial;
+                    // MachineType is the first 4 chars of the model version (e.g. "81LK")
+                    _machineType  = machineType?.Length >= 4
+                                    ? machineType.Substring(0, 4)
+                                    : machineType;
 
                     Dispatcher.Invoke(() =>
                     {
@@ -94,7 +99,7 @@ namespace LenovoController
             });
         }
 
-        // ── Warranty from Lenovo API ──────────────────────────────────────────
+        // ── Warranty — same logic as Legion Toolkit WarrantyChecker.cs ────────
         private async Task LoadWarrantyAsync()
         {
             Dispatcher.Invoke(() =>
@@ -105,39 +110,65 @@ namespace LenovoController
 
             if (string.IsNullOrWhiteSpace(_serialNumber) || _serialNumber == "—")
             {
-                Dispatcher.Invoke(() =>
-                {
-                    txtWarrantyStart.Text = "—";
-                    txtWarrantyEnd.Text   = "—";
-                });
+                Dispatcher.Invoke(() => { txtWarrantyStart.Text = "—"; txtWarrantyEnd.Text = "—"; });
                 return;
             }
 
             try
             {
                 using var client = new HttpClient();
-                client.Timeout = TimeSpan.FromSeconds(15);
+                client.Timeout = TimeSpan.FromSeconds(20);
                 client.DefaultRequestHeaders.Add("User-Agent", UserAgent);
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
-                client.DefaultRequestHeaders.Add("Referer", "https://pcsupport.lenovo.com/");
 
-                // Step 1: get product ID from serial number
-                string productId = await GetProductIdAsync(client, _serialNumber);
-                if (productId == null)
-                    throw new Exception("Product not found for serial: " + _serialNumber);
+                // ── Step 1: POST getIbaseInfo (Legion Toolkit's exact call) ──
+                var body    = new StringContent(
+                    $"{{\"serialNumber\":\"{_serialNumber}\",\"machineType\":\"{_machineType}\"}}",
+                    Encoding.UTF8, "application/json");
 
-                // Step 2: fetch warranty using product ID + serial
-                string warrantyUrl = string.Format(WarrantyApi, productId, _serialNumber);
-                string json = await client.GetStringAsync(warrantyUrl);
+                var response = await client.PostAsync(IbaseInfoUrl, body);
+                var json     = await response.Content.ReadAsStringAsync();
+                var node     = JObject.Parse(json);
 
-                var (start, end, link) = ParseWarranty(json, productId);
+                if (node["code"]?.Value<int>() != 0)
+                    throw new Exception($"getIbaseInfo code={node["code"]} msg={node["msg"]}");
 
-                _warrantyLink = link;
+                var baseWarranties    = node["data"]?["baseWarranties"]?.ToObject<JArray>()    ?? new JArray();
+                var upgradeWarranties = node["data"]?["upgradeWarranties"]?.ToObject<JArray>() ?? new JArray();
+                var all = baseWarranties.Concat(upgradeWarranties).ToList();
+
+                // Min start date, max end date — same as Legion Toolkit
+                var startDates = all
+                    .Select(n => n?["startDate"]?.ToString())
+                    .Where(s => !string.IsNullOrEmpty(s))
+                    .Select(s => DateTime.Parse(s!))
+                    .ToList();
+
+                var endDates = all
+                    .Select(n => n?["endDate"]?.ToString())
+                    .Where(s => !string.IsNullOrEmpty(s))
+                    .Select(s => DateTime.Parse(s!))
+                    .ToList();
+
+                string startText = startDates.Any() ? startDates.Min().ToString("M/d/yyyy") : "—";
+                string endText   = endDates.Any()   ? endDates.Max().ToString("M/d/yyyy")   : "—";
+
+                // ── Step 2: GET product ID for support link ──────────────────
+                try
+                {
+                    var productJson = await client.GetStringAsync(
+                        string.Format(ProductsUrl, _serialNumber));
+                    var productNode = JArray.Parse(productJson);
+                    var id = productNode.FirstOrDefault()?["Id"]?.ToString();
+                    if (id != null)
+                        _warrantyLink = new Uri($"https://pcsupport.lenovo.com/products/{id}");
+                }
+                catch { /* link is optional */ }
 
                 Dispatcher.Invoke(() =>
                 {
-                    txtWarrantyStart.Text = start ?? "—";
-                    txtWarrantyEnd.Text   = end   ?? "—";
+                    txtWarrantyStart.Text = startText;
+                    txtWarrantyEnd.Text   = endText;
                 });
             }
             catch (Exception ex)
@@ -149,83 +180,6 @@ namespace LenovoController
                     txtWarrantyEnd.Text   = "Unavailable";
                 });
             }
-        }
-
-        private static async Task<string> GetProductIdAsync(HttpClient client, string serial)
-        {
-            try
-            {
-                string url  = string.Format(ProductsApi, serial);
-                string json = await client.GetStringAsync(url);
-                var obj = JObject.Parse(json);
-
-                // Response: { "data": { "productList": [ { "ProductID": "..." } ] } }
-                var productId = obj["data"]?["productList"]?[0]?["ProductID"]?.ToString()
-                             ?? obj["data"]?["productList"]?[0]?["id"]?.ToString();
-
-                return productId;
-            }
-            catch (Exception ex)
-            {
-                Trace.TraceWarning($"GetProductId: {ex.Message}");
-                return null;
-            }
-        }
-
-        private static (string start, string end, Uri link) ParseWarranty(string json, string productId)
-        {
-            try
-            {
-                var obj = JObject.Parse(json);
-
-                // Traverse: data.WarrantyInfo[] or data.warrantyInfo[]
-                var warrantyArray = obj["data"]?["WarrantyInfo"]
-                                 ?? obj["data"]?["warrantyInfo"]
-                                 ?? obj["data"]?["warranty"];
-
-                string start = null, end = null;
-
-                if (warrantyArray is JArray arr && arr.Count > 0)
-                {
-                    // Find the base warranty (type = 1 or earliest start date)
-                    JToken best = arr[0];
-                    foreach (var item in arr)
-                    {
-                        var typeVal = item["Type"]?.ToString() ?? item["type"]?.ToString();
-                        if (typeVal == "1") { best = item; break; }
-                    }
-
-                    start = FormatDate(best["Start"]?.ToString() ?? best["start"]?.ToString());
-                    end   = FormatDate(best["End"]?.ToString()   ?? best["end"]?.ToString());
-                }
-
-                // Build warranty link
-                Uri link = null;
-                try
-                {
-                    link = new Uri($"https://pcsupport.lenovo.com/us/en/products/{productId.ToLower()}/warranty");
-                }
-                catch { }
-
-                return (start, end, link);
-            }
-            catch (Exception ex)
-            {
-                Trace.TraceWarning($"ParseWarranty: {ex.Message}");
-                return (null, null, null);
-            }
-        }
-
-        private static string FormatDate(string raw)
-        {
-            if (string.IsNullOrWhiteSpace(raw)) return null;
-            // Handle both "2019-08-25" and "08/25/2019" and unix timestamps
-            if (long.TryParse(raw, out long ts))
-                return DateTimeOffset.FromUnixTimeMilliseconds(ts)
-                                     .LocalDateTime.ToString("M/d/yyyy");
-            if (DateTime.TryParse(raw, out var dt))
-                return dt.ToString("M/d/yyyy");
-            return raw;
         }
 
         // ── Handlers ──────────────────────────────────────────────────────────
