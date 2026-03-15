@@ -143,52 +143,53 @@ namespace LenovoController
                 ulong designCap = 0, fullCap = 0;
                 uint  cycles    = 0;
 
-                // Design capacity
+                // Design capacity — WMI returns UInt32 (mWh)
                 using (var s = new ManagementObjectSearcher(
                     "root\\WMI", "SELECT * FROM BatteryStaticData"))
                 using (var r = s.Get())
                 {
                     foreach (ManagementObject o in r)
                     {
-                        designCap = (ulong)(o["DesignedCapacity"] ?? 0UL);
+                        var raw = o["DesignedCapacity"];
+                        if (raw != null) designCap = Convert.ToUInt64(raw);
                         break;
                     }
                 }
 
-                // Full charge capacity + cycle count
+                // Full charge capacity — WMI returns UInt32 (mWh)
                 using (var s = new ManagementObjectSearcher(
                     "root\\WMI", "SELECT * FROM BatteryFullChargedCapacity"))
                 using (var r = s.Get())
                 {
                     foreach (ManagementObject o in r)
                     {
-                        fullCap = (ulong)(o["FullChargedCapacity"] ?? 0UL);
+                        var raw = o["FullChargedCapacity"];
+                        if (raw != null) fullCap = Convert.ToUInt64(raw);
                         break;
                     }
                 }
 
+                // Cycle count — WMI returns UInt32
                 using (var s = new ManagementObjectSearcher(
                     "root\\WMI", "SELECT * FROM BatteryCycleCount"))
                 using (var r = s.Get())
                 {
                     foreach (ManagementObject o in r)
                     {
-                        cycles = (uint)(o["CycleCount"] ?? 0u);
+                        var raw = o["CycleCount"];
+                        if (raw != null) cycles = Convert.ToUInt32(raw);
                         break;
                     }
                 }
 
-                // Calculate health %
                 double healthPct = (designCap > 0 && fullCap > 0)
                     ? Math.Round((double)fullCap / designCap * 100.0, 1)
                     : 0;
 
-                // Pick bar colour: green ≥70%, yellow ≥40%, red <40%
                 string barColor = healthPct >= 70 ? "#4CAF50"
                                 : healthPct >= 40 ? "#FFC107"
                                                   : "#F44336";
 
-                // mWh → Wh for display
                 string FormatCap(ulong mwh) =>
                     mwh > 0 ? $"{mwh / 1000.0:F1} Wh  ({mwh:N0} mWh)" : "—";
 
@@ -196,8 +197,8 @@ namespace LenovoController
                 {
                     if (healthPct > 0)
                     {
-                        txtBatteryHealth.Text    = $"{healthPct:F1}%";
-                        batteryHealthBar.Width   = Math.Min(80, 80 * healthPct / 100.0);
+                        txtBatteryHealth.Text  = $"{healthPct:F1}%";
+                        batteryHealthBar.Width = Math.Min(80, 80 * healthPct / 100.0);
                         batteryHealthBar.Background =
                             new System.Windows.Media.SolidColorBrush(
                                 (System.Windows.Media.Color)System.Windows.Media.ColorConverter
@@ -209,9 +210,9 @@ namespace LenovoController
                         batteryHealthBar.Width = 0;
                     }
 
-                    txtBatteryDesign.Text  = FormatCap(designCap);
-                    txtBatteryFull.Text    = FormatCap(fullCap);
-                    txtBatteryCycles.Text  = cycles > 0 ? $"{cycles} cycles" : "—";
+                    txtBatteryDesign.Text = FormatCap(designCap);
+                    txtBatteryFull.Text   = FormatCap(fullCap);
+                    txtBatteryCycles.Text = cycles > 0 ? $"{cycles} cycles" : "—";
                 });
             }
             catch (Exception ex)
@@ -247,8 +248,46 @@ namespace LenovoController
                 client.DefaultRequestHeaders.Add("User-Agent", UserAgent);
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
 
+                // ── Step 1: resolve product ID + machine type from serial ────
+                // getproducts returns an object with "Id" like:
+                // "LAPTOPS-AND-NETBOOKS/IDEAPAD-.../L340-15IRH-GAMING/81LK/81LK00DRED/PF1E6E7E"
+                // Machine type is the 4th segment (index 3).
+                string machineType = _machineType; // fallback from WMI
+                string productId   = null;
+
+                try
+                {
+                    var productJson = await client.GetStringAsync(
+                        string.Format(ProductsUrl, _serialNumber));
+
+                    // getproducts returns either an array or a plain object
+                    JToken productToken = productJson.TrimStart().StartsWith("[")
+                        ? (JToken)JArray.Parse(productJson)
+                        : JObject.Parse(productJson);
+
+                    JToken firstProduct = productToken is JArray arr
+                        ? arr.FirstOrDefault()
+                        : productToken;
+
+                    productId = firstProduct?["Id"]?.ToString();
+
+                    if (!string.IsNullOrEmpty(productId))
+                    {
+                        // e.g. "LAPTOPS-AND-NETBOOKS/IDEAPAD-L-SERIES-LAPTOP/L340-15IRH-GAMING/81LK/..."
+                        var segments = productId.Split('/');
+                        if (segments.Length >= 4)
+                            machineType = segments[3]; // "81LK"
+                        _warrantyLink = new Uri($"https://pcsupport.lenovo.com/products/{productId}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceWarning($"getproducts: {ex.Message}");
+                }
+
+                // ── Step 2: POST getIbaseInfo with confirmed machine type ─────
                 var body = new StringContent(
-                    $"{{\"serialNumber\":\"{_serialNumber}\",\"machineType\":\"{_machineType}\"}}",
+                    $"{{\"serialNumber\":\"{_serialNumber}\",\"machineType\":\"{machineType}\"}}",
                     Encoding.UTF8, "application/json");
 
                 var response = await client.PostAsync(IbaseInfoUrl, body);
@@ -256,7 +295,7 @@ namespace LenovoController
                 var node     = JObject.Parse(json);
 
                 if (node["code"]?.Value<int>() != 0)
-                    throw new Exception($"getIbaseInfo code={node["code"]}");
+                    throw new Exception($"getIbaseInfo code={node["code"]} msg={node["msg"]}");
 
                 var baseWarranties    = node["data"]?["baseWarranties"]?.ToObject<JArray>()    ?? new JArray();
                 var upgradeWarranties = node["data"]?["upgradeWarranties"]?.ToObject<JArray>() ?? new JArray();
@@ -274,17 +313,6 @@ namespace LenovoController
 
                 string startText = startDates.Any() ? startDates.Min().ToString("M/d/yyyy") : "—";
                 string endText   = endDates.Any()   ? endDates.Max().ToString("M/d/yyyy")   : "—";
-
-                try
-                {
-                    var productJson = await client.GetStringAsync(
-                        string.Format(ProductsUrl, _serialNumber));
-                    var productNode = JArray.Parse(productJson);
-                    var id = productNode.FirstOrDefault()?["Id"]?.ToString();
-                    if (id != null)
-                        _warrantyLink = new Uri($"https://pcsupport.lenovo.com/products/{id}");
-                }
-                catch { }
 
                 Dispatcher.Invoke(() =>
                 {

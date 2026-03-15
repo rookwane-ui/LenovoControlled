@@ -184,9 +184,8 @@
                         <!-- Subtitle below title -->
                         <TextBlock x:Name="powerSubtitle" Grid.Row="1" Grid.Column="1"
                                    Text="Controls performance and battery life"
-                                   FontSize="11" Margin="0,2,8,0" Opacity="0.6"
-                                   TextWrapping="NoWrap"
-                                   TextTrimming="CharacterEllipsis"/>
+                                   FontSize="11" Margin="0,3,8,0" Opacity="0.6"
+                                   TextWrapping="Wrap"/>
                     </Grid>
                 </ui:Card>
 
