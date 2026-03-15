@@ -5,12 +5,19 @@ All original functionality are same PLUS some new changes and fixed errors
 
 New features:
 -Support for older lenovo models
+
 -Better support for windows 11
+
 -New WPF ui
+
 -New windows,model and battery info
+
 -Fixed errors and crashes from the previous fork
+
 -still lightweight
+
 -Alot more
+
 
 Preview:
 
