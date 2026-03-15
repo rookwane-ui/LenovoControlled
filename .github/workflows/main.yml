@@ -26,19 +26,22 @@ jobs:
       - name: Build
         run: dotnet build LenovoController.sln --configuration Release --no-restore
 
-      - name: Publish
+      - name: Publish (Self-contained for installer)
         run: |
           dotnet publish LenovoController.csproj `
             --configuration Release `
             --runtime win-x64 `
             --self-contained true `
+            -p:PublishSingleFile=false `
+            -p:DebugType=embedded `
             --output publish/
 
-      - name: Upload artifact
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: LenovoController
+          name: LenovoController-Build
           path: publish/
+          retention-days: 1
 
   release:
     needs: build
@@ -46,26 +49,60 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
 
     steps:
-      - name: Download artifact
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
-          name: LenovoController
+          name: LenovoController-Build
           path: publish/
 
-      - name: Download Inno Setup
+      - name: Install Inno Setup
         run: |
           choco install innosetup --no-progress
-          echo "C:\Program Files (x86)\Inno Setup 6" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          # Verify installation
+          echo "Inno Setup installed at:"
+          dir "C:\Program Files (x86)\Inno Setup 6"
 
-      - name: Create installer
+      - name: Create installer with Inno Setup
+        shell: pwsh
         run: |
           $version = "${{ github.ref_name }}" -replace '^v', ''
-          iscc /DAppVersion=$version LenovoController.iss
+          $innoPath = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          
+          Write-Host "Creating installer for version: $version"
+          Write-Host "Contents of publish directory:"
+          Get-ChildItem -Path publish -Recurse
+          
+          # Run Inno Setup compiler
+          & $innoPath "/DAppVersion=$version" "LenovoController.iss"
+          
+          # Check if installer was created
+          Write-Host "Looking for installer files..."
+          Get-ChildItem -Path . -Filter "*.exe" -Recurse
+          
+          # Rename if needed and move to output directory
+          New-Item -ItemType Directory -Force -Path output
+          $installer = Get-ChildItem -Path . -Filter "LenovoController-Setup-*.exe" -Recurse | Select-Object -First 1
+          
+          if ($installer) {
+            Copy-Item $installer.FullName -Destination "output\LenovoController-Setup-$version.exe"
+            Write-Host "Installer copied to output folder"
+          } else {
+            Write-Error "Installer not found!"
+            exit 1
+          }
 
-      - name: Upload Setup to Release
+      - name: List output directory
+        run: Get-ChildItem -Path output -Recurse
+
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: Output/LenovoController-Setup.exe
+          files: |
+            output/LenovoController-Setup-*.exe
           generate_release_notes: true
+          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
