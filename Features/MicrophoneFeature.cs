@@ -1,61 +1,38 @@
-using Microsoft.Win32;
-using System.Diagnostics;
+using Windows.Media.Capture;
+using Windows.ApplicationModel;
+using Windows.Foundation.Metadata;
 
-namespace LenovoController.Features
+public class ModernMicrophoneFeature
 {
-    public class MicrophoneFeature
+    public async Task<bool> GetStateAsync()
     {
-        private const string UserKey =
-        @"Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\microphone";
+        // Check microphone permission status
+        var accessStatus = await AudioCapturePermissions.RequestMicrophoneAccessAsync();
+        return accessStatus == MediaCaptureAccessStatus.Allowed;
+    }
 
-        private const string MachineKey =
-        @"SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\microphone";
-
-        public bool GetState()
+    public async Task SetStateAsync(bool enabled)
+    {
+        // On Windows 11, you can request permission change
+        if (enabled)
         {
-            using var key = Registry.CurrentUser.OpenSubKey(UserKey);
-
-            if (key == null)
-                return true;
-
-            string value = key.GetValue("Value")?.ToString();
-
-            return value != "Deny";
+            // Request microphone access
+            var accessStatus = await AudioCapturePermissions.RequestMicrophoneAccessAsync();
+            
+            if (accessStatus != MediaCaptureAccessStatus.Allowed)
+            {
+                // Open Windows privacy settings if permission denied
+                await Windows.System.Launcher.LaunchUriAsync(
+                    new Uri("ms-settings:privacy-microphone")
+                );
+            }
         }
-
-        public void SetState(bool enabled)
-        {
-            string state = enabled ? "Allow" : "Deny";
-
-            // HKCU (user level)
-            using (var key = Registry.CurrentUser.CreateSubKey(UserKey))
+        else
             {
-                key?.SetValue("Value", state, RegistryValueKind.String);
-            }
-
-            // HKLM (system level) – requires admin
-            try
-            {
-                using var key = Registry.LocalMachine.CreateSubKey(MachineKey);
-                key?.SetValue("Value", state, RegistryValueKind.String);
-            }
-            catch
-            {
-                // Ignore if not admin
-            }
-
-            // Notify Windows
-            try
-            {
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = "powershell",
-                    Arguments = "Restart-Service camsvc -Force",
-                    CreateNoWindow = true,
-                    UseShellExecute = false
-                });
-            }
-            catch { }
+            // Open Windows privacy settings for manual toggling
+            await Windows.System.Launcher.LaunchUriAsync(
+                new Uri("ms-settings:privacy-microphone")
+            );
         }
     }
 }
