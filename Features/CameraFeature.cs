@@ -5,14 +5,14 @@ namespace LenovoController.Features
 {
     public class CameraFeature
     {
-        private const string RegistryKey =
+        private const string HklmKey =
             @"SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam";
 
         public bool IsSupported()
         {
             try
             {
-                using var key = Registry.CurrentUser.OpenSubKey(RegistryKey);
+                using var key = Registry.LocalMachine.OpenSubKey(HklmKey);
                 return key != null;
             }
             catch
@@ -24,8 +24,8 @@ namespace LenovoController.Features
         // true = camera ON (Allow), false = camera OFF (Deny)
         public bool GetState()
         {
-            using var key = Registry.CurrentUser.OpenSubKey(RegistryKey)
-                ?? throw new Exception("Camera registry key not found.");
+            using var key = Registry.LocalMachine.OpenSubKey(HklmKey)
+                ?? throw new Exception("Camera registry key not found in HKLM.");
 
             var value = key.GetValue("Value") as string;
             return string.Equals(value, "Allow", StringComparison.OrdinalIgnoreCase);
@@ -33,8 +33,8 @@ namespace LenovoController.Features
 
         public void SetState(bool enabled)
         {
-            using var key = Registry.CurrentUser.OpenSubKey(RegistryKey, writable: true)
-                ?? throw new Exception("Camera registry key not found.");
+            using var key = Registry.LocalMachine.OpenSubKey(HklmKey, writable: true)
+                ?? throw new Exception("Camera registry key not found in HKLM.");
 
             key.SetValue("Value", enabled ? "Allow" : "Deny", RegistryValueKind.String);
         }
