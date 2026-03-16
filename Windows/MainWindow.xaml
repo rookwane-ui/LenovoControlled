@@ -317,7 +317,44 @@ WindowStartupLocation="CenterScreen"
                                      Checked="chkTouchpadLock_Checked"
                                      Unchecked="chkTouchpadLock_Checked"/>
                 </ui:CardControl>
+<!-- Microphone -->
+<ui:CardControl MinHeight="64" Padding="16,10">
+    <ui:CardControl.Header>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="44"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
+            <Border Width="36" Height="36" CornerRadius="8"
+                    Background="#FCE4EC"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center">
+                <ui:SymbolIcon Symbol="Mic24"
+                               FontSize="18"
+                               Foreground="#C2185B"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+            </Border>
+
+            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <TextBlock Text="Microphone"
+                           FontSize="13"
+                           FontWeight="SemiBold"/>
+
+                <TextBlock Text="Enable or disable the microphone"
+                           FontSize="11"
+                           Margin="0,3,0,0"
+                           Opacity="0.6"
+                           TextWrapping="Wrap"/>
+            </StackPanel>
+        </Grid>
+    </ui:CardControl.Header>
+
+    <ui:ToggleSwitch x:Name="chkMicrophone"
+                     Checked="chkMicrophone_Checked"
+                     Unchecked="chkMicrophone_Checked"/>
+</ui:CardControl>
                 <!-- ══ FOOTER ══ -->
                 <Grid Margin="0,16,0,0" Height="34">
                     <Grid.ColumnDefinitions>
