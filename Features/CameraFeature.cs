@@ -38,7 +38,7 @@ namespace LenovoController.Features
             }
         }
 
-        // Reads from HKLM as the authoritative state
+        // Reads from HKLM parent key as the authoritative state
         public bool GetState()
         {
             using var key = Registry.LocalMachine.OpenSubKey(KeyPath)
@@ -52,22 +52,31 @@ namespace LenovoController.Features
         {
             string value = enabled ? "Allow" : "Deny";
 
-            // Write HKLM — master switch (requires admin)
-            using (var hklm = Registry.LocalMachine.OpenSubKey(KeyPath, writable: true)
-                ?? throw new Exception("Camera registry key not found in HKLM."))
-            {
-                hklm.SetValue("Value", value, RegistryValueKind.String);
-            }
+            // Write HKLM parent + all subkeys (requires admin)
+            SetRegistryHive(Registry.LocalMachine, value);
 
-            // Write HKCU — must match HKLM or it overrides it
-            using (var hkcu = Registry.CurrentUser.OpenSubKey(KeyPath, writable: true)
-                ?? Registry.CurrentUser.CreateSubKey(KeyPath))
-            {
-                hkcu.SetValue("Value", value, RegistryValueKind.String);
-            }
+            // Write HKCU parent + all subkeys
+            SetRegistryHive(Registry.CurrentUser, value);
 
             // Notify all running apps immediately
             BroadcastSettingChange();
+        }
+
+        private static void SetRegistryHive(RegistryKey hive, string value)
+        {
+            using var parent = hive.OpenSubKey(KeyPath, writable: true)
+                ?? hive.CreateSubKey(KeyPath);
+
+            // Write to parent key
+            parent.SetValue("Value", value, RegistryValueKind.String);
+
+            // Write to every per-app subkey (e.g. Microsoft.WindowsCamera_xxx, NonPackaged)
+            foreach (var subkeyName in parent.GetSubKeyNames())
+            {
+                using var sub = parent.OpenSubKey(subkeyName, writable: true);
+                if (sub?.GetValue("Value") != null)
+                    sub.SetValue("Value", value, RegistryValueKind.String);
+            }
         }
     }
 }
