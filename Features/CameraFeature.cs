@@ -6,7 +6,7 @@ namespace LenovoController.Features
 {
     public class CameraFeature
     {
-        private const string HklmKey =
+        private const string KeyPath =
             @"SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam";
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
@@ -29,7 +29,7 @@ namespace LenovoController.Features
         {
             try
             {
-                using var key = Registry.LocalMachine.OpenSubKey(HklmKey);
+                using var key = Registry.LocalMachine.OpenSubKey(KeyPath);
                 return key != null;
             }
             catch
@@ -38,10 +38,10 @@ namespace LenovoController.Features
             }
         }
 
-        // true = camera ON (Allow), false = camera OFF (Deny)
+        // Reads from HKLM as the authoritative state
         public bool GetState()
         {
-            using var key = Registry.LocalMachine.OpenSubKey(HklmKey)
+            using var key = Registry.LocalMachine.OpenSubKey(KeyPath)
                 ?? throw new Exception("Camera registry key not found in HKLM.");
 
             var value = key.GetValue("Value") as string;
@@ -50,11 +50,24 @@ namespace LenovoController.Features
 
         public void SetState(bool enabled)
         {
-            using var key = Registry.LocalMachine.OpenSubKey(HklmKey, writable: true)
-                ?? throw new Exception("Camera registry key not found in HKLM.");
+            string value = enabled ? "Allow" : "Deny";
 
-            key.SetValue("Value", enabled ? "Allow" : "Deny", RegistryValueKind.String);
-            BroadcastSettingChange(); // notify running apps immediately, same as Windows Settings
+            // Write HKLM — master switch (requires admin)
+            using (var hklm = Registry.LocalMachine.OpenSubKey(KeyPath, writable: true)
+                ?? throw new Exception("Camera registry key not found in HKLM."))
+            {
+                hklm.SetValue("Value", value, RegistryValueKind.String);
+            }
+
+            // Write HKCU — must match HKLM or it overrides it
+            using (var hkcu = Registry.CurrentUser.OpenSubKey(KeyPath, writable: true)
+                ?? Registry.CurrentUser.CreateSubKey(KeyPath))
+            {
+                hkcu.SetValue("Value", value, RegistryValueKind.String);
+            }
+
+            // Notify all running apps immediately
+            BroadcastSettingChange();
         }
     }
 }
