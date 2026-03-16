@@ -1,46 +1,73 @@
 using System;
-using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace LenovoController.Features
 {
     public class MicrophoneFeature
     {
-        public bool GetState()
+        [ComImport, Guid("BCDE0395-E52F-467C-8E3D-C4579291692E")]
+        private class MMDeviceEnumerator { }
+
+        [Guid("A95664D2-9614-4F35-A746-DE8DB63617E6"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        private interface IMMDeviceEnumerator
         {
-            return true; // TODO: implement actual state read
+            int NotImpl1();
+            int GetDefaultAudioEndpoint(int dataFlow, int role, out IMMDevice ppDevice);
         }
 
-        public async Task SetStateAsync(bool enabled)
+        [Guid("D666063F-1587-4E43-81F1-B948E807363F"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        private interface IMMDevice
         {
-            string filter = "$_.FriendlyName -like '*Microphone*' -or $_.FriendlyName -like '*Mic*'";
-            string action = enabled ? "Enable-PnpDevice" : "Disable-PnpDevice";
-            string command = $"Get-PnpDevice -Class AudioEndpoint | Where-Object {{{filter}}} | {action} -Confirm:$false";
+            int Activate(ref Guid iid, int dwClsCtx, IntPtr pActivationParams, out IAudioEndpointVolume ppInterface);
+        }
 
-            var process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "powershell",
-                    Arguments = $"-NoProfile -Command \"{command}\"",
-                    CreateNoWindow = true,
-                    UseShellExecute = false,
-                    RedirectStandardError = true,
-                    RedirectStandardOutput = true,
-                }
-            };
+        [Guid("5CDF2C82-841E-4546-9722-0CF74078229A"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        private interface IAudioEndpointVolume
+        {
+            int NotImpl1();
+            int NotImpl2();
+            int NotImpl3();
+            int NotImpl4();
+            int NotImpl5();
+            int NotImpl6();
+            int NotImpl7();
+            int NotImpl8();
+            int SetMute([MarshalAs(UnmanagedType.Bool)] bool bMute, ref Guid pguidEventContext);
+            int GetMute([MarshalAs(UnmanagedType.Bool)] out bool pbMute);
+        }
 
-            process.Start();
-            string error = await process.StandardError.ReadToEndAsync();
-            await process.WaitForExitAsync();
+        private static IAudioEndpointVolume GetMicEndpointVolume()
+        {
+            var enumerator = (IMMDeviceEnumerator)new MMDeviceEnumerator();
+            // dataFlow 1 = eCapture (microphone), role 0 = eConsole
+            enumerator.GetDefaultAudioEndpoint(1, 0, out IMMDevice micDevice);
 
-            if (process.ExitCode != 0)
-                throw new Exception($"Microphone toggle failed: {error}");
+            var iid = typeof(IAudioEndpointVolume).GUID;
+            micDevice.Activate(ref iid, 1, IntPtr.Zero, out IAudioEndpointVolume vol);
+            return vol;
+        }
+
+        public bool GetState()
+        {
+            var vol = GetMicEndpointVolume();
+            vol.GetMute(out bool muted);
+            return !muted; // true = mic is ON
+        }
+
+        public Task SetStateAsync(bool enabled)
+        {
+            var vol = GetMicEndpointVolume();
+            var empty = Guid.Empty;
+            vol.SetMute(!enabled, ref empty); // enabled=true means unmute
+            return Task.CompletedTask;
         }
 
         public void SetState(bool enabled)
         {
-            Task.Run(() => SetStateAsync(enabled)).GetAwaiter().GetResult();
+            var vol = GetMicEndpointVolume();
+            var empty = Guid.Empty;
+            vol.SetMute(!enabled, ref empty);
         }
     }
 }
