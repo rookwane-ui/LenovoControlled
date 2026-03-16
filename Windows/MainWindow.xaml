@@ -24,73 +24,73 @@
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <Grid Margin="16">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
 
-                <!-- Battery -->
-                <ui:Card Grid.Row="0" Margin="0,0,0,12" Padding="12">
-                    <StackPanel>
-                        <TextBlock Text="Battery Charge" FontWeight="SemiBold"/>
-                        <StackPanel Orientation="Horizontal">
-                            <RadioButton Content="Conservation" Tag="Battery" CommandParameter="0"
-                                         Checked="RadioGroup_Checked"/>
-                            <RadioButton Content="Normal" Tag="Battery" CommandParameter="1"
-                                         Checked="RadioGroup_Checked"/>
-                            <RadioButton Content="Rapid" Tag="Battery" CommandParameter="2"
-                                         Checked="RadioGroup_Checked"/>
+                <StackPanel>
+
+                    <!-- Battery -->
+                    <ui:Card Margin="0,0,0,12" Padding="12">
+                        <StackPanel>
+                            <TextBlock Text="Battery Charge" FontWeight="SemiBold"/>
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton Content="Conservation" Tag="Battery" CommandParameter="0"
+                                             Checked="RadioGroup_Checked"/>
+                                <RadioButton Content="Normal" Tag="Battery" CommandParameter="1"
+                                             Checked="RadioGroup_Checked"/>
+                                <RadioButton Content="Rapid" Tag="Battery" CommandParameter="2"
+                                             Checked="RadioGroup_Checked"/>
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                </ui:Card>
+                    </ui:Card>
 
-                <!-- Power Mode -->
-                <ui:Card Grid.Row="1" Margin="0,0,0,12" Padding="12">
-                    <StackPanel>
-                        <TextBlock Text="Power Mode" FontWeight="SemiBold"/>
-                        <StackPanel Orientation="Horizontal">
-                            <RadioButton Content="Efficiency" Tag="PowerMode" CommandParameter="0"
-                                         Checked="RadioGroup_Checked"/>
-                            <RadioButton Content="Balanced" Tag="PowerMode" CommandParameter="1"
-                                         Checked="RadioGroup_Checked"/>
-                            <RadioButton Content="Performance" Tag="PowerMode" CommandParameter="2"
-                                         Checked="RadioGroup_Checked"/>
+                    <!-- Power Mode -->
+                    <ui:Card Margin="0,0,0,12" Padding="12">
+                        <StackPanel>
+                            <TextBlock Text="Power Mode" FontWeight="SemiBold"/>
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton Content="Efficiency" Tag="PowerMode" CommandParameter="0"
+                                             Checked="RadioGroup_Checked"/>
+                                <RadioButton Content="Balanced" Tag="PowerMode" CommandParameter="1"
+                                             Checked="RadioGroup_Checked"/>
+                                <RadioButton Content="Performance" Tag="PowerMode" CommandParameter="2"
+                                             Checked="RadioGroup_Checked"/>
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                </ui:Card>
+                    </ui:Card>
 
-                <!-- USB -->
-                <ui:Card Grid.Row="2" Margin="0,0,0,12" Padding="12">
-                    <StackPanel>
-                        <TextBlock Text="Always On USB" FontWeight="SemiBold"/>
-                        <StackPanel Orientation="Horizontal">
-                            <RadioButton Content="Off" Tag="Usb" CommandParameter="0"
-                                         Checked="RadioGroup_Checked"/>
-                            <RadioButton Content="Sleeping" Tag="Usb" CommandParameter="1"
-                                         Checked="RadioGroup_Checked"/>
-                            <RadioButton Content="Always" Tag="Usb" CommandParameter="2"
-                                         Checked="RadioGroup_Checked"/>
+                    <!-- USB -->
+                    <ui:Card Margin="0,0,0,12" Padding="12">
+                        <StackPanel>
+                            <TextBlock Text="Always On USB" FontWeight="SemiBold"/>
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton Content="Off" Tag="Usb" CommandParameter="0"
+                                             Checked="RadioGroup_Checked"/>
+                                <RadioButton Content="Sleeping" Tag="Usb" CommandParameter="1"
+                                             Checked="RadioGroup_Checked"/>
+                                <RadioButton Content="Always" Tag="Usb" CommandParameter="2"
+                                             Checked="RadioGroup_Checked"/>
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                </ui:Card>
+                    </ui:Card>
 
-                <!-- Toggles -->
-                <ui:Card Grid.Row="3" Margin="0,0,0,12" Padding="12">
-                    <StackPanel>
-                        <ui:ToggleSwitch x:Name="chkFnLock"
-                                         Content="Fn Lock"
-                                         Checked="chkFnLock_Checked"
-                                         Unchecked="chkFnLock_Checked"/>
-                        <ui:ToggleSwitch x:Name="chkTouchpadLock"
-                                         Content="Touchpad"
-                                         Checked="chkTouchpadLock_Checked"
-                                         Unchecked="chkTouchpadLock_Checked"/>
-                    </StackPanel>
-                </ui:Card>
+                    <!-- Toggles -->
+                    <ui:Card Margin="0,0,0,12" Padding="12">
+                        <StackPanel>
+                            <ui:ToggleSwitch x:Name="chkFnLock"
+                                             Content="Fn Lock"
+                                             Checked="chkFnLock_Checked"
+                                             Unchecked="chkFnLock_Checked"/>
+
+                            <ui:ToggleSwitch x:Name="chkTouchpadLock"
+                                             Content="Touchpad"
+                                             Checked="chkTouchpadLock_Checked"
+                                             Unchecked="chkTouchpadLock_Checked"/>
+                        </StackPanel>
+                    </ui:Card>
+
+                </StackPanel>
 
             </Grid>
         </ScrollViewer>
+
     </Grid>
 </ui:FluentWindow>
