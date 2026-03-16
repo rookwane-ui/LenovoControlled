@@ -1,6 +1,7 @@
 using Microsoft.Win32;
 using System;
 using System.Runtime.InteropServices;
+using System.ServiceProcess;
 
 namespace LenovoController.Features
 {
@@ -23,6 +24,22 @@ namespace LenovoController.Features
             SendMessageTimeout(
                 HWND_BROADCAST, WM_SETTINGCHANGE, IntPtr.Zero,
                 "ConsentStore", SMTO_ABORTIFHUNG, 5000, out _);
+        }
+
+        private static void RestartCamSvc()
+        {
+            try
+            {
+                using var sc = new ServiceController("CamSvc");
+                if (sc.Status == ServiceControllerStatus.Running)
+                {
+                    sc.Stop();
+                    sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(5));
+                }
+                sc.Start();
+                sc.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(5));
+            }
+            catch { /* service may not exist on all systems */ }
         }
 
         public bool IsSupported()
@@ -48,27 +65,28 @@ namespace LenovoController.Features
             return string.Equals(value, "Allow", StringComparison.OrdinalIgnoreCase);
         }
 
-        // Mirrors exactly what Windows Settings does:
-        // write HKCU parent + all per-app subkeys, then broadcast
         public void SetState(bool enabled)
         {
             string value = enabled ? "Allow" : "Deny";
 
-            using var parent = Registry.CurrentUser.OpenSubKey(KeyPath, writable: true)
-                ?? Registry.CurrentUser.CreateSubKey(KeyPath);
-
-            // Write parent key
-            parent.SetValue("Value", value, RegistryValueKind.String);
-
-            // Write every per-app subkey (e.g. Microsoft.WindowsCamera_xxx, NonPackaged)
-            foreach (var subkeyName in parent.GetSubKeyNames())
+            // Write HKCU parent + all per-app subkeys
+            using (var parent = Registry.CurrentUser.OpenSubKey(KeyPath, writable: true)
+                ?? Registry.CurrentUser.CreateSubKey(KeyPath))
             {
-                using var sub = parent.OpenSubKey(subkeyName, writable: true);
-                if (sub?.GetValue("Value") != null)
-                    sub.SetValue("Value", value, RegistryValueKind.String);
+                parent.SetValue("Value", value, RegistryValueKind.String);
+
+                foreach (var subkeyName in parent.GetSubKeyNames())
+                {
+                    using var sub = parent.OpenSubKey(subkeyName, writable: true);
+                    if (sub?.GetValue("Value") != null)
+                        sub.SetValue("Value", value, RegistryValueKind.String);
+                }
             }
 
-            // Notify running apps immediately
+            // Restart CamSvc to enforce the change immediately
+            RestartCamSvc();
+
+            // Broadcast to notify running apps
             BroadcastSettingChange();
         }
     }
