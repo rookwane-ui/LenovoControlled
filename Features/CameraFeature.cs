@@ -29,7 +29,7 @@ namespace LenovoController.Features
         {
             try
             {
-                using var key = Registry.LocalMachine.OpenSubKey(KeyPath);
+                using var key = Registry.CurrentUser.OpenSubKey(KeyPath);
                 return key != null;
             }
             catch
@@ -38,45 +38,38 @@ namespace LenovoController.Features
             }
         }
 
-        // Reads from HKLM parent key as the authoritative state
+        // Reads from HKCU parent key
         public bool GetState()
         {
-            using var key = Registry.LocalMachine.OpenSubKey(KeyPath)
-                ?? throw new Exception("Camera registry key not found in HKLM.");
+            using var key = Registry.CurrentUser.OpenSubKey(KeyPath)
+                ?? throw new Exception("Camera registry key not found in HKCU.");
 
             var value = key.GetValue("Value") as string;
             return string.Equals(value, "Allow", StringComparison.OrdinalIgnoreCase);
         }
 
+        // Mirrors exactly what Windows Settings does:
+        // write HKCU parent + all per-app subkeys, then broadcast
         public void SetState(bool enabled)
         {
             string value = enabled ? "Allow" : "Deny";
 
-            // Write HKLM parent + all subkeys (requires admin)
-            SetRegistryHive(Registry.LocalMachine, value);
+            using var parent = Registry.CurrentUser.OpenSubKey(KeyPath, writable: true)
+                ?? Registry.CurrentUser.CreateSubKey(KeyPath);
 
-            // Write HKCU parent + all subkeys
-            SetRegistryHive(Registry.CurrentUser, value);
-
-            // Notify all running apps immediately
-            BroadcastSettingChange();
-        }
-
-        private static void SetRegistryHive(RegistryKey hive, string value)
-        {
-            using var parent = hive.OpenSubKey(KeyPath, writable: true)
-                ?? hive.CreateSubKey(KeyPath);
-
-            // Write to parent key
+            // Write parent key
             parent.SetValue("Value", value, RegistryValueKind.String);
 
-            // Write to every per-app subkey (e.g. Microsoft.WindowsCamera_xxx, NonPackaged)
+            // Write every per-app subkey (e.g. Microsoft.WindowsCamera_xxx, NonPackaged)
             foreach (var subkeyName in parent.GetSubKeyNames())
             {
                 using var sub = parent.OpenSubKey(subkeyName, writable: true);
                 if (sub?.GetValue("Value") != null)
                     sub.SetValue("Value", value, RegistryValueKind.String);
             }
+
+            // Notify running apps immediately
+            BroadcastSettingChange();
         }
     }
 }
