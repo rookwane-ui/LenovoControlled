@@ -3,6 +3,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -27,6 +28,11 @@ namespace LenovoController
 
         private readonly App _app;
         private bool _refreshing;
+
+        // ── Admin check ──────────────────────────────────────────
+        private static bool IsRunningAsAdmin =>
+            new WindowsPrincipal(WindowsIdentity.GetCurrent())
+                .IsInRole(WindowsBuiltInRole.Administrator);
 
         // ── INotifyPropertyChanged ───────────────────────────────
         public event PropertyChangedEventHandler PropertyChanged;
@@ -155,7 +161,7 @@ namespace LenovoController
                     () => chkMicrophone.IsEnabled = false
                 );
 
-                // ── Camera — registry read, no threading concerns ──
+                // ── Camera — HKLM registry read ──
                 Try(
                     () =>
                     {
@@ -333,6 +339,24 @@ namespace LenovoController
             if (_refreshing)
                 return;
 
+            // Warn the user if not running as admin — camera toggle won't work
+            if (!IsRunningAsAdmin)
+            {
+                // Revert the toggle visually so it doesn't appear to have changed
+                _refreshing = true;
+                chkCamera.IsChecked = !chkCamera.IsChecked;
+                _refreshing = false;
+
+                MessageBox.Show(
+                    "Camera control requires administrator privileges.\n\n" +
+                    "Please restart Lenovo Controller as Administrator to use this feature.",
+                    "Administrator Required",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return;
+            }
+
             bool newState = chkCamera.IsChecked == true;
 
             if (_cameraFeature.GetState() != newState)
@@ -377,7 +401,7 @@ namespace LenovoController
                 case "UA":
                     batteryGroup.Text = "Зарядка батареї";
                     miscGroup.Text = "Додаткові опції";
-                    btnAbout.Content = "Про програму";
+                    btnAbout.Content = "Про программу";
                     btnExit.Content = "Вихід";
                     break;
 
