@@ -19,6 +19,7 @@ namespace LenovoController
         private readonly FnLockFeature       _fnLockFeature       = new FnLockFeature();
         private readonly TouchpadLockFeature _touchpadLockFeature = new TouchpadLockFeature();
         private readonly MicrophoneFeature   _microphoneFeature   = new MicrophoneFeature();
+        private readonly CameraFeature       _cameraFeature       = new CameraFeature();
 
         private RadioButton[] _batteryButtons;
         private RadioButton[] _powerModeButtons;
@@ -74,6 +75,7 @@ namespace LenovoController
                 bool touchpad = false;
                 bool fnLock = false;
                 bool microphone = false;
+                bool camera = false;
 
                 bool batteryOk = false;
                 bool usbOk = false;
@@ -81,6 +83,7 @@ namespace LenovoController
                 bool touchpadOk = false;
                 bool fnLockOk = false;
                 bool microphoneOk = false;
+                bool cameraOk = false;
 
                 await Task.Run(() =>
                 {
@@ -140,27 +143,28 @@ namespace LenovoController
                     );
                 });
 
-                // ── Microphone check — on UI thread, with debug error popup ──
+                // ── Microphone — on UI (STA) thread ──
                 Try(
                     () =>
                     {
                         if (!_microphoneFeature.IsSupported())
-                            throw new Exception("IsSupported() returned false — no active capture devices found");
-
+                            throw new Exception("No active capture devices found");
                         microphone = _microphoneFeature.GetState();
                         microphoneOk = true;
                     },
+                    () => chkMicrophone.IsEnabled = false
+                );
+
+                // ── Camera — registry read, no threading concerns ──
+                Try(
                     () =>
                     {
-                        // DEBUG: show exact exception so we can fix the real cause
-                        try { _microphoneFeature.GetState(); }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(ex.ToString(), "Mic GetState() failed", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-
-                        chkMicrophone.IsEnabled = false;
-                    }
+                        if (!_cameraFeature.IsSupported())
+                            throw new Exception("Camera registry key not found");
+                        camera = _cameraFeature.GetState();
+                        cameraOk = true;
+                    },
+                    () => chkCamera.IsEnabled = false
                 );
 
                 if (powerOk)
@@ -180,6 +184,9 @@ namespace LenovoController
 
                 if (microphoneOk)
                     chkMicrophone.IsChecked = microphone;
+
+                if (cameraOk)
+                    chkCamera.IsChecked = camera;
             }
             finally
             {
@@ -319,6 +326,17 @@ namespace LenovoController
 
             if (_microphoneFeature.GetState() != newState)
                 SafeSet(() => _microphoneFeature.SetState(newState));
+        }
+
+        private void chkCamera_Checked(object sender, RoutedEventArgs e)
+        {
+            if (_refreshing)
+                return;
+
+            bool newState = chkCamera.IsChecked == true;
+
+            if (_cameraFeature.GetState() != newState)
+                SafeSet(() => _cameraFeature.SetState(newState));
         }
 
         private static void SafeSet(Action action)
