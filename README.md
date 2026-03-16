@@ -18,6 +18,7 @@ New features:
 
 -Alot more
 
+Tested on: Ideapad L340
 
 Preview:
 
