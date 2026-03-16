@@ -11,6 +11,7 @@
         SizeToContent="Height"
         ResizeMode="CanMinimize"
         Closing="Window_Closing"
+WindowStartupLocation="CenterScreen"
         ExtendsContentIntoTitleBar="True"
         WindowBackdropType="Mica">
 
