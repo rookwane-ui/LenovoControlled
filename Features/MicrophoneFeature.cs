@@ -7,8 +7,7 @@ namespace LenovoController.Features
     {
         public bool GetState()
         {
-            // Optional: you could detect device state here
-            return true;
+            return true; // optional later
         }
 
         public async Task SetStateAsync(bool enabled)
@@ -30,6 +29,12 @@ namespace LenovoController.Features
 
             process.Start();
             await process.WaitForExitAsync();
+        }
+
+        // 🔥 ADD THIS
+        public void SetState(bool enabled)
+        {
+            SetStateAsync(enabled).GetAwaiter().GetResult();
         }
     }
 }
