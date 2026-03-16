@@ -1,6 +1,8 @@
 using LenovoController.Features;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -8,123 +10,241 @@ using System.Windows.Interop;
 
 namespace LenovoController
 {
-    public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
+    public partial class MainWindow : Wpf.Ui.Controls.FluentWindow, INotifyPropertyChanged
     {
-        private readonly AlwaysOnUsbFeature _alwaysOnUsbFeature = new();
-        private readonly BatteryFeature _batteryFeature = new();
-        private readonly PowerModeFeature _powerModeFeature = new();
-        private readonly FnLockFeature _fnLockFeature = new();
-        private readonly TouchpadLockFeature _touchpadLockFeature = new();
+        // ── Features ──────────────────────────────────────────────────────────────
+        private readonly AlwaysOnUsbFeature  _alwaysOnUsbFeature  = new AlwaysOnUsbFeature();
+        private readonly BatteryFeature      _batteryFeature      = new BatteryFeature();
+        private readonly PowerModeFeature    _powerModeFeature    = new PowerModeFeature();
+        private readonly FnLockFeature       _fnLockFeature       = new FnLockFeature();
+        private readonly TouchpadLockFeature _touchpadLockFeature = new TouchpadLockFeature();
 
-        private bool _refreshing;
+        private RadioButton[] _batteryButtons;
+        private RadioButton[] _powerModeButtons;
+        private RadioButton[] _alwaysOnUsbButtons;
+
         private readonly App _app;
+        private bool _refreshing;
 
+        // ── INotifyPropertyChanged ────────────────────────────────────────────────
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void OnPropertyChanged([CallerMemberName] string prop = "") =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+
+        // ── Constructor ───────────────────────────────────────────────────────────
         public MainWindow(App app)
         {
             InitializeComponent();
             _app = app;
+            ChangeLanguage();
 
-            WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            _batteryButtons     = new[] { radioConservation, radioNormalCharge, radioRapidCharge };
+            _powerModeButtons   = new[] { radioQuiet, radioBalance, radioPerformance };
+            _alwaysOnUsbButtons = new[] { radioAlwaysOnUsbOff, radioAlwaysOnUsbOnWhenSleeping, radioAlwaysOnUsbOnAlways };
 
-            Loaded += async (_, _) => await RefreshAsync();
+            Loaded += async (_, __) => await RefreshAsync();
         }
 
+        // ── Async Refresh ─────────────────────────────────────────────────────────
         private async Task RefreshAsync()
         {
+            btnRefresh.IsEnabled = false;
             _refreshing = true;
 
             try
             {
+                BatteryState     battery    = default;
+                AlwaysOnUsbState usb        = default;
+                PowerModeState   powerMode  = default;
+                bool touchpad = false, fnLock = false;
+                bool batteryOk = false, usbOk = false,
+                     powerOk = false,
+                     touchpadOk = false, fnLockOk = false;
+
                 await Task.Run(() =>
                 {
-                    try
-                    {
-                        Dispatcher.Invoke(() =>
-                        {
-                            chkFnLock.IsChecked = _fnLockFeature.GetState() == FnLockState.On;
-                            chkTouchpadLock.IsChecked = _touchpadLockFeature.GetState() == TouchpadLockState.Off;
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        Trace.TraceWarning(ex.Message);
-                    }
+                    Try(() => { powerMode = _powerModeFeature.GetAcState();                           powerOk    = true; }, () => DisableControls(_powerModeButtons));
+                    Try(() => { battery  = _batteryFeature.GetState();                                batteryOk  = true; }, () => DisableControls(_batteryButtons));
+                    Try(() => { usb      = _alwaysOnUsbFeature.GetState();                            usbOk      = true; }, () => DisableControls(_alwaysOnUsbButtons));
+                    Try(() => { touchpad = _touchpadLockFeature.GetState() == TouchpadLockState.Off;  touchpadOk = true; }, () => Dispatcher.Invoke(() => chkTouchpadLock.IsEnabled = false));
+                    Try(() => { fnLock   = _fnLockFeature.GetState()       == FnLockState.On;         fnLockOk   = true; }, () => Dispatcher.Invoke(() => chkFnLock.IsEnabled        = false));
                 });
+
+                if (powerOk)    _powerModeButtons[(int)powerMode].IsChecked  = true;
+                if (batteryOk)  _batteryButtons[(int)battery].IsChecked      = true;
+                if (usbOk)      _alwaysOnUsbButtons[(int)usb].IsChecked      = true;
+                if (touchpadOk) chkTouchpadLock.IsChecked = touchpad;
+                if (fnLockOk)   chkFnLock.IsChecked        = fnLock;
             }
             finally
             {
                 _refreshing = false;
+                btnRefresh.IsEnabled = true;
             }
         }
 
-        private async void RadioGroup_Checked(object sender, RoutedEventArgs e)
+        private static void Try(Action check, Action disable)
         {
-            if (_refreshing) return;
-            if (sender is not RadioButton rb || rb.Tag is not string type) return;
+            try   { check(); }
+            catch (Exception e) { Trace.TraceWarning("Feature unavailable: " + e.Message); disable(); }
+        }
 
-            try
-            {
-                int value = int.Parse(rb.CommandParameter.ToString());
+        private void DisableControls(Control[] controls)
+        {
+            foreach (var c in controls)
+                Dispatcher.Invoke(() => c.IsEnabled = false);
+        }
 
-                await Task.Run(() =>
-                {
-                    switch (type)
-                    {
-                        case "PowerMode":
-                            _powerModeFeature.SetAcState((PowerModeState)value);
-                            break;
-                        case "Battery":
-                            _batteryFeature.SetState((BatteryState)value);
-                            break;
-                        case "Usb":
-                            _alwaysOnUsbFeature.SetState((AlwaysOnUsbState)value);
-                            break;
-                    }
-                });
-            }
-            catch (Exception ex)
+        // ── Button handlers ───────────────────────────────────────────────────────
+        private void btnAbout_Click(object sender, RoutedEventArgs e)
+        {
+            var handle = new WindowInteropHelper(this).EnsureHandle();
+            var dlg = new AboutWindow(handle);
+            dlg.ShowDialog();
+        }
+
+        private async void btnRefresh_Click(object sender, RoutedEventArgs e) =>
+            await RefreshAsync();
+
+        private void btnSettings_Click(object sender, RoutedEventArgs e)
+        {
+            var handle = new WindowInteropHelper(this).EnsureHandle();
+            var dlg = new SettingsWindow(handle, _app);
+            dlg.ShowDialog();
+            if (dlg.DialogResult == true)
             {
-                Trace.TraceError(ex.Message);
+                _app.ApplyTheme(_app.Settings.DarkMode);
+                ChangeLanguage();
             }
         }
 
-        private void chkFnLock_Checked(object sender, RoutedEventArgs e)
+        private void btnExit_Click(object sender, RoutedEventArgs e) =>
+            _app.Shutdown(0);
+
+        // ── Feature handlers ─────────────────────────────────────────────────────
+        private void radioPowerMode_Checked(object sender, RoutedEventArgs e)
         {
             if (_refreshing) return;
+            var newState = (PowerModeState)Array.IndexOf(_powerModeButtons, sender);
+            SafeSet(() => _powerModeFeature.SetAcState(newState));
+        }
 
-            SafeSet(() => _fnLockFeature.SetState(
-                chkFnLock.IsChecked == true ? FnLockState.On : FnLockState.Off));
+        private void radioBattery_Checked(object sender, RoutedEventArgs e)
+        {
+            if (_refreshing) return;
+            var newState = (BatteryState)Array.IndexOf(_batteryButtons, sender);
+            if (_batteryFeature.GetState() != newState)
+                SafeSet(() => _batteryFeature.SetState(newState));
+        }
+
+        private void radioAlwaysOnUsb_Checked(object sender, RoutedEventArgs e)
+        {
+            if (_refreshing) return;
+            var newState = (AlwaysOnUsbState)Array.IndexOf(_alwaysOnUsbButtons, sender);
+            if (_alwaysOnUsbFeature.GetState() != newState)
+                SafeSet(() => _alwaysOnUsbFeature.SetState(newState));
         }
 
         private void chkTouchpadLock_Checked(object sender, RoutedEventArgs e)
         {
             if (_refreshing) return;
+            var newState = chkTouchpadLock.IsChecked == true
+                ? TouchpadLockState.Off : TouchpadLockState.On;
+            if (_touchpadLockFeature.GetState() != newState)
+                SafeSet(() => _touchpadLockFeature.SetState(newState));
+        }
 
-            SafeSet(() => _touchpadLockFeature.SetState(
-                chkTouchpadLock.IsChecked == true ? TouchpadLockState.Off : TouchpadLockState.On));
+        private void chkFnLock_Checked(object sender, RoutedEventArgs e)
+        {
+            if (_refreshing) return;
+            var newState = chkFnLock.IsChecked == true ? FnLockState.On : FnLockState.Off;
+            if (_fnLockFeature.GetState() != newState)
+                SafeSet(() => _fnLockFeature.SetState(newState));
         }
 
         private static void SafeSet(Action action)
         {
-            try { action(); }
-            catch (Exception ex) { Trace.TraceError(ex.Message); }
+            try   { action(); }
+            catch (Exception e) { Trace.TraceError("Failed to set feature: " + e.Message); }
         }
 
-        private void btnAbout_Click(object sender, RoutedEventArgs e)
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
-            var dlg = new AboutWindow(new WindowInteropHelper(this).EnsureHandle());
-            dlg.ShowDialog();
+            Hide();
+            e.Cancel = true;
         }
 
-        private void btnSettings_Click(object sender, RoutedEventArgs e)
+        // ── Localisation ──────────────────────────────────────────────────────────
+        private void ChangeLanguage()
         {
-            var dlg = new SettingsWindow(new WindowInteropHelper(this).EnsureHandle(), _app);
-            dlg.ShowDialog();
-        }
+            switch (_app.Settings.Culture)
+            {
+                case "RU":
+                    batteryGroup.Text              = "Зарядка батареи";
+                    radioConservation.Content      = "Сбережение";
+                    radioNormalCharge.Content      = "Нормальная";
+                    radioRapidCharge.Content       = "Быстрая";
+                    powerModeGroup.Text            = "Режим питания";
+                    radioQuiet.Content             = "Экономия";
+                    radioBalance.Content           = "Баланс";
+                    radioPerformance.Content       = "Производительность";
+                    alwaysGroup.Text               = "Always on USB";
+                    radioAlwaysOnUsbOff.Content            = "Выкл.";
+                    radioAlwaysOnUsbOnWhenSleeping.Content = "Во сне";
+                    radioAlwaysOnUsbOnAlways.Content       = "Всегда";
+                    miscGroup.Text                 = "Дополнительные опции";
+                    fnLockTitle.Text               = "Fn Lock";
+                    fnLockSubtitle.Text            = "Эмулирует удержание клавиши Fn";
+                    touchpadTitle.Text             = "Тачпад";
+                    touchpadSubtitle.Text          = "Включить или отключить тачпад";
+                    btnAbout.Content = "О программе";
+                    btnExit.Content                = "Выход";
+                    break;
 
-        private void btnExit_Click(object sender, RoutedEventArgs e)
-        {
-            _app.Shutdown(0);
+                case "UA":
+                    batteryGroup.Text              = "Зарядка батареї";
+                    radioConservation.Content      = "Збереження";
+                    radioNormalCharge.Content      = "Нормальна";
+                    radioRapidCharge.Content       = "Швидка";
+                    powerModeGroup.Text            = "Режим живлення";
+                    radioQuiet.Content             = "Економія";
+                    radioBalance.Content           = "Баланс";
+                    radioPerformance.Content       = "Продуктивність";
+                    alwaysGroup.Text               = "Always on USB";
+                    radioAlwaysOnUsbOff.Content            = "Вимк.";
+                    radioAlwaysOnUsbOnWhenSleeping.Content = "Уві сні";
+                    radioAlwaysOnUsbOnAlways.Content       = "Завжди";
+                    miscGroup.Text                 = "Додаткові опції";
+                    fnLockTitle.Text               = "Fn Lock";
+                    fnLockSubtitle.Text            = "Емулює утримання клавіші Fn";
+                    touchpadTitle.Text             = "Тачпад";
+                    touchpadSubtitle.Text          = "Увімкнути або вимкнути тачпад";
+                    btnAbout.Content = "Про програму";
+                    btnExit.Content                = "Вихід";
+                    break;
+
+                default:
+                    batteryGroup.Text              = "Battery charge";
+                    radioConservation.Content      = "Conservation";
+                    radioNormalCharge.Content      = "Normal";
+                    radioRapidCharge.Content       = "Rapid";
+                    powerModeGroup.Text            = "Power mode";
+                    radioQuiet.Content             = "Efficiency";
+                    radioBalance.Content           = "Balanced";
+                    radioPerformance.Content       = "Performance";
+                    alwaysGroup.Text               = "Always on USB";
+                    radioAlwaysOnUsbOff.Content            = "Off";
+                    radioAlwaysOnUsbOnWhenSleeping.Content = "Sleeping";
+                    radioAlwaysOnUsbOnAlways.Content       = "Always";
+                    miscGroup.Text                 = "Additional options";
+                    fnLockTitle.Text               = "Fn Lock";
+                    fnLockSubtitle.Text            = "Emulates holding the Fn key permanently";
+                    touchpadTitle.Text             = "Touchpad";
+                    touchpadSubtitle.Text          = "Enable or disable the touchpad";
+                    btnAbout.Content = "About";
+                    btnExit.Content                = "Exit";
+                    break;
+            }
         }
     }
 }
