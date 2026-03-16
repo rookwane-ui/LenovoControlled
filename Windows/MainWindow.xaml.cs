@@ -139,18 +139,21 @@ namespace LenovoController
                             )
                     );
 
-                    Try(
-                        () =>
-                        {
-                            microphone = _microphoneFeature.GetState();
-                            microphoneOk = true;
-                        },
-                        () =>
-                            Dispatcher.Invoke(
-                                () => chkMicrophone.IsEnabled = false
-                            )
-                    );
+                    // NOTE: Microphone is intentionally NOT checked here.
+                    // The COM audio API requires an STA thread. MicrophoneFeature
+                    // handles this internally, but to keep things clean and avoid
+                    // any Dispatcher issues, we check it after Task.Run on the UI thread.
                 });
+
+                // ── Microphone check — must run on UI (STA) thread ──
+                Try(
+                    () =>
+                    {
+                        microphone = _microphoneFeature.GetState();
+                        microphoneOk = true;
+                    },
+                    () => chkMicrophone.IsEnabled = false
+                );
 
                 if (powerOk)
                     _powerModeButtons[(int)powerMode].IsChecked = true;
