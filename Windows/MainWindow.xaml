@@ -54,303 +54,61 @@
         </Style>
     </ui:FluentWindow.Resources>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+<Grid>
+            <!-- POWER MODE -->
+            <ui:Card Grid.Row="1" Margin="0,0,0,12" Padding="12">
+                <StackPanel>
+                    <TextBlock Text="Power Mode" FontWeight="SemiBold"/>
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton Content="Efficiency" Tag="PowerMode" CommandParameter="0"
+                                     Checked="RadioGroup_Checked"/>
+                        <RadioButton Content="Balanced" Tag="PowerMode" CommandParameter="1"
+                                     Checked="RadioGroup_Checked"/>
+                        <RadioButton Content="Performance" Tag="PowerMode" CommandParameter="2"
+                                     Checked="RadioGroup_Checked"/>
+                    </StackPanel>
+                </StackPanel>
+            </ui:Card>
 
-        <!-- WPF-UI title bar with Mica -->
-        <ui:TitleBar Grid.Row="0" Title="Lenovo Controller"/>
+            <!-- USB -->
+            <ui:Card Grid.Row="2" Margin="0,0,0,12" Padding="12">
+                <StackPanel>
+                    <TextBlock Text="Always On USB" FontWeight="SemiBold"/>
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton Content="Off" Tag="Usb" CommandParameter="0"
+                                     Checked="RadioGroup_Checked"/>
+                        <RadioButton Content="Sleeping" Tag="Usb" CommandParameter="1"
+                                     Checked="RadioGroup_Checked"/>
+                        <RadioButton Content="Always" Tag="Usb" CommandParameter="2"
+                                     Checked="RadioGroup_Checked"/>
+                    </StackPanel>
+                </StackPanel>
+            </ui:Card>
 
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="16,8,16,16">
-
-                <!-- ══ BATTERY CHARGE ══ -->
-                <TextBlock x:Name="batteryGroup"
-                           Text="Battery charge"
-                           FontSize="13" FontWeight="SemiBold"
-                           Margin="4,8,0,6"/>
-
-                <ui:Card Margin="0,0,0,0">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="44"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Border Width="36" Height="36" CornerRadius="8"
-                                Background="#FFF3E0" HorizontalAlignment="Left"
-                                VerticalAlignment="Center"
-                                Grid.RowSpan="2">
-                            <ui:SymbolIcon Symbol="BatteryCharge24" FontSize="18"
-                                           Foreground="#E65100"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"/>
-                        </Border>
-
-                        <TextBlock x:Name="batteryTitle" Grid.Column="1"
-                                   Text="Battery charge" FontSize="13"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center"/>
-
-                        <Border Grid.Column="2" Grid.RowSpan="2"
-                                VerticalAlignment="Center"
-                                CornerRadius="8" Padding="3"
-                                Background="{DynamicResource ControlFillColorDefaultBrush}">
-                            <StackPanel Orientation="Horizontal">
-                                <RadioButton x:Name="radioConservation" GroupName="BatteryCharge"
-                                             Content="Conservation"
-                                             Style="{StaticResource SegmentStyle}"
-                                             Checked="radioBattery_Checked"/>
-                                <RadioButton x:Name="radioNormalCharge" GroupName="BatteryCharge"
-                                             Content="Normal"
-                                             Style="{StaticResource SegmentStyle}"
-                                             Checked="radioBattery_Checked"/>
-                                <RadioButton x:Name="radioRapidCharge" GroupName="BatteryCharge"
-                                             Content="Rapid"
-                                             Style="{StaticResource SegmentStyle}"
-                                             Checked="radioBattery_Checked"/>
-                            </StackPanel>
-                        </Border>
-
-                        <TextBlock x:Name="batterySubtitle" Grid.Row="1" Grid.Column="1"
-                                   Text="Conservation limits charging to 60% to extend battery lifespan"
-                                   FontSize="11" Margin="0,3,8,0" Opacity="0.6"
-                                   TextWrapping="Wrap"/>
-                    </Grid>
-                </ui:Card>
-
-                <!-- ══ POWER MODE ══ -->
-                <TextBlock x:Name="powerModeGroup"
-                           Text="Power mode"
-                           FontSize="13" FontWeight="SemiBold"
-                           Margin="4,16,0,6"/>
-
-                <ui:Card>
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="44"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Border Width="36" Height="36" CornerRadius="8"
-                                Background="#E8F5E9" HorizontalAlignment="Left"
-                                VerticalAlignment="Center"
-                                Grid.RowSpan="2">
-                            <ui:SymbolIcon Symbol="LeafOne24" FontSize="18"
-                                           Foreground="#2E7D32"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"/>
-                        </Border>
-
-                        <!-- Title row -->
-                        <TextBlock x:Name="powerTitle" Grid.Column="1"
-                                   Text="Power mode" FontSize="13"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center"/>
-
-                        <!-- Segment control spans both rows on the right -->
-                        <Border Grid.Column="2" Grid.RowSpan="2"
-                                VerticalAlignment="Center"
-                                CornerRadius="8" Padding="3"
-                                Background="{DynamicResource ControlFillColorDefaultBrush}">
-                            <StackPanel Orientation="Horizontal">
-                                <RadioButton x:Name="radioQuiet" GroupName="PowerMode"
-                                             Content="Efficiency"
-                                             Style="{StaticResource SegmentStyle}"
-                                             Checked="radioPowerMode_Checked"/>
-                                <RadioButton x:Name="radioBalance" GroupName="PowerMode"
-                                             Content="Balanced"
-                                             Style="{StaticResource SegmentStyle}"
-                                             Checked="radioPowerMode_Checked"/>
-                                <RadioButton x:Name="radioPerformance" GroupName="PowerMode"
-                                             Content="Performance"
-                                             Style="{StaticResource SegmentStyle}"
-                                             Checked="radioPowerMode_Checked"/>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- Subtitle below title -->
-                        <TextBlock x:Name="powerSubtitle" Grid.Row="1" Grid.Column="1"
-                                   Text="Controls performance and battery life"
-                                   FontSize="11" Margin="0,3,8,0" Opacity="0.6"
-                                   TextWrapping="Wrap"/>
-                    </Grid>
-                </ui:Card>
-
-                <!-- ══ ALWAYS ON USB ══ -->
-                <TextBlock x:Name="alwaysGroup"
-                           Text="Always on USB"
-                           FontSize="13" FontWeight="SemiBold"
-                           Margin="4,16,0,6"/>
-
-                <ui:Card>
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="44"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Border Width="36" Height="36" CornerRadius="8"
-                                Background="#E3F2FD" HorizontalAlignment="Left"
-                                VerticalAlignment="Center"
-                                Grid.RowSpan="2">
-                            <ui:SymbolIcon Symbol="PlugConnected24" FontSize="18"
-                                           Foreground="#1565C0"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"/>
-                        </Border>
-
-                        <TextBlock x:Name="usbTitle" Grid.Column="1"
-                                   Text="Always on USB" FontSize="13"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center"/>
-
-                        <Border Grid.Column="2" Grid.RowSpan="2"
-                                VerticalAlignment="Center"
-                                CornerRadius="8" Padding="3"
-                                Background="{DynamicResource ControlFillColorDefaultBrush}">
-                            <StackPanel Orientation="Horizontal">
-                                <RadioButton x:Name="radioAlwaysOnUsbOff" GroupName="Usb"
-                                             Content="Off"
-                                             Style="{StaticResource SegmentStyle}"
-                                             Checked="radioAlwaysOnUsb_Checked"/>
-                                <RadioButton x:Name="radioAlwaysOnUsbOnWhenSleeping" GroupName="Usb"
-                                             Content="Sleeping"
-                                             Style="{StaticResource SegmentStyle}"
-                                             Checked="radioAlwaysOnUsb_Checked"/>
-                                <RadioButton x:Name="radioAlwaysOnUsbOnAlways" GroupName="Usb"
-                                             Content="Always"
-                                             Style="{StaticResource SegmentStyle}"
-                                             Checked="radioAlwaysOnUsb_Checked"/>
-                            </StackPanel>
-                        </Border>
-
-                        <TextBlock x:Name="usbSubtitle" Grid.Row="1" Grid.Column="1"
-                                   Text="Charge USB devices when the laptop is off, sleeping, or hibernated"
-                                   FontSize="11" Margin="0,3,8,0" Opacity="0.6"
-                                   TextWrapping="Wrap"/>
-                    </Grid>
-                </ui:Card>
-
-                <!-- ══ ADDITIONAL OPTIONS ══ -->
-                <TextBlock x:Name="miscGroup"
-                           Text="Additional options"
-                           FontSize="13" FontWeight="SemiBold"
-                           Margin="4,16,0,6"/>
-
-                <!-- Fn Lock -->
-                <ui:CardControl Margin="0,0,0,1" MinHeight="64" Padding="16,10">
-                    <ui:CardControl.Header>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="44"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Border Width="36" Height="36" CornerRadius="8"
-                                    Background="#EDE7F6" HorizontalAlignment="Left"
-                                    VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="Keyboard24" FontSize="18"
-                                               Foreground="#4527A0"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"/>
-                            </Border>
-                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock x:Name="fnLockTitle" Text="Fn Lock" FontSize="13"
-                                               FontWeight="SemiBold"/>
-                                <TextBlock x:Name="fnLockSubtitle"
-                                           Text="Emulates holding the Fn key permanently"
-                                           FontSize="11" Margin="0,3,0,0" Opacity="0.6"
-                                           TextWrapping="Wrap"/>
-                            </StackPanel>
-                        </Grid>
-                    </ui:CardControl.Header>
+            <!-- TOGGLES -->
+            <ui:Card Grid.Row="3" Margin="0,0,0,12" Padding="12">
+                <StackPanel>
                     <ui:ToggleSwitch x:Name="chkFnLock"
+                                     Content="Fn Lock"
                                      Checked="chkFnLock_Checked"
                                      Unchecked="chkFnLock_Checked"/>
-                </ui:CardControl>
-
-                <!-- Touchpad -->
-                <ui:CardControl MinHeight="64" Padding="16,10">
-                    <ui:CardControl.Header>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="44"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Border Width="36" Height="36" CornerRadius="8"
-                                    Background="#E0F7FA" HorizontalAlignment="Left"
-                                    VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="CursorHover24" FontSize="18"
-                                               Foreground="#006064"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"/>
-                            </Border>
-                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock x:Name="touchpadTitle" Text="Touchpad" FontSize="13"
-                                               FontWeight="SemiBold"/>
-                                <TextBlock x:Name="touchpadSubtitle"
-                                           Text="Enable or disable the touchpad"
-                                           FontSize="11" Margin="0,3,0,0" Opacity="0.6"
-                                           TextWrapping="Wrap"/>
-                            </StackPanel>
-                        </Grid>
-                    </ui:CardControl.Header>
                     <ui:ToggleSwitch x:Name="chkTouchpadLock"
+                                     Content="Touchpad"
                                      Checked="chkTouchpadLock_Checked"
                                      Unchecked="chkTouchpadLock_Checked"/>
-                </ui:CardControl>
+                </StackPanel>
+            </ui:Card>
 
-                <!-- ══ FOOTER ══ -->
-                <Grid Margin="0,16,0,0" Height="34">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="42"/>
-                        <ColumnDefinition Width="42"/>
-                        <ColumnDefinition Width="88"/>
-                    </Grid.ColumnDefinitions>
-                    <ui:Button x:Name="btnAbout" HorizontalAlignment="Stretch"
-                               VerticalAlignment="Stretch" Content="About"
-                               Click="btnAbout_Click"/>
-                    <ui:Button x:Name="btnRefresh" Grid.Column="1"
-                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                               Margin="8,0,0,0" Padding="0" ToolTip="Refresh"
-                               Click="btnRefresh_Click">
-                        <ui:SymbolIcon Symbol="ArrowClockwise24" FontSize="16"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </ui:Button>
-                    <ui:Button x:Name="btnSettings" Grid.Column="2"
-                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                               Margin="8,0,0,0" Padding="0" ToolTip="Settings"
-                               Click="btnSettings_Click">
-                        <ui:SymbolIcon Symbol="Settings24" FontSize="16"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </ui:Button>
-                    <ui:Button x:Name="btnExit" Grid.Column="3"
-                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                               Margin="8,0,0,0"
-                               Content="Exit" Click="btnExit_Click"
-                               Appearance="Secondary"/>
-                </Grid>
-
+            <!-- FOOTER -->
+            <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+                <ui:Button Content="Refresh" Click="btnRefresh_Click" Margin="0,0,8,0"/>
+                <ui:Button Content="Settings" Click="btnSettings_Click" Margin="0,0,8,0"/>
+                <ui:Button Content="About" Click="btnAbout_Click" Margin="0,0,8,0"/>
+                <ui:Button Content="Exit" Click="btnExit_Click" Appearance="Secondary"/>
             </StackPanel>
-        </ScrollViewer>
-    </Grid>
+
+        </Grid>
+    </ScrollViewer>
+</Grid>
 
 </ui:FluentWindow>
