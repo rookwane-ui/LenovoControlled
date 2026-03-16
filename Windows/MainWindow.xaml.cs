@@ -138,21 +138,29 @@ namespace LenovoController
                                 () => chkFnLock.IsEnabled = false
                             )
                     );
-
-                    // NOTE: Microphone is intentionally NOT checked here.
-                    // The COM audio API requires an STA thread. MicrophoneFeature
-                    // handles this internally, but to keep things clean and avoid
-                    // any Dispatcher issues, we check it after Task.Run on the UI thread.
                 });
 
-                // ── Microphone check — must run on UI (STA) thread ──
+                // ── Microphone check — on UI thread, with debug error popup ──
                 Try(
                     () =>
                     {
+                        if (!_microphoneFeature.IsSupported())
+                            throw new Exception("IsSupported() returned false — no active capture devices found");
+
                         microphone = _microphoneFeature.GetState();
                         microphoneOk = true;
                     },
-                    () => chkMicrophone.IsEnabled = false
+                    () =>
+                    {
+                        // DEBUG: show exact exception so we can fix the real cause
+                        try { _microphoneFeature.GetState(); }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.ToString(), "Mic GetState() failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+
+                        chkMicrophone.IsEnabled = false;
+                    }
                 );
 
                 if (powerOk)
