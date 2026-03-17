@@ -14,7 +14,6 @@ namespace LenovoController
     public partial class MainWindow : Wpf.Ui.Controls.FluentWindow, INotifyPropertyChanged
     {
         // ── Features ─────────────────────────────────────────────
-        private readonly AlwaysOnUsbFeature  _alwaysOnUsbFeature  = new AlwaysOnUsbFeature();
         private readonly BatteryFeature      _batteryFeature      = new BatteryFeature();
         private readonly PowerModeFeature    _powerModeFeature    = new PowerModeFeature();
         private readonly FnLockFeature       _fnLockFeature       = new FnLockFeature();
@@ -24,7 +23,6 @@ namespace LenovoController
 
         private RadioButton[] _batteryButtons;
         private RadioButton[] _powerModeButtons;
-        private RadioButton[] _alwaysOnUsbButtons;
 
         private readonly App _app;
         private bool _refreshing;
@@ -55,14 +53,6 @@ namespace LenovoController
             _powerModeButtons =
                 new[] { radioQuiet, radioBalance, radioPerformance };
 
-            _alwaysOnUsbButtons =
-                new[]
-                {
-                    radioAlwaysOnUsbOff,
-                    radioAlwaysOnUsbOnWhenSleeping,
-                    radioAlwaysOnUsbOnAlways
-                };
-
             Loaded += async (_, __) => await RefreshAsync();
         }
 
@@ -75,7 +65,6 @@ namespace LenovoController
             try
             {
                 BatteryState battery = default;
-                AlwaysOnUsbState usb = default;
                 PowerModeState powerMode = default;
 
                 bool touchpad = false;
@@ -84,7 +73,6 @@ namespace LenovoController
                 bool camera = false;
 
                 bool batteryOk = false;
-                bool usbOk = false;
                 bool powerOk = false;
                 bool touchpadOk = false;
                 bool fnLockOk = false;
@@ -109,15 +97,6 @@ namespace LenovoController
                             batteryOk = true;
                         },
                         () => DisableControls(_batteryButtons)
-                    );
-
-                    Try(
-                        () =>
-                        {
-                            usb = _alwaysOnUsbFeature.GetState();
-                            usbOk = true;
-                        },
-                        () => DisableControls(_alwaysOnUsbButtons)
                     );
 
                     Try(
@@ -148,7 +127,6 @@ namespace LenovoController
                             )
                     );
 
-                    // Microphone — simple registry read, no threading concerns
                     Try(
                         () =>
                         {
@@ -161,7 +139,6 @@ namespace LenovoController
                             )
                     );
 
-                    // Camera — simple registry read
                     Try(
                         () =>
                         {
@@ -180,9 +157,6 @@ namespace LenovoController
 
                 if (batteryOk)
                     _batteryButtons[(int)battery].IsChecked = true;
-
-                if (usbOk)
-                    _alwaysOnUsbButtons[(int)usb].IsChecked = true;
 
                 if (touchpadOk)
                     chkTouchpadLock.IsChecked = touchpad;
@@ -275,26 +249,7 @@ namespace LenovoController
                 SafeSet(() => _batteryFeature.SetState(newState));
         }
 
-        private void radioAlwaysOnUsb_Checked(
-            object sender,
-            RoutedEventArgs e
-        )
-        {
-            if (_refreshing)
-                return;
-
-            var newState =
-                (AlwaysOnUsbState)
-                    Array.IndexOf(_alwaysOnUsbButtons, sender);
-
-            if (_alwaysOnUsbFeature.GetState() != newState)
-                SafeSet(() => _alwaysOnUsbFeature.SetState(newState));
-        }
-
-        private void chkTouchpadLock_Checked(
-            object sender,
-            RoutedEventArgs e
-        )
+        private void chkTouchpadLock_Checked(object sender, RoutedEventArgs e)
         {
             if (_refreshing)
                 return;
@@ -390,16 +345,13 @@ namespace LenovoController
             }
         }
 
-        private void Window_Closing(
-            object sender,
-            CancelEventArgs e
-        )
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
             Hide();
             e.Cancel = true;
         }
 
-        // ── Localisation (unchanged) ─────────────────────────────
+        // ── Localisation ─────────────────────────────────────────
         private void ChangeLanguage()
         {
             switch (_app.Settings.Culture)
@@ -407,6 +359,7 @@ namespace LenovoController
                 case "RU":
                     batteryGroup.Text = "Зарядка батареи";
                     miscGroup.Text = "Дополнительные опции";
+                    privacyGroup.Text = "Конфиденциальность";
                     btnAbout.Content = "О программе";
                     btnExit.Content = "Выход";
                     break;
@@ -414,6 +367,7 @@ namespace LenovoController
                 case "UA":
                     batteryGroup.Text = "Зарядка батареї";
                     miscGroup.Text = "Додаткові опції";
+                    privacyGroup.Text = "Конфіденційність";
                     btnAbout.Content = "Про програму";
                     btnExit.Content = "Вихід";
                     break;
@@ -421,6 +375,7 @@ namespace LenovoController
                 default:
                     batteryGroup.Text = "Battery charge";
                     miscGroup.Text = "Additional options";
+                    privacyGroup.Text = "Privacy";
                     btnAbout.Content = "About";
                     btnExit.Content = "Exit";
                     break;

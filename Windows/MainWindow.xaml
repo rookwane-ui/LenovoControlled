@@ -187,65 +187,81 @@
                     </Grid>
                 </ui:Card>
 
-                <!-- ══ ALWAYS ON USB ══ -->
-                <TextBlock x:Name="alwaysOnUsbGroup"
-                           Text="Always on USB"
+                <!-- ══ PRIVACY ══ -->
+                <TextBlock x:Name="privacyGroup"
+                           Text="Privacy"
                            FontSize="13" FontWeight="SemiBold"
                            Margin="4,16,0,6"/>
 
-                <ui:Card>
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="44"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Border Width="36" Height="36" CornerRadius="8"
-                                Background="#E3F2FD" HorizontalAlignment="Left"
-                                VerticalAlignment="Center"
-                                Grid.RowSpan="2">
-                            <ui:SymbolIcon Symbol="UsbPlug24" FontSize="18"
-                                           Foreground="#0D47A1"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"/>
-                        </Border>
-
-                        <TextBlock x:Name="usbTitle" Grid.Column="1"
-                                   Text="Always on USB" FontSize="13"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center"/>
-
-                        <Border Grid.Column="2" Grid.RowSpan="2"
-                                VerticalAlignment="Center"
-                                CornerRadius="8" Padding="3"
-                                Background="{DynamicResource ControlFillColorDefaultBrush}">
-                            <StackPanel Orientation="Horizontal">
-                                <RadioButton x:Name="radioAlwaysOnUsbOff" GroupName="AlwaysOnUsb"
-                                             Content="Off"
-                                             Style="{StaticResource SegmentStyle}"
-                                             Checked="radioAlwaysOnUsb_Checked"/>
-                                <RadioButton x:Name="radioAlwaysOnUsbOnWhenSleeping" GroupName="AlwaysOnUsb"
-                                             Content="Sleep"
-                                             Style="{StaticResource SegmentStyle}"
-                                             Checked="radioAlwaysOnUsb_Checked"/>
-                                <RadioButton x:Name="radioAlwaysOnUsbOnAlways" GroupName="AlwaysOnUsb"
-                                             Content="Always"
-                                             Style="{StaticResource SegmentStyle}"
-                                             Checked="radioAlwaysOnUsb_Checked"/>
+                <!-- Microphone -->
+                <ui:CardControl Margin="0,0,0,1" MinHeight="64" Padding="16,10">
+                    <ui:CardControl.Header>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="44"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Width="36" Height="36" CornerRadius="8"
+                                    Background="#FCE4EC"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                                <ui:SymbolIcon Symbol="Mic24"
+                                               FontSize="18"
+                                               Foreground="#C2185B"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="Microphone"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="Enable or disable microphone access for all apps"
+                                           FontSize="11"
+                                           Margin="0,3,0,0"
+                                           Opacity="0.6"
+                                           TextWrapping="Wrap"/>
                             </StackPanel>
-                        </Border>
+                        </Grid>
+                    </ui:CardControl.Header>
+                    <ui:ToggleSwitch x:Name="chkMicrophone"
+                                     Checked="chkMicrophone_Checked"
+                                     Unchecked="chkMicrophone_Checked"/>
+                </ui:CardControl>
 
-                        <TextBlock x:Name="usbSubtitle" Grid.Row="1" Grid.Column="1"
-                                   Text="Charge USB devices when the laptop is off, sleeping, or hibernated"
-                                   FontSize="11" Margin="0,3,8,0" Opacity="0.6"
-                                   TextWrapping="Wrap"/>
-                    </Grid>
-                </ui:Card>
+                <!-- Camera -->
+                <ui:CardControl MinHeight="64" Padding="16,10">
+                    <ui:CardControl.Header>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="44"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Width="36" Height="36" CornerRadius="8"
+                                    Background="#E8EAF6"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                                <ui:SymbolIcon Symbol="Camera24"
+                                               FontSize="18"
+                                               Foreground="#283593"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="Camera"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="Enable or disable camera access for all apps"
+                                           FontSize="11"
+                                           Margin="0,3,0,0"
+                                           Opacity="0.6"
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Grid>
+                    </ui:CardControl.Header>
+                    <ui:ToggleSwitch x:Name="chkCamera"
+                                     Checked="chkCamera_Checked"
+                                     Unchecked="chkCamera_Checked"/>
+                </ui:CardControl>
 
                 <!-- ══ ADDITIONAL OPTIONS ══ -->
                 <TextBlock x:Name="miscGroup"
@@ -285,7 +301,7 @@
                 </ui:CardControl>
 
                 <!-- Touchpad -->
-                <ui:CardControl Margin="0,0,0,1" MinHeight="64" Padding="16,10">
+                <ui:CardControl MinHeight="64" Padding="16,10">
                     <ui:CardControl.Header>
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -313,76 +329,6 @@
                     <ui:ToggleSwitch x:Name="chkTouchpadLock"
                                      Checked="chkTouchpadLock_Checked"
                                      Unchecked="chkTouchpadLock_Checked"/>
-                </ui:CardControl>
-
-                <!-- Microphone -->
-                <ui:CardControl Margin="0,0,0,1" MinHeight="64" Padding="16,10">
-                    <ui:CardControl.Header>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="44"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Border Width="36" Height="36" CornerRadius="8"
-                                    Background="#FCE4EC"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="Mic24"
-                                               FontSize="18"
-                                               Foreground="#C2185B"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"/>
-                            </Border>
-                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock Text="Microphone"
-                                           FontSize="13"
-                                           FontWeight="SemiBold"/>
-                                <TextBlock Text="Enable or disable the microphone"
-                                           FontSize="11"
-                                           Margin="0,3,0,0"
-                                           Opacity="0.6"
-                                           TextWrapping="Wrap"/>
-                            </StackPanel>
-                        </Grid>
-                    </ui:CardControl.Header>
-                    <ui:ToggleSwitch x:Name="chkMicrophone"
-                                     Checked="chkMicrophone_Checked"
-                                     Unchecked="chkMicrophone_Checked"/>
-                </ui:CardControl>
-
-                <!-- Camera -->
-                <ui:CardControl MinHeight="64" Padding="16,10">
-                    <ui:CardControl.Header>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="44"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Border Width="36" Height="36" CornerRadius="8"
-                                    Background="#E8EAF6"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="Camera24"
-                                               FontSize="18"
-                                               Foreground="#283593"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"/>
-                            </Border>
-                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock Text="Camera"
-                                           FontSize="13"
-                                           FontWeight="SemiBold"/>
-                                <TextBlock Text="Enable or disable camera access via Windows privacy"
-                                           FontSize="11"
-                                           Margin="0,3,0,0"
-                                           Opacity="0.6"
-                                           TextWrapping="Wrap"/>
-                            </StackPanel>
-                        </Grid>
-                    </ui:CardControl.Header>
-                    <ui:ToggleSwitch x:Name="chkCamera"
-                                     Checked="chkCamera_Checked"
-                                     Unchecked="chkCamera_Checked"/>
                 </ui:CardControl>
 
                 <!-- ══ FOOTER ══ -->
