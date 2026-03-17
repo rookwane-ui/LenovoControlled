@@ -1,53 +1,24 @@
 using Microsoft.Win32;
 using System;
-using System.Runtime.InteropServices;
-using System.ServiceProcess;
+using System.Diagnostics;
 
 namespace LenovoController.Features
 {
     public class CameraFeature
     {
-        private const string KeyPath =
-            @"SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam";
+        // Group Policy key — enforced system-wide, overrides ConsentStore
+        // LetAppsAccessCamera: 0 = user controlled, 1 = force allow, 2 = force deny
+        private const string PolicyKeyPath =
+            @"SOFTWARE\Policies\Microsoft\Windows\AppPrivacy";
 
-        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-        private static extern IntPtr SendMessageTimeout(
-            IntPtr hWnd, uint Msg, IntPtr wParam, string lParam,
-            uint fuFlags, uint uTimeout, out IntPtr lpdwResult);
-
-        private static readonly IntPtr HWND_BROADCAST = new IntPtr(0xffff);
-        private const uint WM_SETTINGCHANGE = 0x001A;
-        private const uint SMTO_ABORTIFHUNG = 0x0002;
-
-        private static void BroadcastSettingChange()
-        {
-            SendMessageTimeout(
-                HWND_BROADCAST, WM_SETTINGCHANGE, IntPtr.Zero,
-                "ConsentStore", SMTO_ABORTIFHUNG, 5000, out _);
-        }
-
-        private static void RestartCamSvc()
-        {
-            try
-            {
-                using var sc = new ServiceController("CamSvc");
-                if (sc.Status == ServiceControllerStatus.Running)
-                {
-                    sc.Stop();
-                    sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(5));
-                }
-                sc.Start();
-                sc.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(5));
-            }
-            catch { /* service may not exist on all systems */ }
-        }
+        private const string PolicyValueName = "LetAppsAccessCamera";
 
         public bool IsSupported()
         {
             try
             {
-                using var key = Registry.CurrentUser.OpenSubKey(KeyPath);
-                return key != null;
+                // Always supported — we create the key if it doesn't exist
+                return true;
             }
             catch
             {
@@ -55,39 +26,70 @@ namespace LenovoController.Features
             }
         }
 
-        // Reads from HKCU parent key
+        // true = camera ON, false = camera OFF
         public bool GetState()
         {
-            using var key = Registry.CurrentUser.OpenSubKey(KeyPath)
-                ?? throw new Exception("Camera registry key not found in HKCU.");
+            using var key = Registry.LocalMachine.OpenSubKey(PolicyKeyPath);
+            if (key == null) return true; // key absent = user controlled = allow
 
-            var value = key.GetValue("Value") as string;
-            return string.Equals(value, "Allow", StringComparison.OrdinalIgnoreCase);
+            var val = key.GetValue(PolicyValueName);
+            if (val == null) return true; // value absent = allow
+
+            return (int)val != 2; // 2 = force deny
         }
 
         public void SetState(bool enabled)
         {
-            string value = enabled ? "Allow" : "Deny";
-
-            // Write HKCU parent + all per-app subkeys
-            using (var parent = Registry.CurrentUser.OpenSubKey(KeyPath, writable: true)
-                ?? Registry.CurrentUser.CreateSubKey(KeyPath))
+            if (enabled)
             {
-                parent.SetValue("Value", value, RegistryValueKind.String);
-
-                foreach (var subkeyName in parent.GetSubKeyNames())
-                {
-                    using var sub = parent.OpenSubKey(subkeyName, writable: true);
-                    if (sub?.GetValue("Value") != null)
-                        sub.SetValue("Value", value, RegistryValueKind.String);
-                }
+                // Remove the policy entirely — restores user control (allow)
+                using var key = Registry.LocalMachine.OpenSubKey(PolicyKeyPath, writable: true);
+                key?.DeleteValue(PolicyValueName, throwOnMissingValue: false);
+            }
+            else
+            {
+                // Create key if needed, set force deny
+                using var key = Registry.LocalMachine.CreateSubKey(PolicyKeyPath, writable: true);
+                key.SetValue(PolicyValueName, 2, RegistryValueKind.DWord);
             }
 
-            // Restart CamSvc to enforce the change immediately
-            RestartCamSvc();
+            // Apply group policy immediately without full gpupdate
+            RefreshPolicy();
+        }
 
-            // Broadcast to notify running apps
-            BroadcastSettingChange();
+        private static void RefreshPolicy()
+        {
+            try
+            {
+                // RefreshPolicy(true) = machine policy, faster than gpupdate /force
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "rundll32.exe",
+                        Arguments = "user32.dll,UpdatePerUserSystemParameters 1, True",
+                        CreateNoWindow = true,
+                        UseShellExecute = false
+                    }
+                };
+                process.Start();
+                process.WaitForExit();
+
+                // Also run gpupdate for machine policy
+                var gp = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "gpupdate.exe",
+                        Arguments = "/force /target:computer /wait:0",
+                        CreateNoWindow = true,
+                        UseShellExecute = false
+                    }
+                };
+                gp.Start();
+                // Don't wait — gpupdate can be slow, registry change is already written
+            }
+            catch { /* non-critical */ }
         }
     }
 }
