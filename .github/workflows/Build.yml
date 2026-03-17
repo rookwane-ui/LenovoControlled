@@ -36,43 +36,26 @@ jobs:
       - name: Build Installer
         run: iscc LenovoController.iss
 
-      - name: Upload app artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: LenovoController
-          path: bin/publish/
-
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
         with:
           name: LenovoController-Installer
-          path: installer/
+          path: installer/LenovoController_Setup_3.0.0.1.exe
 
   release:
     needs: build
     runs-on: windows-latest
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
-      - name: Download app artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: LenovoController
-          path: publish/
-
       - name: Download installer artifact
         uses: actions/download-artifact@v4
         with:
           name: LenovoController-Installer
           path: installer/
 
-      - name: Zip portable build
-        run: Compress-Archive -Path publish/* -DestinationPath LenovoController.zip
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            LenovoController.zip
-            installer/LenovoController_Setup_3.0.0.1.exe
+          files: installer/LenovoController_Setup_3.0.0.1.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
