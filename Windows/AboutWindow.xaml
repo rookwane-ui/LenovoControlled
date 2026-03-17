@@ -5,7 +5,8 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     Title="About"
     Width="420"
-    SizeToContent="Height"
+    Height="680"
+    MinHeight="400"
     ResizeMode="NoResize"
     WindowStartupLocation="CenterOwner"
     ExtendsContentIntoTitleBar="True"
@@ -121,7 +122,6 @@
                     <Grid>
                         <TextBlock Text="Health" FontSize="13" FontWeight="SemiBold"
                                    HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                        <!-- health bar + percentage -->
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
                                     VerticalAlignment="Center">
                             <Border Width="80" Height="8" CornerRadius="4"
