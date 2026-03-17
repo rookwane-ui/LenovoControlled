@@ -147,31 +147,33 @@ namespace LenovoController
                                 () => chkFnLock.IsEnabled = false
                             )
                     );
+
+                    // Microphone — simple registry read, no threading concerns
+                    Try(
+                        () =>
+                        {
+                            microphone = _microphoneFeature.GetState();
+                            microphoneOk = true;
+                        },
+                        () =>
+                            Dispatcher.Invoke(
+                                () => chkMicrophone.IsEnabled = false
+                            )
+                    );
+
+                    // Camera — simple registry read
+                    Try(
+                        () =>
+                        {
+                            camera = _cameraFeature.GetState();
+                            cameraOk = true;
+                        },
+                        () =>
+                            Dispatcher.Invoke(
+                                () => chkCamera.IsEnabled = false
+                            )
+                    );
                 });
-
-                // ── Microphone — on UI (STA) thread ──
-                Try(
-                    () =>
-                    {
-                        if (!_microphoneFeature.IsSupported())
-                            throw new Exception("No active capture devices found");
-                        microphone = _microphoneFeature.GetState();
-                        microphoneOk = true;
-                    },
-                    () => chkMicrophone.IsEnabled = false
-                );
-
-                // ── Camera — HKLM registry read ──
-                Try(
-                    () =>
-                    {
-                        if (!_cameraFeature.IsSupported())
-                            throw new Exception("Camera registry key not found");
-                        camera = _cameraFeature.GetState();
-                        cameraOk = true;
-                    },
-                    () => chkCamera.IsEnabled = false
-                );
 
                 if (powerOk)
                     _powerModeButtons[(int)powerMode].IsChecked = true;
@@ -320,13 +322,26 @@ namespace LenovoController
                 SafeSet(() => _fnLockFeature.SetState(newState));
         }
 
-        private void chkMicrophone_Checked(
-            object sender,
-            RoutedEventArgs e
-        )
+        private void chkMicrophone_Checked(object sender, RoutedEventArgs e)
         {
             if (_refreshing)
                 return;
+
+            if (!IsRunningAsAdmin)
+            {
+                _refreshing = true;
+                chkMicrophone.IsChecked = !chkMicrophone.IsChecked;
+                _refreshing = false;
+
+                MessageBox.Show(
+                    "Microphone control requires administrator privileges.\n\n" +
+                    "Please restart Lenovo Controller as Administrator to use this feature.",
+                    "Administrator Required",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return;
+            }
 
             bool newState = chkMicrophone.IsChecked == true;
 
@@ -339,10 +354,8 @@ namespace LenovoController
             if (_refreshing)
                 return;
 
-            // Warn the user if not running as admin — camera toggle won't work
             if (!IsRunningAsAdmin)
             {
-                // Revert the toggle visually so it doesn't appear to have changed
                 _refreshing = true;
                 chkCamera.IsChecked = !chkCamera.IsChecked;
                 _refreshing = false;
@@ -401,7 +414,7 @@ namespace LenovoController
                 case "UA":
                     batteryGroup.Text = "Зарядка батареї";
                     miscGroup.Text = "Додаткові опції";
-                    btnAbout.Content = "Про программу";
+                    btnAbout.Content = "Про програму";
                     btnExit.Content = "Вихід";
                     break;
 
